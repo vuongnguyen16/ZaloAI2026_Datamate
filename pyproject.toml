@@ -1,0 +1,34 @@
+[project]
+name = "datamate"
+version = "0.1.0"
+description = "DataMate CPU harness and competition contract stub"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = ["duckdb", "pydantic>=2,<3", "pyyaml"]
+
+[project.scripts]
+datamate = "datamate.cli:main"
+
+[dependency-groups]
+cloud = [
+    "modal>=1.6.3",
+]
+dev = ["pytest", "ruff"]
+
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/datamate"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
+markers = ["gpu: remote Modal only", "integration: checks the CPU pipeline"]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

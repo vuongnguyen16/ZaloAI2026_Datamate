@@ -1,0 +1,9 @@
+# Paths are relative to this file. Synthetic fixtures only; no model weights.
+adapter: fake
+input_dir: ../tests/fixtures/synthetic
+output_root: ../runs
+seed: 0
+local_cpu_threads: 2
+memory_limit_mb: 256
+max_fixture_bytes: 1048576
+max_questions: 100

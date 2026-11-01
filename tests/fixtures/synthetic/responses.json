@@ -1,0 +1,4 @@
+[
+  {"sql": "SELECT SUM(amount) AS answer FROM sales", "answer_type": "number"},
+  {"sql": "SELECT code AS answer FROM sales ORDER BY code LIMIT 1", "answer_type": "string"}
+]

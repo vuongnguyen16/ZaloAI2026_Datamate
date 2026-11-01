@@ -1,0 +1,21 @@
+.venv/
+.tools/
+.uv-cache/
+.uv-python/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+.modal.toml
+data/
+models/
+runs/
+dist/
+build/
+*.egg-info/
+*.log
+# Supplied competition materials stay local until redistribution rights are verified.
+/Thể lệ cuộc thi/

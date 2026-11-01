@@ -1,0 +1,68 @@
+[
+  {
+    "id": "S00-A",
+    "title": "Kiểm kê môi trường và phân công local/Modal",
+    "status": "done_with_recorded_unknowns",
+    "acceptance": ["Ghi phần cứng thực đo và công cụ", "Giới hạn CPU local", "Ghi profile/workspace/budget và lịch GPU smoke"],
+    "evidence": ["docs/environment.md", "scripts/doctor.py", "configs/modal_dev.yaml"]
+  },
+  {
+    "id": "S00-B-C",
+    "title": "Project src-layout, lock, bảo toàn dữ liệu và Git remote",
+    "status": "done",
+    "acceptance": ["uv sync --locked trong môi trường sạch", "Core import/smoke thành công", "Raw/model/secret không được track"],
+    "evidence": ["pyproject.toml", "uv.lock", ".python-version", ".gitignore", "reports/s00_setup.md"]
+  },
+  {
+    "id": "S00-D-E-F",
+    "title": "Coding harness, CLI/config/contracts và cổng CPU",
+    "status": "done",
+    "acceptance": ["Phiên mới có task/state/lệnh chạy", "Hai câu synthetic đúng", "Response hỏng/ID sai bị phát hiện", "Cổng fail đúng và pass đúng"],
+    "evidence": ["AGENTS.md", "README.md", "scripts/check.py", "reports/s00_setup.md"]
+  },
+  {
+    "id": "S00-H-G-CPU",
+    "title": "Modal CPU smoke có chặn mạng",
+    "status": "done_with_limitations",
+    "acceptance": ["Profile đã xác thực và ngân sách được giao", "Cloud CPU trả đúng synthetic", "Probe egress thất bại", "Có artifact và runbook"],
+    "evidence": ["infra/modal_app.py", "docs/modal_runbook.md", "reports/s00_setup.md"],
+    "limitations": ["Chưa kiểm tra hard billing cap", "Chưa nghiệm thu Docker candidate và /data read-only trên host tương đương BTC"]
+  },
+  {
+    "id": "P00",
+    "title": "Xác minh contract bằng runner/scorer/Docker guide BTC",
+    "status": "in_progress_missing_official_artifacts",
+    "depends_on": ["S00-B-C"],
+    "acceptance": ["Requirements có nguồn hiện hành", "Stub chạy qua runner/scorer chính thức", "Unknown được ghi rõ"],
+    "evidence": ["docs/requirements.md", "docs/open_questions.md", "runs/train-format-stub/summary.json"]
+  },
+  {
+    "id": "P01",
+    "title": "Inventory và khóa split nội bộ theo business",
+    "status": "todo",
+    "depends_on": ["P00"],
+    "acceptance": ["Business không giao nhau", "Manifest/split seed và lý do", "Khóa split trước nghiên cứu sâu nhãn"],
+    "evidence": ["manifests/kit_files.json chỉ là hash/metadata ban đầu; chưa có data_splits.json"]
+  },
+  {
+    "id": "P04",
+    "title": "Model/SQL worker có process boundary và timeout trên Modal",
+    "status": "todo",
+    "acceptance": ["Model đủ điều kiện được pin", "GPU/network-off smoke thật", "Worker timeout được dừng có cấu trúc"],
+    "evidence": []
+  },
+  {
+    "id": "P05-resume",
+    "title": "Runner thật có fingerprint/resume và streaming output",
+    "status": "todo",
+    "acceptance": ["Crash/resume không trộn config", "Đổi rule/config vô hiệu cache", "Có B0 thật với scorer"],
+    "evidence": []
+  },
+  {
+    "id": "P13-Docker",
+    "title": "Nghiệm thu Docker offline và full run tương đương BTC",
+    "status": "todo",
+    "acceptance": ["Base/image digest đã ghi", "Mount /data read-only, /result ghi được", "Cold start/full run trong budget"],
+    "evidence": ["Dockerfile mới là candidate CPU, chưa build/test trên host Docker"]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "status": "no_real_model_selected",
+  "inference_models": [],
+  "total_parameters": null,
+  "eligibility_verified": false,
+  "fake_adapter_is_model": false,
+  "execution_policy": "all_real_models_on_modal",
+  "next_review": "P04: full revision, public release date, license, total parameters including auxiliary models"
+}

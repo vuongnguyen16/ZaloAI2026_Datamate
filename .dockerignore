@@ -1,0 +1,15 @@
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!predict.sh
+!src/
+!src/**
+!configs/
+!configs/smoke.yaml
+!tests/
+!tests/fixtures/
+!tests/fixtures/synthetic/
+!tests/fixtures/synthetic/**
+**/__pycache__/
+**/*.pyc

@@ -1,0 +1,9 @@
+# User-authorized ceiling. Time/resource limits are separate from billing limits.
+profile: vuonghungnguyen07
+workspace: vuonghungnguyen07
+budget_usd_per_experiment: 30
+gpu: null
+max_containers: 1
+min_containers: 0
+buffer_containers: 0
+status: authenticated_cpu_smoke_passed

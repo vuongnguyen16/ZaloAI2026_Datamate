@@ -1,6 +1,6 @@
 # DataMate
 
-Khởi tạo dự án theo `Research/DataMate_Research_Build_Plan.md` v1.2.
+Khởi tạo dự án theo `Research/DataMate_Research_Build_Plan.md` v1.3.
 Hiện tại có CPU smoke bằng fake adapter và stub kiểm tra format; chưa có model thật hoặc B0.
 
 ## Chạy trên Windows PowerShell
@@ -33,9 +33,22 @@ uv run --locked datamate stub --input data/train --output runs/train-format-stub
 ```
 
 Stub chỉ đọc `questions.jsonl`, xuất mỗi ID một `abstain`; không đọc gold hoặc dữ liệu doanh nghiệp.
-Thư mục output phải mới/trống để tránh trộn run. `predict.sh` gọi stub với `/data` và `/result` theo thể lệ.
-Chưa có evaluator/runner/Docker guide chính thức trong workspace để xác nhận tương thích đầy đủ.
+Thư mục output phải mới/trống để tránh trộn run. `predict.sh` mặc định gọi stub với `/data` và `/result` theo thể lệ; biến `DATAMATE_INPUT_DIR`/`DATAMATE_OUTPUT_DIR` dùng cho phép thử shell ngoài container.
+Chưa có evaluator/runner chính thức trong workspace để xác nhận tương thích đầy đủ.
 `predict` thật ở P05 và `evaluate` ở P02 chưa có; không dùng stub để báo chất lượng model.
+
+## P00 — Kiểm tra contract
+
+```powershell
+uv run --locked datamate validate-input --input data/train
+uv run --locked datamate validate-submission --input data/train --submission runs/train-format-stub/submission.jsonl --require-complete
+uv run --locked datamate validate-logs --input data/train --run runs/train-format-stub
+uv run --locked python scripts/verify_p00.py
+```
+
+Các validator chỉ kiểm tra cấu trúc, tham chiếu business và coverage/log; không đọc gold hoặc tính PA. Thiếu ID được báo là abstain theo tài liệu; `--require-complete` là cổng riêng để bắt lỗi runner bỏ sót câu. JSON sai, ID trùng/ngoài input và type/value sai bị báo lỗi. Kết quả tái hiện của cả train/public test nằm ở `reports/p00_contract_checks.json` và `reports/p00_results.md`.
+
+**Docker hoãn tới P13**, sau khi pipeline hoàn chỉnh, theo quyết định chủ dự án. Không build/test/chỉnh Dockerfile trong các phase hiện tại. Hai file Docker có sẵn là bản nháp chưa kiểm chứng; yêu cầu offline, filesystem và format vẫn được theo dõi. Modal Image cho job cloud vẫn sử dụng bình thường.
 
 ## Local và Modal
 

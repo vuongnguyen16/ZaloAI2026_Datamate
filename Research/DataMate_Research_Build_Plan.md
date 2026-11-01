@@ -1,6 +1,10 @@
 # DataMate — Kế hoạch research từng phần, build từng phần
 
-**Phiên bản:** 1.2 · **Ngày cập nhật:** 01/11/2026, giờ Việt Nam
+**Phiên bản:** 1.3 · **Ngày cập nhật:** 01/11/2026, giờ Việt Nam
+
+**Thay đổi v1.3 — quyết định chủ dự án:** hoãn toàn bộ công việc Docker (viết/chỉnh Dockerfile, build image Docker, thử mount/entrypoint và nghiệm thu container nộp) tới **P13, sau khi pipeline và cấu hình giải pháp hoàn chỉnh**. Docker không là blocker của S00 hoặc P00–P12. Các file Docker đã có được giữ nguyên ở trạng thái nháp, chưa kiểm chứng. Vẫn giữ contract input/output, bảo toàn raw và kiểm tra offline trên Modal trong quá trình phát triển; Modal Image để chạy job cloud không thuộc phần Docker đang hoãn. Yêu cầu Docker của BTC vẫn phải hoàn thành trước nộp bài.
+
+**Xác nhận bổ sung từ chủ dự án ngày 01/11/2026:** BTC không cung cấp runner hoặc evaluator riêng. Dùng contract và quy tắc chấm trong thể lệ để xây runner/validator của dự án ở P00, scorer của dự án ở P02. Không chờ executable BTC và không gọi công cụ tự xây là công cụ chính thức.
 
 **Thay đổi v1.2:** mọi model thật chạy trên tài khoản Modal; local chỉ CPU nhẹ. Thêm S00-H và điều chỉnh P04/P13, prompts và checklist.
 
@@ -124,7 +128,7 @@ P12 có thể bỏ. M1 và M3 phải được ưu tiên để dự án luôn có
 | Một cổng kiểm tra tự động dùng chung cho người và AI | [S4], [S5] | Format/lint bắt lỗi cơ học; fixture và integration test bắt lỗi hành vi. Không xem lint pass là đúng nghiệp vụ. |
 | Tách môi trường CPU local khỏi mọi model thật trên Modal | [S6] | Tránh buộc máy cá nhân cài cả stack GPU. Quyết định engine cụ thể ở P04 sau khi biết GPU Modal, runtime và checkpoint. |
 | Tải model theo revision vào cloud, chạy từ filesystem container | [S7], [S8] | Biết chính xác weights/tokenizer nào được dùng; kiểm tra offline bằng chặn mạng thật ở G. |
-| Container smoke sớm; full offline và tài nguyên ở P13 | [S9] | Phát hiện vấn đề đóng gói trước deadline, nhưng không trì hoãn B0 để xây hạ tầng lớn. |
+| Smoke chặn egress trên Modal; Docker dời P13 theo quyết định chủ dự án | [S9] | Kiểm tra runtime offline sớm; chỉ build/test Docker khi pipeline hoàn chỉnh. |
 
 **Hai loại harness cần phân biệt:**
 
@@ -308,7 +312,7 @@ Bạn cần đọc **tác động, ví dụ và bằng chứng**, không nhất 
 | `uv run --locked python scripts/check.py` | Chạy lint, format check, CPU test; fail nếu một bước fail |
 | `uv run --locked datamate smoke --config configs/smoke.yaml` | Fixture → fake adapter → execution tối thiểu → output nội bộ |
 | `uv run --locked datamate predict --config configs/b0.yaml` | Inference thật ở P05; không được nhận đường dẫn gold |
-| `uv run --locked datamate evaluate --run runs/EXAMPLE --labels PATH` | Scorer chạy riêng, chỉ sau prediction; adapter chính thức ở P02 |
+| `uv run --locked datamate evaluate --run runs/EXAMPLE --labels PATH` | Scorer project từ đặc tả ở P02, chạy riêng chỉ sau prediction; BTC không cung cấp evaluator |
 
 CLI entrypoint do `uv init` tạo cần được nối tới CLI thật; không xem entrypoint mẫu là runner DataMate. Dùng `argparse` trước nếu đủ; chưa cần thêm thư viện CLI.
 
@@ -363,11 +367,13 @@ Fake adapter trả response định sẵn để kiểm tra wiring; **không dùn
 
 ### S00-G — Chuẩn bị đường chạy offline và khả năng tái lập
 
+**Cập nhật v1.3:** ở S00 chỉ thực hiện smoke chặn mạng trên Modal. Toàn bộ nội dung Docker và ví dụ Docker bên dưới là tham chiếu dành cho P13, không thực hiện hoặc dùng làm điều kiện nghiệm thu S00/P00–P12.
+
 Ở S00 chỉ cần smoke CPU đóng gói được; P04 thêm GPU/model; P13 full run. **Không coi venv là sandbox:** nó cô lập dependency, không cô lập quyền đọc file hay mạng.
 
 Khi P04 chốt model, dùng [S7] tải snapshot theo **full commit revision**; ghi model card/license, tokenizer, chat template, mọi file runtime cần dùng vào inventory. Không dùng revision `main` cho cấu hình đã freeze. Tải và cài trên cloud ở setup/build có mạng, inference chỉ đọc filesystem của container cloud. Biến `HF_HUB_OFFLINE=1` ngăn Hub gọi mạng theo [S8], nhưng không chặn mọi thư viện; phải kiểm tra chặn egress trên cloud và artifact container theo S00-H7 [S9].
 
-Dockerfile ban đầu cần: base image được pin, dependency từ lock, cài package, user chạy phù hợp, entrypoint, thư mục output/cache có quyền ghi. Không copy `.venv` của laptop sang Linux container. Khi build hoàn chỉnh, ghi image digest và phiên bản driver/engine đã đo. Lock Python không khóa driver hoặc hệ điều hành.
+Ở P13, sau khi pipeline hoàn chỉnh, Dockerfile cần: base image được pin, dependency từ lock, cài package, user chạy phù hợp, entrypoint, thư mục output/cache có quyền ghi. Không copy `.venv` của laptop sang Linux container. Khi build hoàn chỉnh, ghi image digest và phiên bản driver/engine đã đo. Lock Python không khóa driver hoặc hệ điều hành.
 
 Ví dụ **lệnh nghiệm thu trên host cloud hỗ trợ Docker**, sau khi image/CLI đã được build (Bash/Linux; không bắt chạy laptop, không giả định có Docker daemon trong Modal Function):
 
@@ -384,7 +390,7 @@ Lệnh trên giả định entrypoint là `datamate` và CLI có flags tương �
 
 **Kiểm tra:** chạy ở output/cache mới, không dựa cache máy cá nhân; dữ liệu read-only không bị sửa; thiếu file phải fail rõ; đo cold start riêng warm run. Pin seed là một phần hồ sơ, không bảo đảm bitwise reproducibility trên mọi GPU/phiên bản [S10].
 
-**Cổng qua S00-G:** CPU offline smoke có artifact. **Cổng P04:** model thật offline trên phần cứng đã ghi. **Cổng P13:** toàn bộ job cold-start offline đáp ứng contract/budget BTC. Ba cổng không thay thế nhau.
+**Cổng qua S00-G:** CPU smoke Modal chặn egress có artifact; không cần Docker. **Cổng P04:** model thật offline trên Modal, không cần Docker local hoặc Docker nộp. **Cổng P13:** build/test Docker và toàn bộ job cold-start offline đáp ứng contract/budget BTC. Ba cổng không thay thế nhau.
 
 ### S00.2. Prompt giao AI coding khởi tạo dự án
 
@@ -423,7 +429,7 @@ Kết thúc bằng cổng đã qua/chưa qua, lệnh tái hiện và task P00 k�
 - [ ] G-GPU: để P04, không tự đánh dấu hoàn tất.
 - [ ] G-full: để P13, không tự đánh dấu hoàn tất.
 
-**Timebox đề xuất:** một đến hai phiên tập trung cho bộ khung CPU; đây là ngân sách quản lý, không phải thời lượng đảm bảo cho người mới. Nếu kẹt vì cloud setup/Docker/GPU, giữ blocker và tiếp tục P00–P03 trên CPU. Không dành nhiều ngày xây dashboard thí nghiệm trước B0. S00 chỉ cần đủ để thay đổi nhỏ có thể chạy, kiểm tra và bàn giao giữa các phiên.
+**Timebox đề xuất:** một đến hai phiên tập trung cho bộ khung CPU; đây là ngân sách quản lý, không phải thời lượng đảm bảo cho người mới. Nếu kẹt vì cloud setup/GPU, giữ blocker và tiếp tục P00–P03 trên CPU; Docker đã hoãn tới P13. Không dành nhiều ngày xây dashboard thí nghiệm trước B0. S00 chỉ cần đủ để thay đổi nhỏ có thể chạy, kiểm tra và bàn giao giữa các phiên.
 
 ### S00.4. Nguồn đã research cho phần bổ sung
 
@@ -534,7 +540,7 @@ Cấu hình ban đầu đề xuất: `min_containers=0`, `buffer_containers=0`, 
 
 Modal là hạ tầng phát triển và benchmark; yêu cầu offline của BTC vẫn áp dụng cho giải pháp nộp. Chạy full pipeline trong một job cloud với weights/dữ liệu có sẵn. Có thể dùng `block_network=True` cho Function để chặn outbound từ container theo [M9]; cần thử tương thích của image/mounts và probe xác nhận request ngoài thực sự thất bại. Control plane nhận job/trả artifact không biến một pipeline gọi model qua mạng thành pipeline offline.
 
-Job offline không gọi worker Modal khác, model API hoặc tải dependency ở runtime. Docker `--network none` vẫn là phép nghiệm thu artifact trên host cloud hỗ trợ Docker, không bắt chạy trên laptop. Không giả định có Docker daemon/GPU passthrough bên trong Modal Function: nếu chưa có môi trường tương đương BTC, ghi cổng đó chưa kiểm chứng và dùng máy cloud/BTC phù hợp. Model smoke có chặn egress trên Modal chưa thay thế full test container nộp.
+Job offline không gọi worker Modal khác, model API hoặc tải dependency ở runtime. Docker `--network none` dành cho P13, sau khi pipeline hoàn chỉnh, trên host cloud hỗ trợ Docker; không là blocker trước P13. Không giả định có Docker daemon/GPU passthrough bên trong Modal Function. Model smoke có chặn egress trên Modal chưa thay thế full test container nộp.
 
 Giữ một đường thực thi `EngineAdapter` + filesystem thông thường để export cùng code/weights/config sang artifact BTC. Cần kiểm tra eligibility của checkpoint, model phụ và tổng tham số theo kit ngay cả khi tài nguyên Modal dư sức chạy model lớn hơn.
 
@@ -584,7 +590,7 @@ Truy cập **01/11/2026**. Thông số API/cách tính tiền cần đối chi�
 ### Research
 
 - Kit thật có cấu trúc nào? File nào là source of truth khi khác tài liệu tổng hợp?
-- Evaluator, mẫu submission, runner, hướng dẫn Docker và changelog nằm ở đâu?
+- Mẫu submission và contract trong thể lệ quy định gì? Theo xác nhận chủ dự án, BTC không có runner/evaluator riêng; xác định đặc tả cần tự triển khai. Hướng dẫn Docker dành cho P13, changelog ghi nhận nếu có.
 - Hạn tham số tính các model phụ, adapter và MoE như thế nào? Cutoff trọng số/giấy phép ra sao?
 - Quy định dữ liệu training/test, offline, đường dẫn mount, logging, thời gian và tái lập là gì?
 - Local có đủ CPU/RAM cho fixture nhỏ không? Modal có GPU/quota/ngân sách nào và khác môi trường BTC ở đâu?
@@ -600,9 +606,11 @@ Truy cập **01/11/2026**. Thông số API/cách tính tiền cần đối chi�
 
 ### Cổng hoàn thành
 
-- [ ] Biết deadline và runner contract từ nguồn hiện hành.
-- [ ] Stub tạo được file đúng đường dẫn và schema mà scorer chấp nhận.
-- [ ] Các chỗ chưa xác minh được ghi rõ, không bị biến thành giả định ngầm.
+- [x] Biết deadline và runner contract từ thể lệ được cung cấp, đối chiếu deadline website BTC.
+- [x] Stub tạo được file đúng đường dẫn/schema đặc tả; validator project kiểm tra đủ ID, kiểu dữ liệu và log. BTC không cung cấp scorer executable nên không có cổng chấp nhận bằng công cụ BTC.
+- [x] Các chỗ chưa xác minh được ghi rõ, không bị biến thành giả định ngầm.
+
+**Cách nghiệm thu theo xác nhận hiện tại:** runner/validator tự xây từ đặc tả trong thể lệ, có fixture dương/âm và kết quả trên kit thật. Không chờ runner/scorer BTC vì BTC không cung cấp. P02 tự triển khai matching/PA theo đặc tả, ghi rõ corner cases còn mơ hồ và policy tạm khi cần. Nếu sau này có công cụ/thông báo mới từ BTC thì đối chiếu bổ sung. Docker không chặn P00.
 
 **Đầu ra cần tạo:** `docs/requirements.md`, `docs/open_questions.md`, `manifests/models.json`, runner stub.
 
@@ -654,11 +662,11 @@ Truy cập **01/11/2026**. Thông số API/cách tính tiền cần đối chi�
 - Training chỉ có answer hay có cả SQL/trace? Không giả định có gold program.
 - Một lời giải đúng cần đọc những bảng, quy tắc và khoảng thời gian nào?
 
-**Nguồn:** evaluator và ví dụ BTC; chọn khoảng 30–50 câu development đại diện nếu quy mô cho phép. Mục tiêu là phủ kiểu câu và ca khó, không lấy mẫu chỉ vì dễ giải. Đọc mục 10–14 baseline; paper test-suite evaluation khi thiết kế ca phân biệt logic.
+**Nguồn:** §2 thể lệ và ví dụ BTC; không có executable evaluator theo xác nhận chủ dự án. Chọn khoảng 30–50 câu development đại diện sau khi khóa split nếu quy mô cho phép. Mục tiêu là phủ kiểu câu và ca khó, không lấy mẫu chỉ vì dễ giải. Đọc mục 10–14 baseline; paper test-suite evaluation khi thiết kế ca phân biệt logic.
 
 ### Build tối thiểu
 
-- Bọc scorer gốc bằng adapter, giữ semantics của BTC.
+- BTC không cung cấp evaluator riêng theo xác nhận chủ dự án: xây scorer của dự án từ §2 thể lệ, tách matching từng type, aggregation PA và policy cho điểm chưa rõ; không gọi là scorer chính thức. Nếu sau này có scorer BTC thì bọc bằng adapter và đối chiếu.
 - Xác minh bằng các đáp án cố ý đúng/sai: đúng số nhưng sai type, list đảo vị trí, string có/không dấu, abstain, unanswerable.
 - Tạo bộ diagnostic có lời giải tham chiếu: input → bảng/cột → rule → phép tính → output.
 - Lưu lý do không chắc chắn nếu nhãn và cách hiểu có vẻ mâu thuẫn; không sửa scorer hoặc thay nhãn chính thức trong báo cáo PA.
@@ -666,13 +674,13 @@ Truy cập **01/11/2026**. Thông số API/cách tính tiền cần đối chi�
 ### Cổng hoàn thành
 
 - [ ] Gold answers đạt kết quả kỳ vọng khi chạy qua adapter phù hợp format.
-- [ ] Các đáp án cố ý sai được chấm đúng như kỳ vọng từ code gốc.
+- [ ] Các đáp án cố ý sai được chấm đúng như kỳ vọng từ đặc tả và oracle độc lập; policy cho phần chưa rõ được ghi riêng.
 - [ ] PA, correct/wrong/abstain và lỗi format được báo riêng.
 - [ ] Diagnostic suite có ca nghiệp vụ thực sự phân biệt đúng/sai.
 
 **Đầu ra:** `src/datamate/evaluation/`, `reports/evaluator_contract.md`, `tests/fixtures/diagnostic/`.
 
-**Nếu BTC chưa cung cấp evaluator:** dùng bản tạm ghi nhãn `provisional`; khoanh rõ mọi corner case chưa xác minh. Cần cập nhật scorer gốc trước khi chốt chất lượng cuối.
+**BTC không cung cấp evaluator:** scorer project phải có nguồn cho từng quy tắc, ca đúng/sai và diagnostic oracle; corner case không được tài liệu xác định phải ghi `provisional`, không giả định âm thầm. Không đặt việc có scorer gốc thành điều kiện bắt buộc. Nếu BTC phát hành bổ sung thì đối chiếu khi có.
 
 ---
 
@@ -739,7 +747,7 @@ Truy cập **01/11/2026**. Thông số API/cách tính tiền cần đối chi�
 - [ ] Có log cold-start/VRAM; không khẳng định phù hợp máy BTC từ một môi trường khác.
 - [ ] Có kiểm tra nhỏ network-off; lỗi tải ngầm được phát hiện sớm.
 
-**Đầu ra:** `infra/modal_app.py`, `reports/modal_smoke.md`, `src/datamate/runtime/model_adapter.py`, `src/datamate/execution/`, `reports/runtime_smoke.md`, Docker sơ bộ.
+**Đầu ra:** `infra/modal_app.py`, `reports/modal_smoke.md`, `src/datamate/runtime/model_adapter.py`, `src/datamate/execution/`, `reports/runtime_smoke.md`. Docker sơ bộ hoãn tới P13.
 
 **Chưa làm:** so hết model, tăng candidate hoặc quantization vì phỏng đoán.
 
@@ -1022,6 +1030,8 @@ Nếu scorer vẫn +1/−1/0 như baseline, kỳ vọng trả một candidate c�
 
 **Mục tiêu:** chuyển kết quả trên validation thành gói có thể chấm lại từ đầu.
 
+**Thứ tự theo quyết định chủ dự án:** khi pipeline/cấu hình đã hoàn chỉnh, mới bắt đầu toàn bộ việc Docker: đối chiếu Docker guide, hoàn thiện Dockerfile, build image, kiểm tra mount/quyền/entrypoint, chặn mạng và full run. Docker là yêu cầu trước nộp, không bị bỏ khỏi giải pháp cuối.
+
 ### Research
 
 - Khi tính cả load, ingest, cold cache và tail query, hệ thống có hoàn thành giới hạn BTC không?
@@ -1265,8 +1275,8 @@ Một paper dùng model vượt hạn tham số có thể cung cấp ý tưởng
 
 | Phase | Trạng thái ban đầu | Research note | Code/config | Bằng chứng nghiệm thu |
 |---|---|---|---|---|
-| S00 | CPU local và Modal smoke chặn egress đã qua; Docker/GPU/full còn chờ | `docs/research/S00_setup.md` | `src/datamate/`, `infra/modal_app.py`, `uv.lock` | `reports/s00_setup.md` |
-| P00 | Đã đối chiếu kit và chạy format stub; còn thiếu scorer/runner/Docker guide chính thức | `docs/requirements.md`, `docs/open_questions.md` | `predict.sh`, CLI stub | 3.000 output train khớp ID; chưa nghiệm thu scorer |
+| S00 | CPU local và Modal smoke chặn egress đã qua; Docker hoãn P13, GPU/full còn chờ | `docs/research/S00_setup.md` | `src/datamate/`, `infra/modal_app.py`, `uv.lock` | `reports/s00_setup.md` |
+| P00 | Hoàn thành contract/runner stub/validator theo đặc tả; BTC không có runner/evaluator riêng; Docker hoãn P13 | `docs/research/P00_contract.md`, `docs/requirements.md` | CLI stub và validator | `reports/p00_results.md`, `reports/p00_contract_checks.json` |
 | P01 | Chưa làm | — | — | — |
 | P02 | Chưa làm | — | — | — |
 | P03 | Chưa làm | — | — | — |

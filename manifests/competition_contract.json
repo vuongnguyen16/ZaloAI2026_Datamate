@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "checked_date": "2026-11-01",
+  "status": "document_backed_project_contract",
+  "organizer_tools": {
+    "runner_available": false,
+    "evaluator_available": false,
+    "source": "user confirmation 2026-11-01: organizer provides no runner/evaluator",
+    "project_runner": "src/datamate/runner.py",
+    "project_structural_validator": "src/datamate/validation.py",
+    "project_scorer": "to be implemented in P02 from written specification"
+  },
+  "sources": {
+    "supplied_guideline": "Thể lệ cuộc thi/The_Le_Zalo_AI_Challenge_2026_DataMate.docx",
+    "guideline_hash_manifest": "manifests/kit_files.json",
+    "official_overview": "https://challenge.zalo.ai/portal/datamate",
+    "official_timeline": "https://challenge.zalo.ai/#timeline"
+  },
+  "input": {
+    "question_fields": ["id", "business_id", "question", "as_of_date"],
+    "split_files": ["questions.jsonl", "rulebook.md", "calendar.csv"],
+    "business_directory": "data/<business_id>",
+    "business_readme": "README.md",
+    "table_extensions": [".csv", ".xlsx", ".sqlite"],
+    "as_of_format": "YYYY-MM-DD",
+    "source": "guideline sections 1 and 3.2; public Overview; observed local kit"
+  },
+  "output": {
+    "types": ["number", "percent", "string", "date", "boolean", "list", "table", "unanswerable", "abstain"],
+    "format": "JSONL",
+    "fields": ["id", "type", "answer_when_applicable", "optional_reason"],
+    "missing_id_action": "abstain",
+    "source": "guideline sections 2.1 and 3.5; public Overview confirms types/example",
+    "scorer_executable_acceptance": "not_applicable_organizer_provides_none"
+  },
+  "submission_runtime": {
+    "entrypoint": "predict.sh",
+    "input_mount": "/data",
+    "input_read_only": true,
+    "output_file": "/result/submission.jsonl",
+    "logs_directory": "/result/logs",
+    "inference_offline": true,
+    "max_wall_clock_seconds_including_model_load": 21600,
+    "hardware_as_described": "2 x NVIDIA RTX 5090, 32 GB each; 512 GB RAM",
+    "source": "supplied guideline sections 3.5 and 4; public Rule tab confirms offline/hardware/time; exact paths/logging from DOCX"
+  },
+  "model_policy": {
+    "max_aggregate_inference_parameters": 15000000000,
+    "include_auxiliary_models": true,
+    "moe_count_all_parameters": true,
+    "weights_public_before_date_exclusive": "2026-10-01",
+    "valid_license_required": true,
+    "source": "supplied guideline section 4 item 2; public Rule tab; detailed evidence in manifests/p00_sources.json"
+  },
+  "scoring_as_described": {
+    "correct": 1,
+    "wrong": -1,
+    "abstain": 0,
+    "metric": "PA=(correct-wrong)/N",
+    "type_and_value_must_match": true,
+    "matching_implementation": "not_implemented_in_P00",
+    "source": "supplied guideline section 2"
+  },
+  "timeline": {
+    "solution_deadline": "2026-11-16T23:59:00+07:00",
+    "private_release": "2026-11-20T09:00:00+07:00",
+    "private_results_deadline": "2026-11-23T23:59:00+07:00",
+    "source": "official public homepage Timeline, verified 2026-11-01"
+  },
+  "project_decisions": {
+    "docker_work": "deferred_to_P13_after_pipeline_complete_by_user",
+    "all_real_model_execution": "Modal",
+    "modal_profile": "vuonghungnguyen07",
+    "modal_workspace": "vuonghungnguyen07",
+    "budget_usd_per_experiment": 30,
+    "source": "user instructions; not organizer constraints"
+  }
+}

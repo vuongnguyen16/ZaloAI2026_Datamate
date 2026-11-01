@@ -5,5 +5,11 @@
   "eligibility_verified": false,
   "fake_adapter_is_model": false,
   "execution_policy": "all_real_models_on_modal",
-  "next_review": "P04: full revision, public release date, license, total parameters including auxiliary models"
+  "policy_reference": "manifests/competition_contract.json#/model_policy",
+  "next_review": "P04: full revision, public release date, license, total parameters including auxiliary models",
+  "required_fields_per_real_model": [
+    "role", "repository", "full_commit_revision", "public_release_date",
+    "license_and_source", "total_parameters_including_all_moe_experts",
+    "artifact_hashes", "tokenizer_and_chat_template_revision"
+  ]
 }

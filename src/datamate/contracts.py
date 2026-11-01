@@ -3,12 +3,35 @@
 The organizer's evaluator is not present; this is structural validation, not scoring.
 """
 
+import json
 import math
 import re
 from datetime import date
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+
+
+def json_object(text: str) -> dict:
+    """Reject ambiguous JSON keys and non-standard NaN/Infinity constants."""
+
+    def unique_keys(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise ValueError(f"non-standard JSON constant: {value}")
+
+    value = json.loads(
+        text, object_pairs_hook=unique_keys, parse_constant=reject_constant
+    )
+    if not isinstance(value, dict):
+        raise ValueError("JSONL record must be an object")
+    return value
 
 
 class Question(BaseModel):

@@ -1,0 +1,55 @@
+{
+  "checked_date": "2026-11-01",
+  "timezone": "Asia/Saigon",
+  "sources": [
+    {
+      "id": "BTC_HOME",
+      "url": "https://challenge.zalo.ai/",
+      "section": "Timeline",
+      "access": "TinyFish fetch",
+      "verified_topics": ["solution deadline", "private release", "private results deadline"]
+    },
+    {
+      "id": "BTC_DATAMATE_OVERVIEW",
+      "url": "https://challenge.zalo.ai/portal/datamate",
+      "section": "Overview",
+      "access": "TinyFish fetch",
+      "verified_topics": ["input components", "question fields example", "output types and example"]
+    },
+    {
+      "id": "BTC_DATAMATE_TABS",
+      "url": "https://challenge.zalo.ai/portal/datamate",
+      "sections": ["Evaluation", "Rule", "Submission Guidance"],
+      "access": "TinyFish read-only public browser tabs",
+      "run_id": "2eca7057-11c3-4e97-8a58-7c7c7c6a93ca",
+      "verified_topics": [
+        "type and value must both match; PA; ranking rules",
+        "15B aggregate inference parameters including MoE",
+        "public weights before 2026-10-01; licensing eligibility",
+        "offline inference; no hard-coded answers; read-only input",
+        "2 RTX 5090, total 64 GB VRAM, 512 GB RAM, 6 hours",
+        "PA rerun deviation threshold 0.03",
+        "submission dates and quotas 5 public per day / 2 solution packages"
+      ],
+      "limitations": ["Exact predict.sh paths and detailed log contract not captured from public tabs; use supplied DOCX"]
+    },
+    {
+      "id": "SUPPLIED_GUIDELINE",
+      "path": "Thể lệ cuộc thi/The_Le_Zalo_AI_Challenge_2026_DataMate.docx",
+      "size_bytes": 47267,
+      "sha256_reference": "manifests/kit_files.json",
+      "access": "local read-only OOXML text and relationships",
+      "verified_topics": ["written matching rules", "submission examples", "predict.sh paths", "per-question log requirements"],
+      "embedded_executables_or_hyperlinks": false
+    },
+    {
+      "id": "USER_TOOL_AVAILABILITY",
+      "source": "user clarification in this session on 2026-11-01",
+      "runner_available": false,
+      "evaluator_available": false,
+      "decision": "Implement project runner/validator in P00 and project scorer from written rules in P02; do not wait for organizer executables"
+    }
+  ],
+  "portal_data_tab": "sign-in required; not needed to continue P00 after user clarification",
+  "no_account_mutations_or_submissions": true
+}

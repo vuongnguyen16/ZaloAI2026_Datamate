@@ -1,7 +1,8 @@
 # Làm việc trong DataMate
 
 - Đọc README.md, docs/project_state.md, tasks/backlog.json và contract liên quan trước khi sửa.
-- Thực hiện Research/DataMate_Research_Build_Plan.md v1.2 theo từng increment có bằng chứng.
+- Thực hiện Research/DataMate_Research_Build_Plan.md v1.3 theo từng increment có bằng chứng.
+- Theo quyết định chủ dự án: hoãn mọi việc Docker tới P13 sau khi pipeline hoàn chỉnh; giữ bản nháp, không dùng Docker làm blocker trước P13. Modal Image vẫn dùng cho job cloud.
 - Mọi model thật, embedding, reranker và huấn luyện chạy trên Modal; local chỉ CPU nhẹ/fake. Không tải weights hoặc cài CUDA/PyTorch/vLLM local.
 - Profile/workspace người dùng cung cấp: vuonghungnguyen07. Phải xác minh tài khoản và có ngân sách trước job cloud.
 - Cổng CPU: uv run --locked python scripts/check.py. PowerShell chưa có uv PATH dùng .tools/uv/uv.exe.

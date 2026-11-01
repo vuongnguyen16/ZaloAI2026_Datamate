@@ -13,7 +13,7 @@ import duckdb
 
 from datamate.artifacts import manifest, new_run, write_json
 from datamate.config import load_config
-from datamate.contracts import FakeResponse, Question, Submission
+from datamate.contracts import FakeResponse, Question, Submission, json_object
 
 
 def read_questions(path: Path, limit: int | None = None) -> list[Question]:
@@ -24,7 +24,7 @@ def read_questions(path: Path, limit: int | None = None) -> list[Question]:
             if not line.strip():
                 raise ValueError(f"blank question line {line_number}")
             try:
-                question = Question.model_validate_json(line)
+                question = Question.model_validate(json_object(line))
             except ValueError as exc:
                 raise ValueError(
                     f"invalid question at line {line_number}: {exc}"
@@ -191,7 +191,11 @@ def run_stub(input_dir: Path, output_dir: Path) -> Path:
         output_dir / "manifest.json",
         manifest(
             root,
-            [input_dir / "questions.jsonl"],
+            [
+                input_dir / name
+                for name in ("questions.jsonl", "rulebook.md", "calendar.csv")
+                if (input_dir / name).is_file()
+            ],
             "format_stub",
             output_dir.name,
         ),

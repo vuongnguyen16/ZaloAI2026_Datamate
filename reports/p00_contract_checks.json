@@ -1,0 +1,135 @@
+{
+  "phase": "P00",
+  "scope": "project_structural_acceptance_from_written_spec",
+  "run_dir": "runs\\p00-contract-20261101T063347Z-f31cb227",
+  "splits": {
+    "train": {
+      "input": {
+        "scope": "project_structure_from_spec; not_organizer_evaluator",
+        "input_dir": "D:\\ZaloAI_2026\\data\\train",
+        "errors": [],
+        "warnings": [],
+        "input_sha256": {
+          "questions.jsonl": "b258ebd978a6d51b3b0b431b26926f958e56522beeb7da2984fea8333e21cec1",
+          "rulebook.md": "740267bccba29df70f745bc39968bbec5b3e62dada2c858c45314f3ec723d113",
+          "calendar.csv": "c2579905e8b4eb152a4833b05f1f72de3e3d2c517b5d610d7664aeeb2d6a75b3"
+        },
+        "gold_file_present": true,
+        "gold_content_read": false,
+        "valid": true,
+        "questions": 3000,
+        "question_fields": [
+          "as_of_date",
+          "business_id",
+          "id",
+          "question"
+        ],
+        "referenced_businesses": 30,
+        "table_formats": {
+          ".csv": 20,
+          ".xlsx": 107,
+          ".sqlite": 1
+        },
+        "calendar_columns": [
+          "date",
+          "weekday",
+          "lunar_day",
+          "lunar_month",
+          "lunar_year",
+          "lunar_leap",
+          "holiday"
+        ],
+        "calendar_rows": 1461
+      },
+      "submission": {
+        "scope": "project_structure_from_spec; not_organizer_evaluator",
+        "valid": true,
+        "errors": [],
+        "input_questions": 3000,
+        "submitted_unique_ids": 3000,
+        "missing_ids_counted_as_abstain": 0,
+        "types": {
+          "abstain": 3000
+        },
+        "require_complete": true,
+        "submission_sha256": "eb0ca9c45517700a058ec08ae2dd1f2f065f6292e0b06b2101ea3670535f8956",
+        "scorer_acceptance": "not_applicable_organizer_provides_no_executable",
+        "pa": "not_evaluated"
+      },
+      "logs": {
+        "valid": true,
+        "errors": [],
+        "question_logs": 3000,
+        "scope": "project_structure_from_spec; not_organizer_evaluator"
+      }
+    },
+    "public_test": {
+      "input": {
+        "scope": "project_structure_from_spec; not_organizer_evaluator",
+        "input_dir": "D:\\ZaloAI_2026\\data\\public_test",
+        "errors": [],
+        "warnings": [],
+        "input_sha256": {
+          "questions.jsonl": "b33ae585ed5d4acdacbd6a2873d442e3a5673a8238b6e932827f40c48c158832",
+          "rulebook.md": "959ebb63b709fad68f7e8a339cde955c96b6e9af2e48141db3ad5a2429510e10",
+          "calendar.csv": "c2579905e8b4eb152a4833b05f1f72de3e3d2c517b5d610d7664aeeb2d6a75b3"
+        },
+        "gold_file_present": false,
+        "gold_content_read": false,
+        "valid": true,
+        "questions": 1000,
+        "question_fields": [
+          "as_of_date",
+          "business_id",
+          "id",
+          "question"
+        ],
+        "referenced_businesses": 14,
+        "table_formats": {
+          ".xlsx": 69,
+          ".csv": 10,
+          ".sqlite": 1
+        },
+        "calendar_columns": [
+          "date",
+          "weekday",
+          "lunar_day",
+          "lunar_month",
+          "lunar_year",
+          "lunar_leap",
+          "holiday"
+        ],
+        "calendar_rows": 1461
+      },
+      "submission": {
+        "scope": "project_structure_from_spec; not_organizer_evaluator",
+        "valid": true,
+        "errors": [],
+        "input_questions": 1000,
+        "submitted_unique_ids": 1000,
+        "missing_ids_counted_as_abstain": 0,
+        "types": {
+          "abstain": 1000
+        },
+        "require_complete": true,
+        "submission_sha256": "4eda0ddb0179e46293dcf54d2719b79a151fd5dba99da82893cf8bedf2111e1a",
+        "scorer_acceptance": "not_applicable_organizer_provides_no_executable",
+        "pa": "not_evaluated"
+      },
+      "logs": {
+        "valid": true,
+        "errors": [],
+        "question_logs": 1000,
+        "scope": "project_structure_from_spec; not_organizer_evaluator"
+      }
+    }
+  },
+  "organizer_scorer_acceptance": "not_applicable_organizer_provides_no_executable",
+  "organizer_tool_availability_source": "user_confirmation_2026-11-01",
+  "scorer_implementation": "P02_project_scorer_from_written_spec",
+  "docker": "deferred_to_P13_by_user",
+  "gpu": "not_tested",
+  "pa": "not_evaluated",
+  "contract_sha256": "4539675848df8c9e32461fb6b23640fe02b9883e67b4890557849b524b18d3f8",
+  "passed": true
+}

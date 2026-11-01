@@ -38,6 +38,8 @@ Chi phí thực tế phải lấy từ usage/billing sau khi cập nhật; `remo
 
 ## Nghiệm thu Docker trên cloud phù hợp
 
+**Hoãn tới P13 sau khi pipeline hoàn chỉnh, theo quyết định chủ dự án ngày 01/11/2026.** Các lệnh trong mục này chỉ là tham chiếu cho lúc đó; không thực hiện hoặc xem là blocker hiện tại. Modal Image cho các phép thử cloud không bị hoãn.
+
 `Dockerfile` hiện là ứng viên CPU, chưa được nghiệm thu trên host Docker. Nó không chứa model và chưa phải artifact nộp. Build và thử trên host cloud hỗ trợ Docker, không giả định Docker daemon có trong Modal Function. Ví dụ Bash:
 
 ```bash

@@ -347,5 +347,31 @@
     ],
     "evidence": [],
     "start_condition": "Chỉ bắt đầu đóng gói sau khi pipeline và cấu hình giải pháp hoàn chỉnh"
+  },
+  {
+    "id": "G-GITHUB",
+    "title": "??ng b? source/t?i li?u l?n GitHub ?? ??c tr?n web",
+    "source": "user request 2026-11-04",
+    "source_section": "G ? v?n h?nh repository",
+    "status": "done",
+    "depends_on": [
+      "RESET-TIMELINE"
+    ],
+    "acceptance": [
+      "Source/config/tests/docs v? timeline ???c push main",
+      "C? b?n timeline Markdown gi? ?? n?i dung v? s? ??",
+      "Remote SHA kh?p source commit; CPU local v? GitHub CI c? b?ng ch?ng ri?ng",
+      "Data BTC/credentials/models/runs kh?ng upload"
+    ],
+    "evidence": [
+      "reports/github_publish.md",
+      "Research/Timeline_DataMate_A-G.md",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/c69d4da0952d9ea8acf96f87f841071b8f0f806d",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41872674037"
+    ],
+    "limitations": [
+      "GPU/model kh?ng ch?y; PA ch?a ??nh gi?",
+      "Kit v? run artifacts ch? local; AI web ??c ???c source/t?i li?u public"
+    ]
   }
 ]

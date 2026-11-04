@@ -17,7 +17,8 @@ pass trong 12.07s**; artifact `runs/cpu-check-20261104T164734905777Z-5kmhmukp/ga
 Context A-T1: todo/ready, timeline đúng hash, không warnings, CPU passed/current;
 20 task không lỗi dependency/vòng lặp, ID cũ bị từ chối. Audit kit: hash train/public
 và thể lệ giữ nguyên. Skill validator pass. Kết quả ở `reports/timeline_reset_results.md`.
-GPU/model không chạy; PA chưa đánh giá; CI GitHub chưa chạy. Review là self-review.
+GPU/model không chạy; PA chưa đánh giá. CI GitHub đã pass sau publish, xem phần
+đồng bộ bên dưới. Review là self-review.
 
 **Config/tài nguyên:** `configs/smoke.yaml` chỉ synthetic;
 `configs/modal_dev.yaml` profile/workspace `vuonghungnguyen07`, tối đa 30 USD
@@ -42,8 +43,11 @@ path/hash timeline; nếu thiếu thì báo thiếu, không hồi sinh plan đã
 SHA-256 trước sửa/xóa, local/ignored. Không xóa data, lịch sử Git, runs cũ,
 môi trường uv hoặc tài liệu gốc; phiên cleanup không commit/push.
 
-**Đồng bộ GitHub theo yêu cầu mới:** đang chuẩn bị publish source/config/tests/
-tài liệu lên `vuongnguyen16/ZaloAI2026_Datamate`, nhánh main. Đã thêm bản timeline
-Markdown và ảnh sơ đồ để đọc trên web; DOCX vẫn là nguồn kế hoạch. Dữ liệu BTC,
-credentials, model, runs và môi trường local tiếp tục được ignore. Chỉ xác nhận
-publish/CI thành công sau khi kiểm tra remote.
+**Đồng bộ GitHub:** source/config/tests/tài liệu đã push lên repo public
+`vuongnguyen16/ZaloAI2026_Datamate`, nhánh main, source commit `c69d4da`.
+Đã đối chiếu remote SHA trùng local và CPU GitHub Actions run `41872674037`
+completed/success. CPU local trước push: 59 passed in 7.49s, lint/format pass;
+artifact `runs/cpu-check-20261104T165544622253Z-oze3s9zf/gate.json`.
+Bản timeline Markdown giữ đủ 137 paragraph/15 bảng/123 dòng bảng và một sơ đồ,
+có nguồn/hash DOCX. Dữ liệu BTC, credentials, model, runs và môi trường local
+tiếp tục được ignore. Chi tiết ở `reports/github_publish.md`.

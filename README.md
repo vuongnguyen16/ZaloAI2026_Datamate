@@ -6,6 +6,11 @@ có đầy đủ văn bản, bảng và sơ đồ từ DOCX gốc.
 Bắt đầu lại theo timeline từ 04/11/2026, kế thừa phần nền đã kiểm thử.
 Chưa có loader đa định dạng, scorer, model thật hoặc PA baseline.
 
+Để đọc/review trên web: bắt đầu từ [timeline Markdown](Research/Timeline_DataMate_A-G.md),
+[state hiện tại](docs/project_state.md), [backlog](tasks/backlog.json) và
+[contract](docs/requirements.md). Source và fixture synthetic được đồng bộ;
+kit BTC, model, credentials và run artifacts giữ local.
+
 ## Bắt đầu phiên làm việc
 
 ```powershell
@@ -65,8 +70,9 @@ job theo [runbook](docs/modal_runbook.md). Trong phiên reset không chạy clou
 `data/`, models, runs, credentials và thể lệ gốc được giữ local qua `.gitignore`.
 Không upload kit khi chưa xác minh quyền; source chỉ dùng fixture synthetic.
 Dockerfile/.dockerignore là bản nháp giữ cho nhóm G sau khi pipeline hoàn chỉnh.
-Chưa build/test Docker. Workflow CPU sẽ chạy khi push lên GitHub;
-kết quả CI cần được kiểm tra riêng với bằng chứng CPU local.
+Chưa build/test Docker. [CPU gate trên GitHub Actions](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41872674037)
+đã pass cho source commit `c69d4da`; bằng chứng local và CI được ghi riêng trong
+[báo cáo publish](reports/github_publish.md).
 
 Chi tiết giữ/xóa và backup: [báo cáo reset](reports/timeline_reset_results.md).
 Repo: https://github.com/vuongnguyen16/ZaloAI2026_Datamate.

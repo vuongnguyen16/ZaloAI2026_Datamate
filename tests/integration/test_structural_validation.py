@@ -17,7 +17,7 @@ def split(tmp_path):
     shutil.copytree(ROOT / "tests/fixtures/synthetic", path)
     business = path / "data" / "synthetic"
     business.mkdir(parents=True)
-    (business / "README.md").write_text("Synthetic P00 business")
+    (business / "README.md").write_text("Synthetic contract business")
     shutil.copyfile(path / "sales.csv", business / "sales.csv")
     (path / "answers.jsonl").write_text("gold must never be parsed")
     return path
@@ -27,7 +27,7 @@ def test_input_audit_checks_references_and_never_opens_gold(split, monkeypatch):
     original_open = Path.open
 
     def guarded_open(path, *args, **kwargs):
-        assert path.name != "answers.jsonl", "P00 validation must not open gold labels"
+        assert path.name != "answers.jsonl", "Validation must not open gold labels"
         return original_open(path, *args, **kwargs)
 
     monkeypatch.setattr(Path, "open", guarded_open)

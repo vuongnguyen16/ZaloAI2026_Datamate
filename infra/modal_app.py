@@ -1,4 +1,4 @@
-"""S00-H/G CPU smoke only. Explicit allowlist prevents uploading the BTC kit.
+"""Group G CPU smoke only. Explicit allowlist prevents uploading the BTC kit.
 
 Run via the local entrypoint so profile and declared budget are checked first.
 No GPU, weights or business data are attached to this app.

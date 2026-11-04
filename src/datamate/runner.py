@@ -1,6 +1,6 @@
 """CPU wiring smoke, deliberately limited to a tiny, trusted synthetic fixture.
 
-The DuckDB connection here is not the untrusted SQL worker planned for P04.
+The DuckDB connection here is not the untrusted SQL worker needed by group D.
 """
 
 import csv
@@ -49,7 +49,7 @@ class FakeModelAdapter:
         self.responses = iter(responses)
 
     def generate(self, question: Question) -> FakeResponse:
-        # A real adapter will consume question/context at P04. This checks wiring only.
+        # A real group D adapter will consume question/context. This checks wiring only.
         return FakeResponse.model_validate(next(self.responses))
 
 
@@ -78,7 +78,7 @@ def run_smoke(config_path: Path) -> Path:
     if not isinstance(responses, list) or len(responses) != len(questions):
         raise ValueError("fake response count must match question count")
     adapter = FakeModelAdapter(responses)
-    # Only this synthetic schema is supported. General ingestion belongs to P03.
+    # Only this synthetic schema is supported. General ingestion belongs to group A.
     with (input_dir / "sales.csv").open(encoding="utf-8", newline="") as handle:
         rows = [(row["code"], Decimal(row["amount"])) for row in csv.DictReader(handle)]
     run_dir = new_run(output_root, "smoke")
@@ -160,7 +160,7 @@ def run_smoke(config_path: Path) -> Path:
 
 
 def run_stub(input_dir: Path, output_dir: Path) -> Path:
-    """Format-only P00 stub: never reads answers, business files or rule semantics."""
+    """Format-only stub: never reads answers, business files or rule semantics."""
     input_dir = input_dir.resolve(strict=True)
     output_dir = output_dir.resolve()
     if output_dir == input_dir or input_dir in output_dir.parents:

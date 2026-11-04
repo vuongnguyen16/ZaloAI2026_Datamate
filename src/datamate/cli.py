@@ -9,7 +9,7 @@ from datamate.validation import inspect_input, inspect_logs, inspect_submission
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="DataMate CPU harness and P00 structural checks; not B0"
+        description="DataMate CPU harness and structural checks; not a model baseline"
     )
     commands = parser.add_subparsers(dest="command", required=True)
     smoke = commands.add_parser(
@@ -22,7 +22,7 @@ def main() -> int:
     stub.add_argument("--input", type=Path, required=True)
     stub.add_argument("--output", type=Path, required=True)
     audit = commands.add_parser(
-        "validate-input", help="P00 split contract checks; never reads gold"
+        "validate-input", help="Split contract checks; never reads gold"
     )
     audit.add_argument("--input", type=Path, required=True)
     validate = commands.add_parser(

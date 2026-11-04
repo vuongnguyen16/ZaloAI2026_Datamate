@@ -8,7 +8,7 @@
     "source": "user confirmation 2026-11-01: organizer provides no runner/evaluator",
     "project_runner": "src/datamate/runner.py",
     "project_structural_validator": "src/datamate/validation.py",
-    "project_scorer": "to be implemented in P02 from written specification"
+    "project_scorer": "pending group E, from written specification"
   },
   "sources": {
     "supplied_guideline": "Thể lệ cuộc thi/The_Le_Zalo_AI_Challenge_2026_DataMate.docx",
@@ -17,18 +17,46 @@
     "official_timeline": "https://challenge.zalo.ai/#timeline"
   },
   "input": {
-    "question_fields": ["id", "business_id", "question", "as_of_date"],
-    "split_files": ["questions.jsonl", "rulebook.md", "calendar.csv"],
+    "question_fields": [
+      "id",
+      "business_id",
+      "question",
+      "as_of_date"
+    ],
+    "split_files": [
+      "questions.jsonl",
+      "rulebook.md",
+      "calendar.csv"
+    ],
     "business_directory": "data/<business_id>",
     "business_readme": "README.md",
-    "table_extensions": [".csv", ".xlsx", ".sqlite"],
+    "table_extensions": [
+      ".csv",
+      ".xlsx",
+      ".sqlite"
+    ],
     "as_of_format": "YYYY-MM-DD",
     "source": "guideline sections 1 and 3.2; public Overview; observed local kit"
   },
   "output": {
-    "types": ["number", "percent", "string", "date", "boolean", "list", "table", "unanswerable", "abstain"],
+    "types": [
+      "number",
+      "percent",
+      "string",
+      "date",
+      "boolean",
+      "list",
+      "table",
+      "unanswerable",
+      "abstain"
+    ],
     "format": "JSONL",
-    "fields": ["id", "type", "answer_when_applicable", "optional_reason"],
+    "fields": [
+      "id",
+      "type",
+      "answer_when_applicable",
+      "optional_reason"
+    ],
     "missing_id_action": "abstain",
     "source": "guideline sections 2.1 and 3.5; public Overview confirms types/example",
     "scorer_executable_acceptance": "not_applicable_organizer_provides_none"
@@ -50,7 +78,7 @@
     "moe_count_all_parameters": true,
     "weights_public_before_date_exclusive": "2026-10-01",
     "valid_license_required": true,
-    "source": "supplied guideline section 4 item 2; public Rule tab; detailed evidence in manifests/p00_sources.json"
+    "source": "supplied guideline section 4 item 2; public Rule tab; detailed evidence in manifests/contract_sources.json"
   },
   "scoring_as_described": {
     "correct": 1,
@@ -58,7 +86,7 @@
     "abstain": 0,
     "metric": "PA=(correct-wrong)/N",
     "type_and_value_must_match": true,
-    "matching_implementation": "not_implemented_in_P00",
+    "matching_implementation": "not_implemented",
     "source": "supplied guideline section 2"
   },
   "timeline": {
@@ -68,7 +96,7 @@
     "source": "official public homepage Timeline, verified 2026-11-01"
   },
   "project_decisions": {
-    "docker_work": "deferred_to_P13_after_pipeline_complete_by_user",
+    "docker_work": "deferred_until_pipeline_complete_group_G_packaging",
     "all_real_model_execution": "Modal",
     "modal_profile": "vuonghungnguyen07",
     "modal_workspace": "vuonghungnguyen07",

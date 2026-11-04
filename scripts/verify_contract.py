@@ -1,4 +1,4 @@
-"""Reproduce P00 structural acceptance on the supplied kit, without gold/scoring."""
+"""Reproduce structural contract checks, without gold/scoring (groups E/G)."""
 
 from pathlib import Path
 
@@ -9,16 +9,16 @@ from datamate.validation import inspect_input, inspect_logs, inspect_submission
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    destination = new_run(root / "runs", "p00-contract")
+    destination = new_run(root / "runs", "contract")
     report = {
-        "phase": "P00",
+        "timeline_groups": ["E", "G"],
         "scope": "project_structural_acceptance_from_written_spec",
         "run_dir": str(destination.relative_to(root)),
         "splits": {},
         "organizer_scorer_acceptance": "not_applicable_organizer_provides_no_executable",
         "organizer_tool_availability_source": "user_confirmation_2026-11-01",
-        "scorer_implementation": "P02_project_scorer_from_written_spec",
-        "docker": "deferred_to_P13_by_user",
+        "scorer_implementation": "pending_group_E_from_written_spec",
+        "docker": "deferred_until_pipeline_complete_group_G",
         "gpu": "not_tested",
         "pa": "not_evaluated",
         "contract_sha256": sha256(root / "manifests/competition_contract.json"),
@@ -49,7 +49,7 @@ def main() -> int:
     )
     write_json(destination / "verification.json", report)
     # Commit only aggregate metadata; full logs and data remain ignored in runs/.
-    write_json(root / "reports" / "p00_contract_checks.json", report)
+    write_json(root / "reports" / "contract_checks.json", report)
     print(destination / "verification.json")
     return 0 if report["passed"] else 1
 

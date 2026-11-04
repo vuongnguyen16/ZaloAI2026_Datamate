@@ -25,7 +25,7 @@ packages = ["src/datamate"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib"]
-markers = ["gpu: remote Modal only", "integration: checks the CPU pipeline"]
+markers = ["gpu: remote Modal only", "modal: remote Modal integration, including CPU jobs", "integration: checks the CPU pipeline"]
 
 [tool.ruff]
 target-version = "py311"

@@ -1,4 +1,4 @@
-"""P00 structural checks from the supplied contract, never answer matching/PA.
+"""Structural checks from the supplied contract, never answer matching/PA.
 
 This module reads questions, file metadata, rule/calendar hashes and predictions.
 It does not open gold labels or inspect business table content.

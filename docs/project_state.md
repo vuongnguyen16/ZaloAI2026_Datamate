@@ -1,19 +1,49 @@
-# Trạng thái dự án
+# Trạng thái DataMate theo Timeline A–G
 
-Cập nhật 01/11/2026, giờ Việt Nam.
+Cập nhật 04/11/2026, giờ Việt Nam. Theo yêu cầu người dùng, timeline DOCX trong
+Research là nguồn kế hoạch hiện tại; toàn bộ tracker cũ đã được thay thế.
+Các mốc ngày trong DOCX là dự kiến, không tự thay lịch/contract BTC.
 
-**Phase hiện tại:** P00 đã triển khai contract/runner stub/validator và nghiệm thu cấu trúc trên kit thật theo thể lệ. Người dùng xác nhận BTC không có runner/evaluator riêng; không chờ executable BTC. Sẵn sàng P01. Chưa B0.
+**Hiện tại:** đã dọn tài liệu cũ và giữ foundation có ích. Chưa bắt đầu build
+task chức năng mới theo timeline. `G-FOUNDATION` và `A-INVENTORY` chỉ công nhận
+phạm vi kế thừa, không tương đương G/T1 hay A/T1 hoàn thành.
 
-**Phiên bản chạy ổn định:** package `datamate` 0.1.0, CPython 3.11.18, uv 0.13.6, dependencies trong `uv.lock`. Không chọn model thật.
+**Đã có:** CPython 3.11.18 + uv 0.13.6 + lock; strict schema/validators;
+fake/stub runner, logging/hash; inventory cơ học; CPU gate/CI; Modal CPU smoke
+lịch sử. Xem `docs/foundation.md`. Chưa có real model, scorer, PA/B0.
 
-**Bằng chứng gần nhất:** 34 tests pass + lint/format. P00 kiểm tra 3.000 train + 1.000 public: input refs/schema, submission đầy đủ ID, log/answer khớp; không mở gold. Shell entrypoint pass synthetic. Hash kit nguyên trạng. Kết quả ở `reports/p00_results.md`, `reports/p00_contract_checks.json`; S00 cloud smoke lịch sử ở `reports/s00_setup.md`.
+**Kiểm chứng phiên reset:** cổng CPU chuẩn exit 0, Ruff/format pass và **59 tests
+pass trong 12.07s**; artifact `runs/cpu-check-20261104T164734905777Z-5kmhmukp/gate.json`.
+Context A-T1: todo/ready, timeline đúng hash, không warnings, CPU passed/current;
+20 task không lỗi dependency/vòng lặp, ID cũ bị từ chối. Audit kit: hash train/public
+và thể lệ giữ nguyên. Skill validator pass. Kết quả ở `reports/timeline_reset_results.md`.
+GPU/model không chạy; PA chưa đánh giá; CI GitHub chưa chạy. Review là self-review.
 
-**Config:** `configs/smoke.yaml` cho fixture nhỏ; `configs/modal_dev.yaml` profile/workspace `vuonghungnguyen07`, ngân sách 30 USD/thí nghiệm. Token đã xác thực; không đổi active profile của máy. Source core không phụ thuộc Modal SDK.
+**Config/tài nguyên:** `configs/smoke.yaml` chỉ synthetic;
+`configs/modal_dev.yaml` profile/workspace `vuonghungnguyen07`, tối đa 30 USD
+mỗi thí nghiệm. Xác minh lại tài khoản/budget trước job. Không có model đã pin.
 
-**Quyết định còn hiệu lực:** plan v1.3; Docker hoãn toàn bộ tới P13 sau khi pipeline hoàn chỉnh, không chặn S00/P00–P12. Giữ nguyên Dockerfile/.dockerignore nháp. Modal Image vẫn dùng cho cloud. Local chỉ CPU nhẹ/fake; model thật trên Modal; không đọc gold vào inference; chưa upload dữ liệu BTC; không dùng public/private test để training/tuning. Raw giữ nguyên, hash trong `manifests/kit_files.json`.
+**Quy tắc tiếp tục giữ:** raw read-only; không đọc gold vào inference; không
+upload BTC data khi chưa rõ quyền; không tuning bằng public/private test;
+split/access policy phải rõ trước tuning/huấn luyện; model thật chỉ trên Modal.
+Docker nháp giữ nguyên tới bước đóng gói nhóm G sau khi pipeline hoàn chỉnh.
 
-**Chưa kiểm chứng / việc về sau:** scorer project/matching/PA (P02); GPU/model/offline model (P04); full runtime/budget và Docker (P13); revision kit upstream; quyền upload kit; backup ngoài ổ D. Deadline 16/11/2026 23:59 GMT+7 đã đối chiếu trang chủ BTC ngày 01/11/2026.
+**Bước tiếp theo:** A-T1 — khảo sát metadata dòng/cột/README và thiết kế loader
+CSV/XLSX/SQLite → DuckDB giữ raw. Trước sửa đọc timeline A/T1 và contract; ghi
+research/spec nhỏ, kiểm tra format thực tế được phép. E-T1 scorer và C-T1
+rulebook/calendar vẫn todo; timeline ghi scorer “đã có” không phải bằng chứng
+repo hiện có scorer. Không tự chọn/chạy model trong phiên cleanup.
 
-**Việc tiếp theo có phạm vi rõ:** P01 inventory metadata/cấu trúc và khóa manifest chia development/calibration/holdout theo business, tránh nghiên cứu sâu câu/nhãn trước khi khóa. P02 sau đó xây scorer từ quy tắc chấm thành văn và diagnostic oracle; chỉ các quy tắc chưa rõ mới mang policy provisional. Không chờ scorer/runner BTC, không làm Docker hoặc chọn model trong P01.
+**Phiên mới:** chạy `uv run --locked python scripts/harness.py context --task A-T1`,
+đọc `read_first` và DOCX timeline, review diff rồi chạy CPU gate. Context trả
+path/hash timeline; nếu thiếu thì báo thiếu, không hồi sinh plan đã bỏ.
 
-**Cách tiếp tục ở phiên mới:** đọc README → file này → tasks/backlog.json → docs/requirements.md, kiểm tra diff rồi chạy `uv run --locked python scripts/check.py`. Không coi trạng thái kế hoạch ban đầu là bằng chứng công việc đã hoàn thành.
+**Backup:** `runs/timeline-reset-backup-20261104-233607/`, 32 file đã xác minh
+SHA-256 trước sửa/xóa, local/ignored. Không xóa data, lịch sử Git, runs cũ,
+môi trường uv hoặc tài liệu gốc; phiên cleanup không commit/push.
+
+**Đồng bộ GitHub theo yêu cầu mới:** đang chuẩn bị publish source/config/tests/
+tài liệu lên `vuongnguyen16/ZaloAI2026_Datamate`, nhánh main. Đã thêm bản timeline
+Markdown và ảnh sơ đồ để đọc trên web; DOCX vẫn là nguồn kế hoạch. Dữ liệu BTC,
+credentials, model, runs và môi trường local tiếp tục được ignore. Chỉ xác nhận
+publish/CI thành công sau khi kiểm tra remote.

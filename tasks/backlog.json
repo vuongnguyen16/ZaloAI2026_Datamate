@@ -1,78 +1,351 @@
 [
   {
-    "id": "S00-A",
-    "title": "Kiểm kê môi trường và phân công local/Modal",
-    "status": "done_with_recorded_unknowns",
-    "acceptance": ["Ghi phần cứng thực đo và công cụ", "Giới hạn CPU local", "Ghi profile/workspace/budget và lịch GPU smoke"],
-    "evidence": ["docs/environment.md", "scripts/doctor.py", "configs/modal_dev.yaml"]
-  },
-  {
-    "id": "S00-B-C",
-    "title": "Project src-layout, lock, bảo toàn dữ liệu và Git remote",
+    "id": "RESET-TIMELINE",
+    "title": "Dọn foundation và chuyển tracker sang timeline A–G",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "Quyết định người dùng 04/11",
     "status": "done",
-    "acceptance": ["uv sync --locked trong môi trường sạch", "Core import/smoke thành công", "Raw/model/secret không được track"],
-    "evidence": ["pyproject.toml", "uv.lock", ".python-version", ".gitignore", "reports/s00_setup.md"]
+    "depends_on": [],
+    "acceptance": [
+      "Không còn điều hướng plan cũ",
+      "Giữ regression nền",
+      "Context đọc đúng timeline; cổng CPU pass"
+    ],
+    "evidence": [
+      "docs/research/timeline_reset.md",
+      "reports/timeline_reset_results.md",
+      "runs/cpu-check-20261104T164734905777Z-5kmhmukp/gate.json (local, ignored): exit 0; 59 passed in 12.07s",
+      "runs/timeline-reset-context.json (local, ignored)"
+    ],
+    "scope": "Cleanup/migration, không build các module mới"
   },
   {
-    "id": "S00-D-E-F",
-    "title": "Coding harness, CLI/config/contracts và cổng CPU",
-    "status": "done",
-    "acceptance": ["Phiên mới có task/state/lệnh chạy", "Hai câu synthetic đúng", "Response hỏng/ID sai bị phát hiện", "Cổng fail đúng và pass đúng"],
-    "evidence": ["AGENTS.md", "README.md", "scripts/check.py", "reports/s00_setup.md"]
-  },
-  {
-    "id": "S00-H-G-CPU",
-    "title": "Modal CPU smoke có chặn mạng",
+    "id": "G-FOUNDATION",
+    "title": "Nền môi trường, coding harness, contract và fake runner kế thừa",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "G/T1; E nền",
     "status": "done_with_limitations",
-    "acceptance": ["Profile đã xác thực và ngân sách được giao", "Cloud CPU trả đúng synthetic", "Probe egress thất bại", "Có artifact và runbook"],
-    "evidence": ["infra/modal_app.py", "docs/modal_runbook.md", "reports/s00_setup.md"],
-    "limitations": ["Chưa kiểm tra hard billing cap", "Docker và /data read-only trên host tương đương BTC hoãn tới P13 theo yêu cầu người dùng; không là blocker hiện tại"]
+    "depends_on": [],
+    "acceptance": [
+      "uv/lock và CPU gate hiện có",
+      "Contract/stub/log/hash có regression",
+      "Ghi rõ chưa real model/scorer"
+    ],
+    "evidence": [
+      "docs/foundation.md"
+    ],
+    "inherited": true,
+    "limitations": [
+      "Chưa hoàn thành G/T1 model thật",
+      "CI remote chưa chạy",
+      "GPU/PA chưa kiểm chứng"
+    ]
   },
   {
-    "id": "P00",
-    "title": "Contract từ thể lệ, runner stub và validator project trên kit thật",
-    "status": "done",
-    "depends_on": ["S00-B-C"],
-    "acceptance": ["Requirements có nguồn thể lệ và website BTC", "Stub/validator project pass cấu trúc, ID và log trên cả hai split", "Unknown được ghi rõ; BTC không có runner/evaluator riêng theo xác nhận người dùng"],
-    "evidence": ["docs/research/P00_contract.md", "docs/requirements.md", "manifests/competition_contract.json", "manifests/p00_sources.json", "reports/p00_contract_checks.json", "reports/p00_results.md"],
-    "limitations": ["Matching/PA triển khai ở P02 từ đặc tả", "Docker hoãn P13"]
+    "id": "A-INVENTORY",
+    "title": "Inventory cơ học kế thừa",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "A/T1, một phần",
+    "status": "done_with_limitations",
+    "depends_on": [],
+    "acceptance": [
+      "File/hash/câu theo business và bảo vệ input",
+      "Regression ID/JSON/output alias giữ nguyên"
+    ],
+    "evidence": [
+      "docs/foundation.md"
+    ],
+    "inherited": true,
+    "limitations": [
+      "Chưa khảo sát dòng/cột/README nội dung hoặc loader"
+    ]
   },
   {
-    "id": "P01",
-    "title": "Inventory và khóa split nội bộ theo business",
+    "id": "A-T1",
+    "title": "Khảo sát schema và loader CSV/XLSX/SQLite → DuckDB giữ raw",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "A/T1",
     "status": "todo",
-    "depends_on": ["P00"],
-    "acceptance": ["Business không giao nhau", "Manifest/split seed và lý do", "Khóa split trước nghiên cứu sâu nhãn"],
-    "evidence": ["manifests/kit_files.json chỉ là hash/metadata ban đầu; chưa có data_splits.json"]
+    "depends_on": [
+      "G-FOUNDATION",
+      "A-INVENTORY"
+    ],
+    "acceptance": [
+      "Có khảo sát định dạng/dòng/cột/README với dữ liệu được phép",
+      "Mọi business nạp được qua loader có lỗi có cấu trúc",
+      "Giữ raw và có fingerprint/cache theo business"
+    ],
+    "evidence": [],
+    "next_action": "Đọc timeline A/T1 và contract; khảo sát metadata được phép, ghi research/build spec cho loader nhỏ nhất trước triển khai"
   },
   {
-    "id": "P02",
-    "title": "Scorer của dự án từ quy tắc chấm thành văn và diagnostic oracle",
+    "id": "E-T1",
+    "title": "Scorer từ thể lệ, run_eval và taxonomy câu hỏi",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "E/T1",
     "status": "todo",
-    "depends_on": ["P01"],
-    "acceptance": ["Matching từng type có nguồn và ca đúng/sai", "PA/correct/wrong/abstain được kiểm tra", "Corner cases không rõ có policy provisional minh bạch", "Không chờ hoặc gọi scorer project là executable BTC"],
-    "evidence": ["Thể lệ cuộc thi: section 2; manifests/p00_sources.json"]
+    "depends_on": [
+      "G-FOUNDATION"
+    ],
+    "acceptance": [
+      "Matching từng type có nguồn/corner cases rõ",
+      "PA/correct/wrong/abstain có fixture đúng/sai",
+      "Taxonomy chỉ dùng split được phép, không gold vào inference"
+    ],
+    "evidence": [],
+    "limitations": [
+      "Timeline ghi scorer đã có nhưng repo hiện chưa có; không coi là done"
+    ]
   },
   {
-    "id": "P04",
-    "title": "Model/SQL worker có process boundary và timeout trên Modal",
+    "id": "C-T1",
+    "title": "Checklist rulebook và tiện ích calendar",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "C/T1",
     "status": "todo",
-    "acceptance": ["Model đủ điều kiện được pin", "GPU/network-off smoke thật", "Worker timeout được dừng có cấu trúc"],
+    "depends_on": [
+      "G-FOUNDATION"
+    ],
+    "acceptance": [
+      "Định nghĩa có trích nguồn",
+      "Tuần/tháng/cùng kỳ/Tết theo calendar và as_of_date có unit test"
+    ],
     "evidence": []
   },
   {
-    "id": "P05-resume",
-    "title": "Runner thật có fingerprint/resume và streaming output",
+    "id": "D-G-T1",
+    "title": "Model ban đầu ≤15B và runtime trên Modal",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "D/T1; G/T1",
     "status": "todo",
-    "acceptance": ["Crash/resume không trộn config", "Đổi rule/config vô hiệu cache", "Có B0 thật với scorer"],
+    "depends_on": [
+      "G-FOUNDATION"
+    ],
+    "acceptance": [
+      "Eligibility/revision/license/budget/profile đã xác minh",
+      "Lời gọi model thật trên Modal có artifact",
+      "Probe end-to-end có giới hạn, không model local"
+    ],
     "evidence": []
   },
   {
-    "id": "P13-Docker",
-    "title": "Nghiệm thu Docker offline và full run tương đương BTC",
-    "status": "deferred_by_user_until_pipeline_complete",
-    "start_condition": "P13, sau khi pipeline và cấu hình giải pháp hoàn chỉnh; không chặn P00–P12",
-    "acceptance": ["Base/image digest đã ghi", "Mount /data read-only, /result ghi được", "Cold start/full run trong budget"],
-    "evidence": ["Dockerfile mới là candidate CPU, chưa build/test trên host Docker"]
+    "id": "A-T2",
+    "title": "Profile schema, encoding và header",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "A/T2",
+    "status": "todo",
+    "depends_on": [
+      "A-T1"
+    ],
+    "acceptance": [
+      "Profile bảng/cột/type/sample/null/min-max",
+      "Encoding/header có ca tái hiện",
+      "Baseline dùng được schema profile"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "C-T2",
+    "title": "domain_lib bản đầu",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "C/T2",
+    "status": "todo",
+    "depends_on": [
+      "C-T1"
+    ],
+    "acceptance": [
+      "Hàm doanh thu/số lượng/đơn hủy/trả theo checklist",
+      "Có unit test và giao diện baseline gọi được"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "G-T2",
+    "title": "Tracing, cache theo business và seed",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "G/T2",
+    "status": "todo",
+    "depends_on": [
+      "G-FOUNDATION"
+    ],
+    "acceptance": [
+      "Mọi ID có output/log kể cả lỗi",
+      "Cache không trộn data/rule/config",
+      "Ghi seed và giới hạn tái lập"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "D-E-T2",
+    "title": "Baseline single_sql và PA theo business/type",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "D/T2; E/T2",
+    "status": "todo",
+    "depends_on": [
+      "A-T1",
+      "E-T1",
+      "C-T2",
+      "D-G-T1",
+      "G-T2"
+    ],
+    "acceptance": [
+      "Input thật → model/SQL → output có log",
+      "Có PA baseline với scorer và split/config đã khai báo",
+      "Fake/stub không dùng làm baseline"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "E-SPLIT",
+    "title": "Khóa split và access policy",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "E/T3; trước tuning/huấn luyện",
+    "status": "todo",
+    "depends_on": [
+      "A-T1"
+    ],
+    "acceptance": [
+      "Development/calibration/holdout có manifest/lý do",
+      "Tách business/domain phù hợp, không leakage",
+      "Không chọn prompt/model/ngưỡng bằng holdout hoặc test"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "A-T3-T6",
+    "title": "Cleaning, semantic profile, join/entity và missing-data flags",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "A/T3–T6",
+    "status": "todo",
+    "depends_on": [
+      "A-T2",
+      "D-E-T2",
+      "E-SPLIT"
+    ],
+    "acceptance": [
+      "Giữ bảng raw, cleaning có test/lineage",
+      "Join/entity/coverage có bằng chứng",
+      "Đo trên dữ liệu được phép, không chỉ heuristic"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "B-T3-T6",
+    "title": "Tiếng Việt, thời gian, kiểu đáp án và entity linking",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "B/T3–T6",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2",
+      "C-T1",
+      "E-SPLIT"
+    ],
+    "acceptance": [
+      "Từ viết tắt/thời gian theo as_of/calendar có tests",
+      "Đánh giá normalization/type/entity và ambiguity"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "C-T3-T6",
+    "title": "Rulebook cấu trúc và mở rộng domain_lib theo lỗi",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "C/T3–T6",
+    "status": "todo",
+    "depends_on": [
+      "C-T2",
+      "D-E-T2"
+    ],
+    "acceptance": [
+      "Đọc rulebook lúc chạy",
+      "Mỗi helper có test",
+      "Biến thể rulebook được kiểm chứng"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "D-T3-T7",
+    "title": "Repair/linking, ReAct có sandbox, voting và router",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "D/T3–T7",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2",
+      "E-SPLIT"
+    ],
+    "acceptance": [
+      "Mỗi chiến lược có config/control và failure tests",
+      "Có giới hạn worker/timeout",
+      "Chỉ giữ khi chất lượng/chi phí có bằng chứng"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "E-T3-T8",
+    "title": "Error analysis, verification/format, abstain và evaluation freeze",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "E/T3–T8",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2",
+      "E-SPLIT"
+    ],
+    "acceptance": [
+      "Báo lỗi và regression theo type/business",
+      "Ngưỡng chọn bằng calibration",
+      "Holdout/freeze/repro có báo cáo đúng phạm vi"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "F-CONDITIONAL",
+    "title": "Model bake-off, synthetic/SFT/LoRA nếu có bằng chứng",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "F/T3–T7",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2",
+      "E-SPLIT"
+    ],
+    "acceptance": [
+      "Chỉ dùng dữ liệu được phép và trace kiểm chứng",
+      "So control có split/access policy",
+      "Go/no-go và chi phí rõ; có thể giữ base model"
+    ],
+    "evidence": [],
+    "start_condition": "Có phân tích lỗi và ngân sách; không là blocker của baseline/bản nộp"
+  },
+  {
+    "id": "G-T5",
+    "title": "Throughput và ngân sách full run",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "G/T5",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2"
+    ],
+    "acceptance": [
+      "Đo throughput/tail/cold start thật",
+      "Budget đủ bằng phép đo, không chỉ ngoại suy câu dễ"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "G-PACKAGING",
+    "title": "Docker offline, reproducibility, freeze và nộp",
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_section": "G/T7–T8",
+    "status": "todo",
+    "depends_on": [
+      "D-E-T2",
+      "G-T5"
+    ],
+    "acceptance": [
+      "Pipeline hoàn chỉnh trước Docker",
+      "Offline/read-only/full run có evidence",
+      "Freeze/checksum/repro và lịch nộp đã xác minh"
+    ],
+    "evidence": [],
+    "start_condition": "Chỉ bắt đầu đóng gói sau khi pipeline và cấu hình giải pháp hoàn chỉnh"
   }
 ]

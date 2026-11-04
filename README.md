@@ -1,66 +1,72 @@
 # DataMate
 
-Khởi tạo dự án theo `Research/DataMate_Research_Build_Plan.md` v1.3.
-Hiện tại có CPU smoke bằng fake adapter và stub kiểm tra format; chưa có model thật hoặc B0.
+Dự án triển khai theo [Timeline DataMate A–G](<Research/Timeline DataMate theo nhóm việc A–G.docx>).
+Bản [timeline Markdown đọc trực tiếp trên web](Research/Timeline_DataMate_A-G.md)
+có đầy đủ văn bản, bảng và sơ đồ từ DOCX gốc.
+Bắt đầu lại theo timeline từ 04/11/2026, kế thừa phần nền đã kiểm thử.
+Chưa có loader đa định dạng, scorer, model thật hoặc PA baseline.
 
-## Chạy trên Windows PowerShell
-
-Python được pin ở `.python-version`; dependency được khóa bằng `uv.lock`.
-Nếu `uv` chưa có trên PATH, dùng bản workspace:
+## Bắt đầu phiên làm việc
 
 ```powershell
 $env:PATH = "$PWD\.tools\uv;$env:PATH"
 $env:UV_CACHE_DIR = "$PWD\.uv-cache"
 $env:UV_PYTHON_INSTALL_DIR = "$PWD\.uv-python"
 uv sync --locked
-uv run --locked python scripts/doctor.py
+uv run --locked python scripts/harness.py context --task A-T1
 uv run --locked python scripts/check.py
+```
+
+Đọc [trạng thái](docs/project_state.md), [backlog](tasks/backlog.json), timeline và
+[contract](docs/requirements.md) trước sửa. Dùng interpreter `.venv/Scripts/python.exe`,
+không dùng Python MSYS2 trên PATH. Python pin ở `.python-version`, dependency ở `uv.lock`.
+Skill repo `$datamate-increment` dùng cùng tracker; [hướng dẫn harness](docs/harness.md).
+
+## Phần nền giữ lại
+
+| Nhóm timeline | Có thể dùng ngay | Chưa được coi là hoàn thành |
+|---|---|---|
+| A — Dữ liệu | Inventory file/hash/câu theo business; bảo vệ raw | Khảo sát dòng/cột/README, CSV/XLSX/SQLite loader, profile/cleaning |
+| E — Đánh giá | Strict output schema, validator input/submission/log | Matching scorer, run_eval, split/access policy, phân tích lỗi và PA |
+| G — Hạ tầng | uv/lock, CLI, fake runner, logging/hash, CPU gate/CI, Modal CPU smoke | GPU/model thật, cache/resume production, throughput và Docker offline |
+| B/C/D/F | Contract, config và giao diện để phát triển tiếp | Chưa triển khai module nghiệp vụ/ngôn ngữ/agent/huấn luyện |
+
+Nguồn và giới hạn bằng chứng kế thừa: [foundation](docs/foundation.md).
+Chỉ bắt đầu task mới trong phạm vi được giao; chưa tạo module rỗng theo tên thư mục timeline.
+Task đầu tiên sẵn sàng là **A-T1**, cùng các việc E-T1 và C-T1 có thể lên kế hoạch tiếp.
+
+## Công cụ hiện có
+
+```powershell
+uv run --locked python scripts/doctor.py
 uv run --locked datamate smoke --config configs/smoke.yaml
-```
-
-Editor chọn interpreter `.venv/Scripts/python.exe`. Không dùng Python MSYS2 trên PATH để chạy project.
-Máy khác cài [uv chính thức](https://docs.astral.sh/uv/getting-started/installation/), rồi chạy cùng lệnh `uv sync --locked`.
-Không cần activate venv khi dùng `uv run`. Core không cài engine GPU.
-
-Smoke dùng hai câu synthetic: tổng `12.34 + 0.01 = 12.35` và mã `0012` giữ số 0 đầu.
-Kết quả trong thư mục mới `runs/smoke-.../`: submission, predictions, log từng câu, manifest hash, config và summary.
-Đường dẫn trong YAML tính từ thư mục chứa YAML. SQL trong smoke là fixture tin cậy; worker SQL cho model chưa triển khai.
-
-## Stub theo format thể lệ được cung cấp
-
-```powershell
-uv run --locked datamate stub --input data/train --output runs/train-format-stub
-```
-
-Stub chỉ đọc `questions.jsonl`, xuất mỗi ID một `abstain`; không đọc gold hoặc dữ liệu doanh nghiệp.
-Thư mục output phải mới/trống để tránh trộn run. `predict.sh` mặc định gọi stub với `/data` và `/result` theo thể lệ; biến `DATAMATE_INPUT_DIR`/`DATAMATE_OUTPUT_DIR` dùng cho phép thử shell ngoài container.
-Chưa có evaluator/runner chính thức trong workspace để xác nhận tương thích đầy đủ.
-`predict` thật ở P05 và `evaluate` ở P02 chưa có; không dùng stub để báo chất lượng model.
-
-## P00 — Kiểm tra contract
-
-```powershell
+uv run --locked python scripts/inventory.py --input data/train --output runs/inventory-new
 uv run --locked datamate validate-input --input data/train
-uv run --locked datamate validate-submission --input data/train --submission runs/train-format-stub/submission.jsonl --require-complete
-uv run --locked datamate validate-logs --input data/train --run runs/train-format-stub
-uv run --locked python scripts/verify_p00.py
+uv run --locked python scripts/audit_kit.py
 ```
 
-Các validator chỉ kiểm tra cấu trúc, tham chiếu business và coverage/log; không đọc gold hoặc tính PA. Thiếu ID được báo là abstain theo tài liệu; `--require-complete` là cổng riêng để bắt lỗi runner bỏ sót câu. JSON sai, ID trùng/ngoài input và type/value sai bị báo lỗi. Kết quả tái hiện của cả train/public test nằm ở `reports/p00_contract_checks.json` và `reports/p00_results.md`.
+Smoke chỉ chạy hai câu synthetic: tổng `12.35` và mã `0012`. SQL fixture tin cậy,
+không phải worker an toàn cho SQL do model sinh. Local giới hạn 2 threads,
+DuckDB 256 MiB, fixture tối đa 1 MiB. Inventory chỉ cơ học; chưa đọc header/sheet/catalog.
+Output inventory phải mới và ở ngoài input, kể cả alias/junction.
 
-**Docker hoãn tới P13**, sau khi pipeline hoàn chỉnh, theo quyết định chủ dự án. Không build/test/chỉnh Dockerfile trong các phase hiện tại. Hai file Docker có sẵn là bản nháp chưa kiểm chứng; yêu cầu offline, filesystem và format vẫn được theo dõi. Modal Image cho job cloud vẫn sử dụng bình thường.
+`datamate stub --input INPUT --output OUTPUT` chỉ xuất abstain/log theo format.
+`predict.sh` hiện gọi stub tại `/data` → `/result`; chưa phải inference thật.
+`validate-submission` và `validate-logs` kiểm tra cấu trúc, không chấm PA.
+`scripts/verify_contract.py` kiểm tra input/stub/submission/log cả train và public
+theo contract, không parse gold; ghi report vào `reports/contract_checks.json`.
 
-## Local và Modal
+## Modal, dữ liệu và đóng gói
 
-Local chỉ viết code, lint/test, fixture nhỏ: 2 threads, DuckDB 256 MiB, fixture tối đa 1 MiB.
-Mọi model thật chạy Modal, kể cả embedding/reranker hoặc model CPU nhỏ. Không tải weights về laptop.
-Profile và workspace người dùng cung cấp: `vuonghungnguyen07`; xem `configs/modal_dev.yaml` và `docs/modal_runbook.md`.
-Đã xác thực profile và chạy thành công smoke CPU Modal có chặn egress. Ngân sách người dùng: tối đa 30 USD/thí nghiệm.
-GPU/quota/billing thực tế chưa đo; xem `reports/s00_setup.md`.
+Mọi model thật chạy Modal; local không tải weights hoặc cài CUDA/PyTorch/vLLM.
+Profile/workspace `vuonghungnguyen07`, tối đa 30 USD/thí nghiệm; xác minh lại trước
+job theo [runbook](docs/modal_runbook.md). Trong phiên reset không chạy cloud.
 
-## Trạng thái và dữ liệu
+`data/`, models, runs, credentials và thể lệ gốc được giữ local qua `.gitignore`.
+Không upload kit khi chưa xác minh quyền; source chỉ dùng fixture synthetic.
+Dockerfile/.dockerignore là bản nháp giữ cho nhóm G sau khi pipeline hoàn chỉnh.
+Chưa build/test Docker. Workflow CPU sẽ chạy khi push lên GitHub;
+kết quả CI cần được kiểm tra riêng với bằng chứng CPU local.
 
-Đọc `docs/project_state.md`, `docs/environment.md`, `docs/requirements.md` và `tasks/backlog.json`.
-`data/`, model, runs, credentials và thể lệ gốc được giữ local qua `.gitignore`.
-Chưa upload dữ liệu BTC hoặc push lên GitHub. Chỉ fixture synthetic được quản lý trong source.
-Repo dự án: https://github.com/vuongnguyen16/ZaloAI2026_Datamate.
+Chi tiết giữ/xóa và backup: [báo cáo reset](reports/timeline_reset_results.md).
+Repo: https://github.com/vuongnguyen16/ZaloAI2026_Datamate.

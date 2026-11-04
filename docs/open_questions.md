@@ -1,10 +1,20 @@
-# Những mục cần xác minh
+# Những mục còn cần xác minh theo A–G
 
-1. Revision/changelog của kit local chưa rõ. Deadline giải pháp 23:59 ngày 16/11/2026 GMT+7 đã đối chiếu trang chủ BTC ngày 01/11/2026; vẫn kiểm tra lại trước freeze.
-2. BTC không có runner/evaluator riêng, đã được người dùng xác nhận; không cần tiếp tục hỏi/tìm như blocker. P00 dùng đặc tả trong DOCX và validator project; P02 tự xây scorer từ đặc tả. Corner cases cần nghiên cứu được nêu ở mục 4.
-3. `/data` mount trực tiếp split hay có wrapper; quyền user, Docker base/CUDA chính thức và cache/temp/resource constraints cụ thể? Theo quyết định chủ dự án, mọi việc Docker hoãn tới P13, không chặn P00–P12.
-4. Các corner case của serializer/scorer: rounding tie, table cells/nulls/column fallback, alias, duplicate/unknown IDs? Không sửa scorer dựa vào suy đoán.
-5. Quyền upload dữ liệu BTC lên Modal hoặc dịch vụ AI coding và quyền phân phối lại kit? Hiện chỉ synthetic được gửi Modal; raw/labels không push.
-6. GPU/quota/credits và spend limit dashboard của workspace `vuonghungnguyen07`? Ngân sách người dùng cho phép là 30 USD/thí nghiệm; chưa biết billing thực đo.
-7. P13 sẽ chọn host cloud nghiệm thu Docker tương đương BTC sau khi pipeline hoàn chỉnh. Modal Function chặn egress chưa thay thế Docker `/data` read-only trên máy chấm; đây là việc hoãn có chủ đích, không là blocker hiện tại.
-8. Nơi backup kit và artifacts lớn ngoài ổ D/Volume; thời gian tập trung còn lại của người phát triển?
+- A: format/schema thực tế, header/encoding/dirty patterns; inventory cơ học
+  chưa trả lời các câu này. Revision/changelog kit chưa rõ.
+- E: chưa có scorer project. BTC không cung cấp executable evaluator theo xác
+  nhận người dùng; xây matching từ thể lệ, ghi policy provisional cho rounding
+  ties, alias, table order/null/cell và trường hợp đặc tả chưa rõ.
+- E: split/access policy trước tuning/huấn luyện; không chọn cấu hình trên
+  holdout hoặc public/private test. Chưa có manifest split đã khóa.
+- C: rulebook/checklist và calendar semantics phải được nghiên cứu trực tiếp;
+  không lấy giả định của timeline làm định nghĩa chính thức.
+- D/G/F: quyền gửi BTC data lên Modal, quota GPU, usage/billing/spend cap chưa
+  được xác minh. Chỉ synthetic đã được gửi cloud; budget 30 USD/thí nghiệm.
+- G: offline/mount/quyền/temp/cache, cold start/full runtime và Docker digest
+  chưa kiểm chứng. Chờ pipeline hoàn chỉnh để đóng gói, không chặn việc CPU sớm.
+- Nguồn lịch trong contract được đối chiếu 01/11; timeline DOCX có mốc ước tính
+  khác. Khi lập lịch/nộp phải xác minh BTC hiện hành, không tự coi ngày trong
+  tài liệu kế hoạch là deadline BTC đã xác nhận.
+- Backup raw/artifact ngoài ổ D chưa xác minh. Backup cleanup trong runs chỉ
+  bảo vệ 32 file code/tài liệu bị đổi, không thay backup kit.

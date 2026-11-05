@@ -17,7 +17,15 @@ audits: đủ 339 unit/3.184 cột/3.997.599 hàng/33.628.129 present cells, fra
 digests trùng A-T1 trước đổi policy. Spec [hoàn thiện](research/a_t2_completion.md),
 [báo cáo](../reports/a_t2_completion_results.md), [runtime policy](runtime_format.md).
 Không ghi nhận text flags trong train; không coi đó là chứng minh không có
-mọi legacy encoding. Source mới giữ local, chưa commit/push phiên này.
+mọi legacy encoding. Source hoàn thiện đã push theo yêu cầu tiếp theo:
+commit [790b1af](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c),
+nhánh main; [source CI 41997216193](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193)
+completed/success, 144 tests trong 12.02s trên Ubuntu, Ruff/format pass.
+Đã đối chiếu remote SHA và đọc job steps/log. 26 path đã rà, không secret
+patterns hoặc raw/profile/nhãn/runs được stage; kit hash không đổi. Evidence
+local: `runs/github-sync-t2-completion-20261105/`; chi tiết
+[publication](../reports/github_publish.md). Commit docs sau source chỉ ghi
+kết quả; CPU local/final acceptance vẫn cùng fingerprint hiện hành.
 Handoff đã xác nhận A-T2 done, CPU passed/current/no warning, frozen
 labels/rule và final proof current; kit/cache cũ/protected configs không đổi.
 12 tài liệu/tracker UTF-8/NFC/JSON, 53 link local và diff/format pass; evidence

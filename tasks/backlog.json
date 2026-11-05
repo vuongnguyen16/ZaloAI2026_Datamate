@@ -169,6 +169,8 @@
       "docs/research/a_t2_engineering.md",
       "docs/research/a_t2_completion.md",
       "reports/a_t2_completion_results.md",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c: source/tests/docs A-T2 completion published to main, 26 files; no raw/profile/labels/runs upload",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193: source CPU CI success, 144 tests in 12.02s on Ubuntu, Ruff/format pass; job steps/log read",
       "runs/a-t2-completion-20261105/handoff_verification.json (local, ignored): A-T2 done, CPU passed/current; final acceptance and frozen rule current; raw/old cache/kit unchanged; protected configs, UTF-8/NFC/JSON/links/diff/format pass; D-E-T2 integration still todo",
       "docs/runtime_format.md",
       "runs/a-t2-completion-20261105/final_acceptance.json (local, ignored): current 30/30 businesses, 339 units/3184 columns/3997599 rows; 311 auto/11 unresolved/17 source_schema; 0 wrong selected against frozen labels; 60 repeat profile/schema hashes identical; independent profile audit pass; raw/cache/source unchanged; no text flags observed",
@@ -418,6 +420,9 @@
     "evidence": [
       "reports/github_publish.md",
       "Research/Timeline_DataMate_A-G.md",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c (05/11): A-T2 completion source/tests/docs, 26 files; remote SHA verified",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193 (05/11): source CI success, 144 tests in 12.02s, Ruff/format pass; logs read",
+      "runs/github-sync-t2-completion-20261105/prepublish.json, source-ci.json, source-ci-logs.json (local, ignored): staged review, UTF-8/NFC/JSON/links, credential patterns and kit hashes verified; no BTC raw/cache/profile/labels/runs uploaded",
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/62d67b9c97b1f3722ca5339412f2125347c44696 (05/11): toàn bộ source/tests/docs A-T1 và engineering A-T2, 25 file; remote SHA trùng local",
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41982405255 (05/11): source CPU CI success, 115 tests trong 9.03s trên Ubuntu; Ruff/format pass",
       "runs/cpu-check-20261105T064100622730Z-u8zuplsa/gate.json (local, ignored): prepush CPU passed/current, 115 tests trong 40.07s, source unchanged",

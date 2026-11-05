@@ -93,4 +93,6 @@ Ruff/format pass, source fingerprint c8f3b52a611dd0ec042835aa2bcc7b9321814551cb1
 trùng `runs/a-t2-completion-20261105/final_acceptance.json` và gate
 `runs/cpu-check-20261105T081753167962Z-qao9tpkg/gate.json`. Đã đọc JSON/log.
 A-T2 done, actual prompt/PA handoff còn mở tại D-E-T2. Không cloud/model/
-weights/Docker hoặc publish; nhãn/profile có sample giữ local/ignored.
+weights/Docker trong phiên implementation; nhãn/profile có sample giữ local/
+ignored. Source sau đó được publish theo yêu cầu mới của người dùng, có
+[publication/CI evidence](../../reports/github_publish.md).

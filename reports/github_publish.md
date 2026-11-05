@@ -1,5 +1,34 @@
 # Đồng bộ GitHub để đọc/review trên web
 
+## Hoàn thiện A-T2 — đồng bộ ngày 05/11/2026
+
+Theo yêu cầu “đưa lên github luôn”, đã commit/push source, tests synthetic và
+tài liệu hoàn thiện runtime format/header/data-start/descriptor lên main.
+Source commit:
+[`790b1af1ff48fca7f255206b12a89f02a31b973c`](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c),
+26 file, 1.956 insertions/95 deletions; có prompt Claude lưu trữ. Push
+fast-forward từ 14d6039; remote SHA đã đối chiếu trùng local. Các commit tài
+liệu tiếp theo ghi kết quả đồng bộ, không thay code đã nghiệm thu.
+
+- CPU local còn passed/current, **144 tests trong 44.83s**, Ruff/format pass;
+  `runs/cpu-check-20261105T081753167962Z-qao9tpkg/gate.json`, đã đọc JSON/log.
+  Fingerprint vẫn c8f3b52a611dd0ec042835aa2bcc7b9321814551cb130cffe78f5a455f994337,
+  trùng full train acceptance; không chạy lại gate khi source không đổi.
+- [GitHub Actions source CPU run 41997216193](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193)
+  completed/success cho đúng source SHA; Ubuntu **144 tests trong 12.02s**,
+  Ruff/format pass. Đã đọc job steps và log, không suy CI từ local.
+- Prepublish đã rà 26 path/289.231 bytes, UTF-8/NFC/JSON, 53 link local,
+  credential patterns không match, staged diff check pass. Chỉ source/tests/
+  aggregate docs được stage; không force-add hoặc upload raw BTC, gold, nhãn,
+  profile chứa mẫu, cache, runs, weights, credentials, attachment hay venv.
+  Kit hashes vẫn khớp manifest. Không đổi visibility, remote hoặc workflow.
+- A-T2 done với 311 auto/11 unresolved/17 source_schema; actual prompt/PA
+  acceptance vẫn ở D-E-T2. Không chạy Modal/model/GPU/PA hoặc Docker.
+
+Evidence local/ignored: `runs/github-sync-t2-completion-20261105/prepublish.json`,
+`source-ci.json`, `source-ci-logs.json`; kết quả kỹ thuật:
+[hoàn thiện A-T2](a_t2_completion_results.md).
+
 ## Đồng bộ A-T1 và engineering A-T2 ngày 05/11/2026
 
 Theo yêu cầu người dùng “đẩy hết lên github”, đã commit và push toàn bộ code,

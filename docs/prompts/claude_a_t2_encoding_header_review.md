@@ -1,3 +1,5 @@
+> Prompt lưu trữ trước phản hồi Claude và trước phiên hoàn thiện A-T2 ngày 05/11/2026. Các trạng thái “engineering done/research deferred” bên dưới là context lúc soạn, không phải trạng thái hiện tại. Xem [project state](../project_state.md) và [kết quả hoàn thiện](../../reports/a_t2_completion_results.md) để đọc tiếp.
+
 Tôi muốn bạn phản biện độc lập phần **dò encoding và tìm header trong A-T2** của dự án DataMate. Tôi đã kết nối GitHub repository với Claude để bạn đọc trực tiếp code và tài liệu.
 
 Đây là yêu cầu **đọc repo, phân tích và đề xuất phạm vi nghiên cứu**, chưa phải giao triển khai. Không sửa code/tracker, tạo PR, chạy model, huấn luyện, gọi dịch vụ trả phí hoặc tự thực hiện một đợt deep research lớn.

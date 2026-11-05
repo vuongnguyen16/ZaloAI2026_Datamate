@@ -151,7 +151,10 @@ Không sửa data/kit manifest, không commit/push/upload; profile/nhãn/raw gi�
 
 A-T2 đã đóng ở phạm vi trên sau yêu cầu hoàn thiện của người dùng; actual
 model/prompt/PA milestone vẫn mở ở D-E-T2, không báo nó đã đạt. Source mới
-chưa publish lên GitHub trong phiên này.
+không publish trong phiên implementation. Theo yêu cầu đồng bộ tiếp theo,
+đã push [source 790b1af](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c)
+và kiểm [source CI pass](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193),
+144 tests trên Ubuntu. Chi tiết: [publication](github_publish.md).
 
 Handoff cuối tại `runs/a-t2-completion-20261105/handoff_verification.json`:
 final proof/frozen label/rule hashes còn current, A-T2 done, CPU passed/current,

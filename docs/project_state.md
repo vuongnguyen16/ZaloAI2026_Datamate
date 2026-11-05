@@ -1,67 +1,99 @@
 # Trạng thái DataMate
 
-Cập nhật 05/11/2026, giờ Việt Nam. Nguồn kế hoạch duy nhất là DOCX mới,
-SHA-256 `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`; bản đọc [Markdown](../Research/Timeline_DataMate_A-G.md).
-Người dùng đã yêu cầu đồng bộ tracker/workspace/GitHub. Kế hoạch tuần 03/11
-đã được thay bằng các pha tuần tự P0–P9; A–G là nhóm chuyên môn.
+Cập nhật 05/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
+hash `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`;
+[bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
+tracker duy nhất state và tasks/backlog.json.
 
-**Bước tiếp theo: P0-SPLIT**, khóa nhóm business/template, split/access policy
-và giao thức thống kê trước taxonomy dùng gold. P0-SCORER có thể làm bằng
-fixture synthetic trong cùng pha; chỉ một task in_progress. Chỉ mở P1 sau
-P0-GATE/G0; sau đó P2 → P3 → P4 → P5 → P6 → P7. P8a/P8b có điều kiện,
-cần quyết định chạy/bỏ có lý do trước P9. Chưa triển khai P0 trong phiên đồng bộ.
+**P0/G0 đã hoàn tất.** Split/scorer/taxonomy/gate đều done;
+P1 ready, chưa model/Modal/Docker/public submission. P1 phải xác minh
+model/license/cutoff/tổng ≤15B, runtime sm_120, account vuonghungnguyen07,
+budget ≤30 USD và phạm vi dữ liệu trước job. Không tự mở job để chốt P0.
 
-## Foundation giữ lại
+## P0 hiện hành
 
-| Task | Trạng thái có bằng chứng | Giới hạn |
-|---|---|---|
-| A-T1 | done; 30/30 business, 339 unit, 3.997.599 hàng raw; source/cache audit độc lập theo parser | Không semantic cleaning; toàn train input đã được khảo sát |
-| A-T2 | done; format/profile/header/data_start/descriptor/consumer; 311 auto, 11 unresolved, 17 SQLite schema; check 218/219 tự chọn, 0 sai | Nhãn cùng tác giả; không unseen QA holdout/PA. data_start chỉ cận dưới; actual descriptor-in-prompt chuyển D-E-T2 → P2 |
-| G-FOUNDATION | done_with_limitations; uv/lock, CLI, validators/fake/log/hash, CPU CI và Modal CPU smoke lịch sử | Chưa model thật/GPU, scorer hoặc PA/B0 |
+- Split 18/6/6 business, 1895/397/708 câu, 4/3/2 cụm độc lập. Manifest hash
+  `b28dd4fa7fb34b7a0ed356c7ec11f32f84911bcdf71fcd128c2c5082b208fa18`
+  giữ nguyên; [split policy](split_policy.md). Không chia lại sau xem gold.
+- Scorer 9 type, run_eval/log, scoped reader, hashes và paired bootstrap
+  business/leakage sensitivity đã có; corner policies provisional.
+  [Hướng dẫn](evaluation.md), [nghiệm thu](../reports/p0_results.md),
+  [provenance](../manifests/p0_evidence.json).
+- Taxonomy metadata3000/dev1895; calibration397/holdout708 sealed. Dev34
+  unanswerable, 519 ASCII-only, 157 other/456 multi-candidate. Type từ gold dev;
+  họ/time/viết tắt heuristic, không human-reviewed accuracy claim.
+- Shared gold file được đọc byte/ID để routing; chỉ decode type/answer/alias
+  dev. Acceptance ngoài dev=0, live sealed-denial pass; release/public ledger
+  rỗng. Không gọi đó là chưa mở file gold; không xuất gold answer/alias.
+- All-abstain PA0 chỉ contract probe, không model/B0; runtime inference
+  unavailable. Calibration aggregate path kiểm synthetic, chưa phân tích gold
+  calibration. Ít leakage groups nên không significance claim.
+- API không thay OS ACL; release P7 cần evaluator/gate/prediction freeze riêng.
 
-Chi tiết: [A-T1](../reports/a_t1_loader_results.md),
-[A-T2](../reports/a_t2_completion_results.md), [foundation](foundation.md).
-Source A-T2 `790b1af` có CI lịch sử 144 tests pass
-([run 41997216193](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193)).
-Các final acceptance cũ vẫn là evidence lịch sử module; fingerprint cũ không
-còn current vì DOCX/harness mới. Không dùng chúng để báo cổng phiên này pass.
+Artifact thật chỉ local trong runs/p0-complete-20261105/. 161 source file,
+split và kit manifest không đổi; contract registry chỉ đồng bộ3 trường project,
+không đổi luật BTC. Không commit/push; CI cũ không chứng minh source mới pass.
+CPU cuối **232 tests pass trong36.59s**, Ruff/format pass, exit0;
+`runs/cpu-check-20261105T113049158829Z-92zldnf2/gate.json`. Đã đọc JSON/ba log,
+source không đổi trong gate, context passed/current/no warnings. Final proof
+`runs/p0-complete-20261105/final_acceptance.json` valid=true, source/artifacts
+current; gold byte hash khớp kit gốc, semantic decode ngoài dev=0. 92 tệp
+UTF-8/NFC/JSON và83 link local hợp lệ, luật BTC không đổi. P1 ready, P2 blocked.
 
-## Quyết định hiện hành
+## Foundation và ràng buộc giữ lại
 
-- Kiến trúc mục tiêu hybrid: thư viện nghiệp vụ dựng trên dev + model nhỏ gọi
-  hàm; SQL/Python dự phòng; abstain/verifier/formatter từ P2. Chưa build kiến trúc.
-- Docker tại P3 thuộc G, sau lát cắt P2/G2; giữ draft, chưa build trong migration.
-- Gold holdout sealed tới P7. Taxonomy P0 không được lộ gold holdout cho chọn
-  prompt/hàm; input đã từng xem phải ghi trong split. Public/private không tuning.
-- Mọi model thật chạy Modal, profile `vuonghungnguyen07`, ≤30 USD/thí nghiệm;
-  xác minh lại account/budget/quyền dữ liệu trước job. Migration không upload kit.
-- Ngày công là ước lượng; quy định/lịch/model/hardware phải xác minh tại task,
-  không tự coi nhận định trong Timeline là contract đã xác nhận.
-- Legacy converter, multi-table regions và kỹ thuật chưa có lợi ích tiếp tục hoãn.
+A-T1 [loader](../reports/a_t1_loader_results.md) và A-T2
+[format/profile/header/descriptor](../reports/a_t2_completion_results.md) giữ done;
+actual descriptor-in-prompt/PA vẫn ở P2. [Nền G/E](foundation.md) có CPU/CI,
+Modal CPU synthetic lịch sử, chưa real model/GPU. Bằng chứng cũ chỉ lịch sử.
 
-## Kiểm chứng và archive
+Toàn train input/structure đã từng khảo sát và dùng chọn header rule; holdout
+chỉ chưa xem đáp án, không khẳng định unseen domain. Gold không vào inference;
+public/private không tuning/training. Dev phát triển, calibration chọn ngưỡng.
+Docker P3 sau P2/G2; draft giữ nguyên. Model thật chỉ Modal, không local weights/CUDA.
 
-CPU cuối: **150 tests pass trong 37.87s**, Ruff/format pass, exit 0;
-`runs/cpu-check-20261105T092441563393Z-syph2ikl/gate.json`. Đã đọc record và
-ba log; source không đổi trong gate, context CPU passed/current, timeline
-sync current, không warning. P0-SPLIT ready; P1 bị chặn bởi P0-GATE.
-72 tệp UTF-8/JSON/NFC, 58 link local hợp lệ; 271 protected hashes không đổi.
-Kết quả cuối tại [báo cáo](../reports/timeline_sync_results.md).
-CPU/Modal model/PA báo riêng; phiên này không chạy model, PA hoặc Docker.
+Plan tuần cũ chỉ tra lịch sử tại
+[archive/timeline-20261103](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103),
+không fallback. Không upload dữ liệu/artifact BTC.
+Phiên sau G0: `uv run --locked python scripts/harness.py context --task P1`;
+đọc read_first/Timeline/task, kiểm split/scorer provenance và gate current.
 
-Đã push source migration [e5cac96](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/e5cac96c149cf18f44ce38f15b4de5e1e6bd9b87)
-lên main; SHA remote đã đối chiếu. [CI 42002438133](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42002438133)
-completed/success, **150 tests trong 10.71s** trên Ubuntu; Ruff/format pass,
-đã đọc job steps/log. Commit tài liệu sau source chỉ ghi kết quả; source
-fingerprint local vẫn current. 35 path được rà/stage, byte index khớp workspace;
-không stage kit, gold, profile, labels, runs, credentials hoặc weights.
+## Graphify cho Codex — 05/11/2026
 
-Mốc cũ đã push trước khi dọn: [archive/timeline-20261103](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103),
-commit `bd0061593698df76c05745c7ef1df3d31b1331f3`. Các note reset,
-engineering tạm và prompt review đã hết hiệu lực chỉ còn trong archive.
-Dữ liệu, cache và run evidence local giữ nguyên; không xóa lịch sử Git.
-Quyết định migration: [research note](research/timeline_sync.md).
+Đã setup Graphify local `0.9.102`, tool dependency/lock riêng, skill `$graphify`
+và wrapper `scripts/graphify_local.py`; [cách dùng](graphify.md),
+[nghiệm thu](../reports/graphify_setup_results.md). Graph current: 49 file Python,
+566 node/1921 cạnh; backend tắt, không data/gold/runs/docs/credentials.
+Query/explain/path/build/incremental/HTML và synthetic ignore check pass.
+Chưa đo tiết kiệm token A/B; không phải model/PA hoặc prerequisite P1.
 
-Phiên mới: `uv run --locked python scripts/harness.py context --task P0-SPLIT`.
-Context phải báo nguồn đồng bộ và CPU current trước khi sửa; thiếu/lệch Timeline
-thì đồng bộ lại, không fallback sang archive.
+CPU hiện hành sau tích hợp: **238 passed in 44.39s**, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261105T125449495803Z-h34xb6o4/gate.json`. Đã đọc JSON/ba log; context P1 passed/current,
+ready, không warnings. Bằng chứng P0 phía trên là lịch sử trước tooling;
+CPU này thay record CPU hiện hành, không mở thêm gold hoặc thay acceptance P0.
+Backlog ghi development_tooling của P1; trạng thái P1 todo và P2 blocked giữ nguyên.
+
+## Đo token Graphify — 05/11/2026
+
+Đã làm một retrieval replay cho audit `run-eval` xuyên7 file implementation và
+4 file test, 12 nhóm source evidence do tác giả review; không phải A/B hai agent
+độc lập hoặc billing thực. [Báo cáo](../reports/graphify_token_benchmark.md),
+[protocol](research/graphify_token_benchmark.md). `o200k_base` tham chiếu:
+graph26716 token, toàn49 file120364, rg-whole-file36703, rg-scoped23807.
+Graph giảm77,80%/27,21% so hai mốc đầu, nhưng tăng12,22% so rg-scoped.
+Cộng context chung cố định30525 token của snapshot: giảm62,06% so đọc toàn repo.
+Hai nhánh scoped đọc cùng22214 source token; graph overhead thêm2909 token.
+Kiểm nhạy cl100k_base không đổi dấu kết luận. Không đổi routing/skill chỉ từ
+một câu hỏi; dùng kết quả này như case study, không claim tiết kiệm trung bình.
+
+Dependency tokenizer có pyproject/lock riêng trong run ignored; không đổi
+runtime DataMate/tool Graphify. Payload/hash/script/counts local trong
+`runs/graphify-token-benchmark-20261105/`; corpus/graph không đổi, không mở gold
+BTC hoặc gọi model. Backlog chỉ thêm development_tooling evidence của P1;
+P1 todo/ready và P2 blocked giữ nguyên.
+
+CPU hiện hành: **238 passed in 79.02s (0:01:19)**, Ruff/format pass, exit0, source không đổi;
+`runs/cpu-check-20261105T140812618084Z-82ztxewm/gate.json`. Đã đọc JSON/ba log; context P1
+passed/current, ready/no warnings. Không thay acceptance P0 hoặc trạng thái
+task; P1 todo/ready, P2 blocked. Chưa có bằng chứng model/PA/B0.
+Lệnh kiểm tra: `uv run --locked python scripts/check.py`.

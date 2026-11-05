@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "label_method": "deterministic_heuristic; not human-reviewed gold taxonomy",
+  "family_priority": [
+    [
+      "expiry",
+      "het han|han su dung|sap het han"
+    ],
+    [
+      "inventory",
+      "ton kho|ton cuoi|ton dau|hang ton|kiem kho|con lai.*(?:trong kho|het hom nay)|trong kho|con may"
+    ],
+    [
+      "receivables",
+      "cong no|con no|du no|phai thu|chua thanh toan"
+    ],
+    [
+      "profit_cost",
+      "loi nhuan|lai gop|gia von|bien loi|von hang"
+    ],
+    [
+      "revenue",
+      "doanh thu|tong tien|tien ban|thanh tien|thu duoc|\\bdt\\b|bao nhieu tien|nhieu tien nhat|ban duoc.*tien|tien hang|doanh so"
+    ],
+    [
+      "order_count",
+      "so don|bao nhieu don|luot mua|so hoa don|so giao dich|(?:so|may|bao nhieu) (?:don|hoa don)|dem.*don"
+    ],
+    [
+      "quantity",
+      "so luong|bao nhieu (ly|cai|san pham|kg|bao|thung|vien|hop)|\\bsl\\b|(?:so|may|nhieu|bao nhieu) (?:kg|ly|phan|goi|bo|vien|hop|cai|chai|tan|bao|thung|ong|chiec|lo)\\b"
+    ],
+    [
+      "returns_cancellations",
+      "\\bhuy\\b|tra lai|hoan tra"
+    ],
+    [
+      "customers",
+      "khach hang|khach mua|\\bkh\\b|khach nao|khach chi tieu|so khach|bao nhieu khach"
+    ],
+    [
+      "sales_staff",
+      "nhan vien|nguoi ban|ban gioi"
+    ],
+    [
+      "pricing",
+      "don gia|gia ban|gia nhap|muc gia|gia bao nhieu|gia binh quan|gia trung binh"
+    ],
+    [
+      "product_lookup",
+      "san pham|mat hang|hang hoa|\\bthuoc\\b|\\bsp\\b"
+    ]
+  ],
+  "operations": [
+    [
+      "ranking",
+      "top\\s*\\d+|ban chay|cao nhat|nhieu nhat|thap nhat|it nhat|xep hang|lon nhat|nho nhat"
+    ],
+    [
+      "comparison",
+      "so voi|so sanh|chenh lech|tang truong|tang bao nhieu|giam bao nhieu|ty le|phan tram|cung ky"
+    ],
+    [
+      "aggregation",
+      "tong|bao nhieu|trung binh|binh quan|dem|so luong|so don"
+    ],
+    [
+      "boolean_check",
+      "co .*khong|dung hay sai|co phai"
+    ],
+    [
+      "lookup",
+      "la gi|ten gi|ma nao|ngay nao|khach nao|mat hang nao"
+    ],
+    [
+      "average",
+      "binh quan|trung binh"
+    ]
+  ],
+  "time_forms": [
+    [
+      "relative_day",
+      "hom nay|hom qua|hom kia|ngay truoc"
+    ],
+    [
+      "relative_week",
+      "tuan nay|tuan truoc|tuan roi|tuan qua"
+    ],
+    [
+      "relative_month",
+      "thang nay|thang truoc|thang roi|thang qua"
+    ],
+    [
+      "relative_quarter",
+      "quy nay|quy truoc"
+    ],
+    [
+      "relative_year",
+      "nam nay|nam truoc|nam ngoai"
+    ],
+    [
+      "same_period",
+      "cung ky"
+    ],
+    [
+      "rolling_window",
+      "\\d+\\s*(ngay|tuan|thang).*(gan nhat|gan day|qua)|gan nhat.*\\d+"
+    ],
+    [
+      "lunar_event",
+      "tet|am lich|thang chap|trung thu"
+    ],
+    [
+      "absolute",
+      "\\b20\\d{2}\\b|\\d{1,2}[/.-]\\d{1,2}|thang\\s*\\d+|quy\\s*\\d+"
+    ],
+    [
+      "relative_period_to_date",
+      "tu dau nam|tu dau thang|den het hom nay|toi het hom nay"
+    ]
+  ],
+  "abbreviation_tokens": [
+    "bill",
+    "bn",
+    "bnhieu",
+    "bnhiu",
+    "ck",
+    "cn",
+    "cos",
+    "dc",
+    "ddown",
+    "dh",
+    "dt",
+    "dthu",
+    "dvt",
+    "hd",
+    "hnay",
+    "hqua",
+    "kh",
+    "ln",
+    "ngayf",
+    "nhaats",
+    "nhiu",
+    "sl",
+    "soos",
+    "sp",
+    "tb",
+    "total",
+    "vat",
+    "vc"
+  ],
+  "fallback": "other_or_unspecified",
+  "selection_scope": "dev only; no holdout or calibration question/gold analysis",
+  "revision": "dev-question-review-2",
+  "token_rewrites": {
+    "dthu": "doanh thu",
+    "dt": "doanh thu",
+    "bn": "bao nhieu",
+    "bnhiu": "bao nhieu",
+    "bnhieu": "bao nhieu",
+    "nhiu": "nhieu",
+    "hnay": "hom nay",
+    "hqua": "hom qua",
+    "dc": "duoc",
+    "soos": "so",
+    "ddown": "don",
+    "ngayf": "ngay",
+    "nhaats": "nhat",
+    "cos": "co",
+    "bill": "hoa don",
+    "total": "tong"
+  }
+}

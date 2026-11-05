@@ -1,0 +1,30 @@
+# Default deny: only these source trees belong in the local code graph.
+/*
+!/src/
+!/scripts/
+!/tests/
+!/infra/
+
+# Fixtures, documents, credentials and generated files are not code context.
+*.json
+*.jsonl
+*.csv
+*.tsv
+*.yaml
+*.yml
+*.md
+*.txt
+*.pdf
+*.docx
+*.xlsx
+*.db
+*.sqlite
+*.sqlite3
+*.pyc
+__pycache__/
+.env
+.env.*
+*secret*
+*credential*
+*.pem
+*.key

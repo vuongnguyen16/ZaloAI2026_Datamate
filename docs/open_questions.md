@@ -2,7 +2,9 @@
 
 - P0: matching corner cases từ thể lệ; phần chưa rõ gắn provisional. Khóa nhóm
   business/template và access policy trước khi đọc gold; taxonomy holdout không
-  làm nguồn chọn cấu hình. Chưa scorer hoặc split manifest.
+  làm nguồn chọn cấu hình. Split đã khóa theo [P0-SPLIT](split_policy.md);
+  scorer đã có [policy provisional](evaluation.md). Holdout có 2 cụm độc lập,
+  cần nêu giới hạn thống kê; chưa model/B0.
 - P1: model card/revision/license/cutoff/tổng tham số, runtime và proxy sm_120;
   không coi danh sách ứng viên trong DOCX là eligibility đã xác minh.
 - P1/P8b: account/quota/usage/billing, budget 30 USD/thí nghiệm và phạm vi dữ liệu.

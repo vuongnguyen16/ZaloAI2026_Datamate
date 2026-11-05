@@ -1,0 +1,3 @@
+# Local code navigation; budget is an approximate output-token budget.
+query_budget=1200
+query_depth=1

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "artifact_directory": "runs/p0-split-20261105/frozen",
+  "manifest_sha256": "b28dd4fa7fb34b7a0ed356c7ec11f32f84911bcdf71fcd128c2c5082b208fa18",
+  "policy_file": "configs/split_policy.json",
+  "summary": {
+    "dev": {
+      "businesses": 18,
+      "questions": 1895,
+      "groups": 4
+    },
+    "calibration": {
+      "businesses": 6,
+      "questions": 397,
+      "groups": 3
+    },
+    "holdout": {
+      "businesses": 6,
+      "questions": 708,
+      "groups": 2
+    }
+  },
+  "scope": "Provenance pointer only; membership and BTC-derived artifacts remain local",
+  "gold_content_read": false,
+  "access_history": "All train inputs/structure previously surveyed; holdout gold unopened at freeze",
+  "evidence": "reports/p0_split_results.md",
+  "policy_sha256": "baa182a30ac8c56760befe2582d0b2d5e8ff897dd945ec9a850519d0d79f4bc1"
+}

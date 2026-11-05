@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "seed": "datamate-p0-split-v1",
+  "ratios": {"dev": 60, "calibration": 20, "holdout": 20},
+  "grouping": "business+full_header_template+identical_table_sha256+normalized_readme_preamble",
+  "assignment": "min_business_ratio_l1_then_holdout_layout_rarity_then_seeded_hash",
+  "access_history": {
+    "train_inputs": "all previously surveyed during A-T1/A-T2; header rules selected using train structure",
+    "train_gold": "not parsed before split freeze",
+    "holdout_claim": "answer-unseen; input/structure previously exposed; not an unseen-domain guarantee"
+  },
+  "access": {
+    "dev": {"questions": ["development", "taxonomy", "training", "evaluation"], "gold": ["development", "taxonomy", "training", "evaluation"]},
+    "calibration": {"questions": ["evaluation", "calibration"], "gold": ["evaluation", "calibration"]},
+    "holdout": {"questions": ["frozen_inference"], "gold": []}
+  },
+  "holdout_release": {
+    "phase": "P7",
+    "maximum_evaluations": 1,
+    "requirements": ["P6 gate accepted", "predictions/config/commit hashes frozen", "dedicated evaluator", "consume durable release ledger before reading gold"],
+    "implementation": "P7 integration required; P0 exposes no unlock command"
+  },
+  "statistics": {
+    "metric": "PA=(correct-wrong)/N; per-question scores -1,0,+1",
+    "comparison": "paired candidate-control on identical question IDs",
+    "primary_resampling_unit": "business",
+    "sensitivity_resampling_unit": "frozen leakage component",
+    "replicates_minimum": 1000,
+    "seed": 20261105,
+    "confidence": 0.95,
+    "interval": "percentile",
+    "acceptance": "lower CI95(delta PA)>0; neutral only with documented simplification",
+    "small_cluster_policy": "report cluster counts and both intervals; no significance claim from too few independent clusters",
+    "report": ["PA", "correct/wrong/abstain", "type", "question_family", "business", "execution_route", "runtime", "new_errors"]
+  },
+  "leaderboard": {
+    "purposes": ["format", "crash", "generalization"],
+    "maximum_per_phase": 1,
+    "first_phase": "P2",
+    "selection_forbidden": ["threshold", "prompt", "model", "small_variant"],
+    "organizer_quota": "verify current BTC quota before submission; historical quota is not authorization",
+    "submission": "manual/explicitly authorized operation; logger never submits"
+  }
+}

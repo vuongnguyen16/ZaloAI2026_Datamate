@@ -9,7 +9,7 @@ Quyết định đồng bộ/giữ foundation: `docs/research/timeline_sync.md`.
 
 ```powershell
 uv run --locked python scripts/timeline.py check
-uv run --locked python scripts/harness.py context --task P0-SPLIT
+uv run --locked python scripts/harness.py context --task P1
 uv run --locked python scripts/check.py
 ```
 
@@ -38,7 +38,7 @@ hash/mapping lịch sử, không phải tracker thứ hai.
 |---|---|---|
 | CPU | Ruff lint/format + pytest; log, command/exit code, code/test/config/lock hash | `scripts/check.py` hiện có; JSON/log dưới `runs/cpu-check-.../` |
 | Modal model | Xác minh account/budget, app/run ID, model revision, hardware/config và lời gọi model thật | D/G chưa có model; smoke CPU lịch sử không thay model gate |
-| Evaluation | Scorer theo nguồn E; split/control/config, correct/wrong/abstain/PA và runtime thật | P0 và baseline hybrid P2 còn todo |
+| Evaluation | Project scorer từ nguồn E, scoped reader, split/control/config/log/bootstrap | P0/G0 đã có; model/PA baseline hybrid P2 còn todo |
 
 CPU gate không gọi cloud và luôn để GPU/model/PA chưa kiểm chứng. Marker `gpu`
 và `modal` bị loại; test cloud không được gọi dịch vụ ở import/collection.
@@ -48,6 +48,7 @@ khiến gate fail.
 Context báo record `current` hay `stale`, không tìm một green run cũ để che fail mới.
 
 Fingerprint gồm src/scripts/tests/infra/configs/.agents/.github, pyproject/lock,
+config Graphify và pyproject/lock riêng tại tools/graphify (không hash .venv tool),
 .python-version, .gitignore, predict.sh, contract/model manifests và đúng DOCX
 timeline cùng timeline manifest, bản web, asset và backlog. Không đọc kit,
 credentials hoặc lưu plaintext diff. State và tài liệu khác vẫn cần review;
@@ -74,3 +75,9 @@ skill/version thực và tuân theo phạm vi/nguồn timeline của repo.
 CI `.github/workflows/cpu.yml` dùng cùng gate, action pin commit, uv 0.13.6,
 Python theo `.python-version`; chỉ upload gate.json và ba stage log synthetic.
 Chưa push/chạy Actions thì không báo CI remote đã pass.
+
+P0-SPLIT đã khóa tại `manifests/split_lock.json`; pointer được đưa vào CPU
+fingerprint. Artifact BTC/membership chỉ local trong runs; CPU CI dùng fixture
+synthetic, không cần kit. Trước real-gold evaluation chạy `datamate split-check`
+theo `docs/split_policy.md`; P0-SCORER đã nối scoped reader/evaluator vào guard.
+Gold holdout không được release bởi lệnh P0, chỉ có giao thức cho P7.

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "datamate-written-rules-v1",
+  "source": {
+    "path": "Thể lệ cuộc thi/The_Le_Zalo_AI_Challenge_2026_DataMate.docx",
+    "sha256": "9d28162bbe2ddcc6373279bc29935c7899f05bb5e736f631de06a4beb19b782e",
+    "locators": ["section2.1 body_table2", "section2.3 body_table3", "section3.2 body_paragraph24"]
+  },
+  "number": "decimal_exact_no_prediction_rounding",
+  "percent": {"places": 2, "rounding": "ROUND_HALF_UP", "signed_zero": "equivalent"},
+  "string": "NFC_lower_non_alnum_to_space_collapse_keep_accents",
+  "aliases": "scalar_string_or_positional_list_or_table_leading_text_by_row",
+  "date": "strict_ISO_exact",
+  "boolean": "strict_bool",
+  "list": "ordered_cell_match",
+  "table": {"columns": "unique_full_name_mapping_else_position", "rows": "set", "null_cells": "unsupported"},
+  "invalid_answer_with_known_id": "wrong",
+  "abstain": "always_zero_including_extra_payload",
+  "missing": "abstain",
+  "provisional": ["percent_halfway_rounding", "signed_zero", "table_partial_or_duplicate_column_names", "nested_alias_scope_and_row_bijection", "null_cells", "malformed_known_id_policy"],
+  "status": "project_implementation_from_written_rules; not organizer executable"
+}

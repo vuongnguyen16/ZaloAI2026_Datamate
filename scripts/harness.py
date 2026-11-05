@@ -23,11 +23,17 @@ SOURCE_FILES = (
     "uv.lock",
     ".python-version",
     ".gitignore",
+    ".graphifyignore",
+    ".graphifyrc",
+    "tools/graphify/pyproject.toml",
+    "tools/graphify/uv.lock",
     "predict.sh",
     "manifests/competition_contract.json",
     "manifests/contract_sources.json",
     "manifests/models.json",
     "manifests/timeline_source.json",
+    "manifests/split_lock.json",
+    "manifests/p0_evidence.json",
     "tasks/backlog.json",
     "Research/Timeline_DataMate_A-G.md",
     TIMELINE,
@@ -41,6 +47,7 @@ READ_FIRST = (
     "manifests/competition_contract.json",
     "docs/harness.md",
     "manifests/timeline_source.json",
+    "docs/evaluation.md",
 )
 
 

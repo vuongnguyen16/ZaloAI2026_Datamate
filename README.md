@@ -5,8 +5,10 @@ nguồn [DOCX](<Research/Timeline DataMate theo nhóm việc A–G.docx>) cập 
 Triển khai tuần tự P0–P9, mỗi pha có cổng kiểm chứng. A–G là nhóm chuyên môn,
 không còn là bảy luồng song song theo tuần. Ước lượng trong DOCX là ngày công.
 
-**Tiếp theo: P0 — đo lường.** Khóa split/access policy trước khi đọc gold cho
-taxonomy; xây scorer 9 type và run_eval. Chưa có scorer, model thật hoặc PA/B0.
+**P0/G0 đã hoàn tất:** split/access khóa, scorer 9 type,
+run_eval/bootstrap và taxonomy dev đã có. [Kết quả](reports/p0_results.md),
+[cách đánh giá](docs/evaluation.md). Calibration/holdout gold giữ kín;
+chưa có model thật hoặc B0. Sau G0, bước tiếp theo là P1 trên Modal.
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên
@@ -17,7 +19,7 @@ $env:UV_CACHE_DIR = "$PWD\.uv-cache"
 $env:UV_PYTHON_INSTALL_DIR = "$PWD\.uv-python"
 uv sync --locked
 uv run --locked python scripts/timeline.py check
-uv run --locked python scripts/harness.py context --task P0-SPLIT
+uv run --locked python scripts/harness.py context --task P1
 uv run --locked python scripts/check.py
 ```
 
@@ -26,13 +28,18 @@ không dùng MSYS2 Python. Dependency chỉ qua pyproject.toml + uv.lock.
 Đọc AGENTS, state, backlog, DOCX và [contract](docs/requirements.md) trước sửa;
 dùng skill `$datamate-increment` và [harness](docs/harness.md).
 
+Tra cứu quan hệ code bằng [Graphify local](docs/graphify.md), skill `$graphify`:
+`python scripts/graphify_local.py query "run_eval read_scoped"`.
+Graph chỉ gồm code, không có dữ liệu BTC/gold; dependency tool khóa riêng.
+
 ## Phần đã có
 
 | Thành phần | Bằng chứng và giới hạn |
 |---|---|
 | A-T1 loader CSV/XLSX/SQLite → DuckDB, cache raw | [Hướng dẫn](docs/ingestion.md), [nghiệm thu](reports/a_t1_loader_results.md); 30 business/339 unit, bảo toàn raw |
 | A-T2 format/profile/header/data_start/descriptor | [Profile](docs/profiling.md), [format](docs/runtime_format.md), [nghiệm thu](reports/a_t2_completion_results.md); 311 auto/11 unresolved/17 schema; actual prompt/PA còn ở P2 |
-| Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử, chưa GPU/model/scorer |
+| P0 đánh giá | [Scorer/scoped reader/bootstrap/taxonomy](docs/evaluation.md); [split khóa](docs/split_policy.md); chưa model/B0 |
+| Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử, chưa GPU/model |
 
 Kiến trúc mục tiêu: domain_lib dựng từ dev, model nhỏ chọn/gọi hàm,
 SQL/Python dự phòng và abstain/verifier/formatter từ P2. single_sql là đối chứng.
@@ -49,6 +56,7 @@ uv run --locked datamate ingest --input data/train --cache runs/raw-cache --outp
 uv run --locked python scripts/verify_ingest.py --input data/train --report runs/ingest-first/ingest.json --output runs/ingest-audit
 uv run --locked datamate profile --input data/train --ingest-report runs/ingest-first/ingest.json --output runs/profile-first
 uv run --locked python scripts/verify_profile.py --input data/train --report runs/profile-first/profile.json --output runs/profile-audit
+uv run --locked datamate split-check --split runs/p0-split-20261105/frozen --manifest-sha256 b28dd4fa7fb34b7a0ed356c7ec11f32f84911bcdf71fcd128c2c5082b208fa18
 ```
 
 Dùng output mới; không ghi đè input/cache cũ. Loader giữ header/tổng/trùng/trống,

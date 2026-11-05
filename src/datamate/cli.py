@@ -3,10 +3,18 @@ import json
 import sys
 from pathlib import Path
 
+from datamate.evaluation import run_eval
 from datamate.ingest import IngestError, LoaderOptions
 from datamate.ingest.loader import run_ingest
 from datamate.profile import ProfileOptions, run_profile
 from datamate.runner import run_smoke, run_stub
+from datamate.splits import (
+    authorize_access,
+    freeze_split,
+    log_public_submission,
+    open_split,
+)
+from datamate.taxonomy import run_taxonomy
 from datamate.validation import inspect_input, inspect_logs, inspect_submission
 
 
@@ -62,9 +70,120 @@ def main() -> int:
     profile.add_argument("--value-bytes", type=int, default=256)
     profile.add_argument("--no-auto-header", action="store_true")
     profile.add_argument("--header-scan-rows", type=int, default=64)
+    freeze = commands.add_parser(
+        "split-freeze", help="Freeze gold-free grouped train split; output stays local"
+    )
+    freeze.add_argument("--input", type=Path, required=True)
+    freeze.add_argument("--structure-labels", type=Path, required=True)
+    freeze.add_argument("--labels-sha256", required=True)
+    freeze.add_argument(
+        "--policy", type=Path, default=Path("configs/split_policy.json")
+    )
+    freeze.add_argument("--output", type=Path, required=True)
+    for name in ("split-check", "split-access", "split-log-public"):
+        command = commands.add_parser(
+            name, help="Verify/use a hash-pinned local split; never reads gold"
+        )
+        command.add_argument("--split", type=Path, required=True)
+        command.add_argument("--manifest-sha256", required=True)
+        if name == "split-access":
+            command.add_argument("--partition", required=True)
+            command.add_argument("--resource", required=True)
+            command.add_argument("--purpose", required=True)
+            command.add_argument("--actor", required=True)
+            command.add_argument("--candidate-sha256", required=True)
+        if name == "split-log-public":
+            command.add_argument("--phase", required=True)
+            command.add_argument("--purpose", required=True)
+            command.add_argument("--candidate-sha256", required=True)
+            command.add_argument("--submission-sha256", required=True)
+            command.add_argument("--evidence", required=True)
+    evaluate = commands.add_parser(
+        "run-eval", help="Scoped project scorer; holdout is unavailable in P0"
+    )
+    evaluate.add_argument("--split", type=Path, required=True)
+    evaluate.add_argument("--manifest-sha256", required=True)
+    evaluate.add_argument("--partition", choices=("dev", "calibration"), required=True)
+    evaluate.add_argument("--submission", type=Path, required=True)
+    evaluate.add_argument("--output", type=Path, required=True)
+    evaluate.add_argument(
+        "--policy", type=Path, default=Path("configs/scoring_policy.json")
+    )
+    evaluate.add_argument("--control", type=Path)
+    evaluate.add_argument("--taxonomy", type=Path)
+    evaluate.add_argument("--execution", type=Path)
+    evaluate.add_argument("--replicates", type=int, default=1000)
+    taxonomy = commands.add_parser(
+        "taxonomy", help="Dev-only taxonomy; other partitions stay sealed"
+    )
+    taxonomy.add_argument("--split", type=Path, required=True)
+    taxonomy.add_argument("--manifest-sha256", required=True)
+    taxonomy.add_argument(
+        "--rules", type=Path, default=Path("configs/taxonomy_rules.json")
+    )
+    taxonomy.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
-        if args.command == "profile":
+        if args.command == "run-eval":
+            output = run_eval(
+                args.split,
+                args.manifest_sha256,
+                args.partition,
+                args.submission,
+                args.output,
+                args.policy,
+                control=args.control,
+                taxonomy=args.taxonomy,
+                execution=args.execution,
+                replicates=args.replicates,
+            )
+        elif args.command == "taxonomy":
+            output = run_taxonomy(
+                args.split, args.manifest_sha256, args.rules, args.output
+            )
+        elif args.command == "split-freeze":
+            output = freeze_split(
+                args.input,
+                args.structure_labels,
+                args.labels_sha256,
+                args.policy,
+                args.output,
+            )
+        elif args.command == "split-check":
+            frozen, _ = open_split(
+                args.split, args.manifest_sha256, verify_sources=True
+            )
+            output = dict(
+                valid=True, summary=frozen["summary"], gold_content_read=False
+            )
+        elif args.command == "split-access":
+            ids = authorize_access(
+                args.split,
+                args.manifest_sha256,
+                args.partition,
+                args.resource,
+                args.purpose,
+                args.actor,
+                args.candidate_sha256,
+            )
+            output = dict(
+                valid=True,
+                authorized_question_ids=ids,
+                operation="authorization_only",
+                gold_content_read=False,
+            )
+        elif args.command == "split-log-public":
+            log_public_submission(
+                args.split,
+                args.manifest_sha256,
+                args.phase,
+                args.purpose,
+                args.candidate_sha256,
+                args.submission_sha256,
+                args.evidence,
+            )
+            output = dict(valid=True, operation="audit_only; no submission sent")
+        elif args.command == "profile":
             output = run_profile(
                 args.input,
                 args.ingest_report,

@@ -23,8 +23,14 @@ Missing timeline means inspect/report the missing source; it does not authorize
 reviving an obsolete plan. Dates in the DOCX are tentative, not verified rules.
 
 Keep tasks/backlog.json as the task registry and docs/project_state.md as the
-handoff. Follow the user's assigned scope. If asked to begin, use P0-SPLIT's
-next action after checking prerequisites. Keep A-T1/A-T2 done with bounded
+handoff. Follow the user's assigned scope. If asked to begin, use the current
+state/backlog handoff after checking prerequisites. P0 split/scorer/taxonomy
+and G0 are implemented; P1 is next when assigned. Read `manifests/split_lock.json`,
+`manifests/p0_evidence.json` and `docs/evaluation.md` before real-gold evaluation.
+Use the scoped reader/evaluator; P0 has no holdout release. Only dev semantic
+gold was opened in P0 acceptance; matching corners remain provisional,
+taxonomy families are heuristic, and all-abstain probes are not B0/model proof.
+Keep A-T1/A-T2 done with bounded
 evidence; actual descriptor-in-prompt and PA are pending in P2. Only one task
 may be in_progress. G0 precedes P1, then P2–P7 in order. P8a/P8b need explicit
 run/skip decisions with reasons before P9. Check code before relying on

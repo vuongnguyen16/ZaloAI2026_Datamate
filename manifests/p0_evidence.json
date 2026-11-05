@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "split_manifest_sha256": "b28dd4fa7fb34b7a0ed356c7ec11f32f84911bcdf71fcd128c2c5082b208fa18",
+  "scoring_policy": {
+    "path": "configs/scoring_policy.json",
+    "sha256": "7f7c44b631c967e0255edbe10fd85ef0dab1353907afbd74baa15bf854251ff3"
+  },
+  "taxonomy_rules": {
+    "path": "configs/taxonomy_rules.json",
+    "sha256": "1e85aec856dc3f6f6747e660015cacab2403b19691d0a4ef56bdde6611b653c1"
+  },
+  "artifacts": [
+    {
+      "path": "runs/p0-complete-20261105/g0_acceptance-current.json",
+      "sha256": "7268a04e51e6c354eae9f44cb5e3fa6a9313d182fbcd9837cd5febed3ca240bd"
+    },
+    {
+      "path": "runs/p0-complete-20261105/taxonomy-g0/taxonomy.json",
+      "sha256": "e1cd00a41c741203c3d5bf1350a8774fa840a0fe7176090277c49cc74da262f1"
+    },
+    {
+      "path": "runs/p0-complete-20261105/evaluation-g0/evaluation.json",
+      "sha256": "dd35d0d4f4a43889597974625ece51a96bcfdba79bc3dbad6fdfc7010ba528dd"
+    },
+    {
+      "path": "runs/p0-complete-20261105/implementation_freeze_g0.json",
+      "sha256": "441173d249f07268909be6aec087ddd127ae51a8bece00d19f4137b94eabe20f"
+    }
+  ],
+  "coverage": {
+    "train_metadata": 3000,
+    "classified": 1895,
+    "sealed": {
+      "calibration": 397,
+      "holdout": 708
+    }
+  },
+  "scope": "Provenance only; task status in state/backlog; BTC records stay local",
+  "evidence": "reports/p0_results.md"
+}

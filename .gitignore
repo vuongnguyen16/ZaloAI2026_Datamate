@@ -18,5 +18,6 @@ dist/
 build/
 *.egg-info/
 *.log
+/graphify-out/
 # Supplied competition materials stay local until redistribution rights are verified.
 /Thể lệ cuộc thi/

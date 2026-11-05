@@ -167,7 +167,7 @@
     "source_items": [
       "E3"
     ],
-    "status": "todo",
+    "status": "done",
     "depends_on": [
       "A-T1",
       "A-T2",
@@ -178,8 +178,22 @@
       "Khóa manifest trước khi parse gold cho taxonomy; dev dùng phát triển, calibration chọn ngưỡng, holdout gold sealed tới P7",
       "Giao thức bootstrap ghép cặp theo business ≥1000 lượt, CI95%; chính sách leaderboard và nhật ký lượt nộp; không tuning public/private"
     ],
-    "evidence": [],
-    "next_action": "Ghi spec split/access trước; dùng metadata/nhóm A-T2, chưa đọc gold holdout. Không mở P1 khi G0 chưa đạt."
+    "evidence": [
+      "docs/research/p0_split.md",
+      "docs/split_policy.md",
+      "configs/split_policy.json",
+      "manifests/split_lock.json",
+      "reports/p0_split_results.md",
+      "runs/p0-split-20261105/acceptance.json (local, ignored): 18/6/6 businesses; 1895/397/708 questions; 9 components; identical repeat manifest; 441 independent edges with no cross-partition leakage; 161 source hashes unchanged; gold never opened",
+      "runs/p0-split-20261105/final_acceptance.json (local, ignored): final source/CPU/manifest/handoff proof"
+    ],
+    "next_action": "Split không chia lại; scoped reader đã có ở P0-SCORER. Chờ G0 nghiệm thu rồi P1, holdout gold giữ kín tới P7.",
+    "limitations": [
+      "Input/structure train đã từng khảo sát và dùng chọn rule header; holdout chỉ chưa xem gold, không khẳng định unseen domain.",
+      "Chỉ 4/3/2 cụm độc lập dev/calibration/holdout; CI business phải có sensitivity và công bố giới hạn.",
+      "Access API cấp quyền/ID và audit, không phải gold reader hoặc OS ACL. P0-SCORER đã nối scoped evaluator; xem docs/evaluation.md; P7 chưa có release implementation.",
+      "Statistics protocol đã khóa; bootstrap/scorer/PA chưa triển khai. Không model/cloud/Docker/public submission."
+    ]
   },
   {
     "id": "P0-SCORER",
@@ -194,16 +208,30 @@
     "source_items": [
       "E1"
     ],
-    "status": "todo",
+    "status": "done",
     "depends_on": [
-      "G-FOUNDATION"
+      "G-FOUNDATION",
+      "P0-SPLIT"
     ],
     "acceptance": [
       "Mỗi luật matching có nguồn/corner cases; policy rounding/alias/list/table/null chưa rõ phải provisional",
       "Fixture đúng/sai/abstain/unanswerable, sai type, missing output và malformed có test; PA=(correct-wrong)/N",
       "run_eval/log từng câu tách gold khỏi inference; bắt đầu bằng fixture synthetic, dùng dữ liệu thật sau access policy"
     ],
-    "evidence": []
+    "evidence": [
+      "docs/research/p0_evaluation.md",
+      "docs/evaluation.md",
+      "configs/scoring_policy.json",
+      "reports/p0_results.md",
+      "manifests/p0_evidence.json",
+      "runs/p0-complete-20261105/evaluation-g0/evaluation.json (local, ignored): N1895 dev all-abstain contract probe; matching/control/report; no model baseline; 1105 outside-dev values opaque"
+    ],
+    "next_action": "G0 nghiệm thu rồi P1; P2 dùng scorer/split để đo baseline thật, không chọn policy bằng holdout/public.",
+    "limitations": [
+      "Project scorer theo nguồn thành văn, không executable BTC; corner policies provisional.",
+      "Real-gold acceptance dev only; calibration aggregate path chỉ synthetic; không holdout release.",
+      "Chưa model/B0; PA0 là contract probe; không significance claim khi ít leakage groups."
+    ]
   },
   {
     "id": "P0-TAXONOMY",
@@ -218,7 +246,7 @@
     "source_items": [
       "E2"
     ],
-    "status": "todo",
+    "status": "done",
     "depends_on": [
       "P0-SPLIT",
       "P0-SCORER"
@@ -228,7 +256,17 @@
       "Gold chỉ đọc qua quyền đã khóa; không xuất gold holdout hoặc thống kê để chọn cấu hình; phần phân tích gold holdout hoãn P7",
       "Báo coverage 3000 câu train và phần chưa mở, không gán nhãn suy đoán thành gold; artifact dữ liệu giữ local"
     ],
-    "evidence": []
+    "evidence": [
+      "configs/taxonomy_rules.json",
+      "reports/p0_results.md",
+      "manifests/p0_evidence.json",
+      "runs/p0-complete-20261105/taxonomy-g0/taxonomy.json (local, ignored): metadata3000, dev1895, calibration397/holdout708 sealed, 157 other/456 multi-candidate, no answer export"
+    ],
+    "limitations": [
+      "Họ/time/viết tắt heuristic self-review; 157 other/456 multi-candidate, chưa human-reviewed accuracy.",
+      "1105 câu sealed không mở semantic taxonomy theo policy; type có nguồn gold dev."
+    ],
+    "next_action": "P2 rà other/ambiguity và chọn họ dev tần suất lớn; không dùng phần sealed để chỉnh cấu hình."
   },
   {
     "id": "P0-GATE",
@@ -245,7 +283,7 @@
       "E2",
       "E3"
     ],
-    "status": "todo",
+    "status": "done",
     "depends_on": [
       "P0-SPLIT",
       "P0-SCORER",
@@ -255,12 +293,27 @@
       "Fixture mọi type pass, manifest split/hash/access và báo cáo taxonomy được review",
       "CPU current; ghi acceptance/evidence và giới hạn thống kê; không coi stub là baseline"
     ],
-    "evidence": [],
-    "gate": "G0"
+    "evidence": [
+      "reports/p0_results.md",
+      "manifests/p0_evidence.json",
+      "runs/p0-complete-20261105/g0_acceptance-current.json (local, ignored): runtime valid, outside-dev decode0; gold byte hash matches original kit",
+      "runs/cpu-check-20261105T112712728900Z-sc4a1am4/gate.json (local, ignored): G0 CPU exit0, 232 passed in36.20s, Ruff/format pass, source unchanged; final handoff gate in report",
+      "runs/p0-complete-20261105/final_acceptance.json (local, ignored): fingerprint/current CPU/artifacts/raw/UTF-8/links/task readiness"
+    ],
+    "gate": "G0",
+    "limitations": [
+      "Matching corners provisional; family/time taxonomy heuristic with157 other/456 multi-candidate.",
+      "Calibration/holdout gold semantic sealed; holdout2 leakage groups. No model/B0/Modal/PA quality claim."
+    ],
+    "next_action": "P1: verify model/license/cutoff/aggregate≤15B, sm_120/runtime, account/budget/data scope before bounded Modal real-model smoke. No Docker until P3/G2 prerequisite."
   },
   {
     "id": "P1",
     "title": "Model chạy được trên Modal và GPU proxy",
+    "development_tooling": {
+      "graphify": "Local AST navigation 0.9.102; docs/graphify.md; reports/graphify_setup_results.md. Công cụ hỗ trợ theo yêu cầu người dùng, không phải prerequisite hoặc acceptance của P1.",
+      "graphify_token_benchmark": "reports/graphify_token_benchmark.md: một retrieval replay audit run-eval; graph 26716 tokens, giảm77.80% so toàn49 file, giảm27.21% so rg-whole-file, tăng12.22% so rg-scoped; o200k_base tham chiếu, không phải billing hoặc A/B hai agent độc lập. P1 vẫn todo."
+    },
     "phase": "P1",
     "groups": [
       "D",

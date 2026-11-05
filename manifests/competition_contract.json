@@ -8,7 +8,7 @@
     "source": "user confirmation 2026-11-01: organizer provides no runner/evaluator",
     "project_runner": "src/datamate/runner.py",
     "project_structural_validator": "src/datamate/validation.py",
-    "project_scorer": "pending group E, from written specification"
+    "project_scorer": "src/datamate/scoring.py + evaluation.py; project implementation from written rules, provisional policy in configs/scoring_policy.json"
   },
   "sources": {
     "supplied_guideline": "Thể lệ cuộc thi/The_Le_Zalo_AI_Challenge_2026_DataMate.docx",
@@ -86,7 +86,7 @@
     "abstain": 0,
     "metric": "PA=(correct-wrong)/N",
     "type_and_value_must_match": true,
-    "matching_implementation": "not_implemented",
+    "matching_implementation": "implemented_project_scorer; not organizer executable; see docs/evaluation.md",
     "source": "supplied guideline section 2"
   },
   "timeline": {
@@ -96,7 +96,7 @@
     "source": "official public homepage Timeline, verified 2026-11-01"
   },
   "project_decisions": {
-    "docker_work": "deferred_until_pipeline_complete_group_G_packaging",
+    "docker_work": "P3 after end-to-end P2 passes G2; drafts before G2, no P4-P8 optimization prerequisite",
     "all_real_model_execution": "Modal",
     "modal_profile": "vuonghungnguyen07",
     "modal_workspace": "vuonghungnguyen07",

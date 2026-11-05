@@ -1,5 +1,40 @@
 # Đồng bộ GitHub để đọc/review trên web
 
+## Đồng bộ A-T1 và engineering A-T2 ngày 05/11/2026
+
+Theo yêu cầu người dùng “đẩy hết lên github”, đã commit và push toàn bộ code,
+tests và tài liệu đang chờ của hai increment, gồm các note khảo sát tổng hợp.
+Source commit:
+[`62d67b9c97b1f3722ca5339412f2125347c44696`](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/62d67b9c97b1f3722ca5339412f2125347c44696),
+25 file, 4.927 insertions/23 deletions, trên `main`. Đã so SHA bằng
+`git ls-remote origin refs/heads/main`, trùng local; push fast-forward, không
+force hoặc đổi remote/visibility. Các commit tài liệu tiếp theo chỉ ghi kết
+quả đồng bộ này, không thay code đã nghiệm thu.
+
+- CPU local mới trước push: exit 0, Ruff/format pass, **115 tests trong 40.07s**;
+  đã đọc JSON/log ở `runs/cpu-check-20261105T064100622730Z-u8zuplsa/`.
+  Source fingerprint vẫn là
+  `da548568cc12ebedad7b23f3e4c07b0ce7f8c24a548db20f5863032d8b8847da`,
+  không đổi trong gate và trùng A-T2 acceptance.
+- [GitHub Actions CPU run 41982405255](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41982405255)
+  completed/success cho đúng source SHA; Ubuntu chạy **115 tests trong 9.03s**,
+  Ruff/format pass. Đã đọc job steps/log; đây là bằng chứng CI riêng.
+- Prepublish: 25 path được rà; UTF-8/NFC/JSON và 49 link local hợp lệ;
+  credential patterns không có match; staged diff check pass. Chỉ source,
+  tests synthetic và tài liệu tổng hợp được stage. Raw BTC, gold, cache,
+  profile chứa mẫu, run artifacts, weights, credentials và môi trường vẫn
+  local/ignored; không force-add. Kit hashes theo manifest không đổi.
+- Ghi chú khảo sát A-T1 được gắn rõ là lịch sử trước implementation, có link
+  nghiệm thu hiện tại. A-T1 done; A-T2 engineering done, task in_progress và
+  research deferred_by_user vẫn giữ nguyên. Không tự mở phần research.
+
+Artifact kiểm chứng local/ignored: `runs/github-sync-20261105/prepublish.json`,
+`source-ci.json`, `source-ci-logs.json`; báo cáo đầy đủ của hai increment:
+[A-T1](a_t1_loader_results.md), [engineering A-T2](a_t2_engineering_results.md).
+Không model/Modal/GPU, PA hoặc Docker trong phiên đồng bộ này.
+
+## Lần publish nền ngày 04/11/2026
+
 Ngày 04/11/2026, giờ Việt Nam. Người dùng yêu cầu upload repo hiện tại để AI web
 dễ đọc. Đã publish source, config, tests, tài liệu và timeline vào repo public
 [vuongnguyen16/ZaloAI2026_Datamate](https://github.com/vuongnguyen16/ZaloAI2026_Datamate),

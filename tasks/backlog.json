@@ -404,6 +404,10 @@
     "evidence": [
       "reports/github_publish.md",
       "Research/Timeline_DataMate_A-G.md",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/62d67b9c97b1f3722ca5339412f2125347c44696 (05/11): toàn bộ source/tests/docs A-T1 và engineering A-T2, 25 file; remote SHA trùng local",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41982405255 (05/11): source CPU CI success, 115 tests trong 9.03s trên Ubuntu; Ruff/format pass",
+      "runs/cpu-check-20261105T064100622730Z-u8zuplsa/gate.json (local, ignored): prepush CPU passed/current, 115 tests trong 40.07s, source unchanged",
+      "runs/github-sync-20261105/prepublish.json, source-ci.json, source-ci-logs.json (local, ignored): staged paths/secret patterns/UTF-8/NFC/links/kit hashes và CI verified; raw/cache/run artifacts không upload",
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/c69d4da0952d9ea8acf96f87f841071b8f0f806d",
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41872674037"
     ],

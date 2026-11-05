@@ -19,10 +19,10 @@ Modal CPU smoke lịch sử. Xem `docs/foundation.md` và
 [hướng dẫn loader](ingestion.md), [hướng dẫn profile](profiling.md).
 Chưa có real model, scorer, PA/B0.
 
-**Kiểm chứng A-T2 hiện hành:** CPU gate exit 0, Ruff/format pass, **115 tests
+**Kiểm chứng A-T2 khi nghiệm thu engineering:** CPU gate exit 0, Ruff/format pass, **115 tests
 pass trong 27.51s**, không skip; đã đọc JSON/log tại
-`runs/cpu-check-20261105T062508275441Z-5p01bmls/`. Context phải báo record này
-passed/current. Full train 30/30 business, 339 unit, 3.184 cột, 3.997.599 hàng,
+`runs/cpu-check-20261105T062508275441Z-5p01bmls/`. CPU trước push mới hơn được
+ghi ở mục đồng bộ GitHub bên dưới. Full train 30/30 business, 339 unit, 3.184 cột, 3.997.599 hàng,
 33.628.129 cell có mặt. Hai lượt profile 151.99s và 152.62s cho hash giống
 nhau của toàn bộ 60 business profile/schema JSON. SQL auditor riêng đạt toàn
 counts/types/extrema/sample-coordinate/query-schema trong 153.29s; raw 162
@@ -90,14 +90,20 @@ path/hash timeline; nếu thiếu thì báo thiếu, không hồi sinh plan đã
 SHA-256 trước sửa/xóa, local/ignored. Không xóa data, lịch sử Git, runs cũ,
 môi trường uv hoặc tài liệu gốc; phiên cleanup không commit/push.
 
-**Đồng bộ GitHub:** source/config/tests/tài liệu đã push lên repo public
-`vuongnguyen16/ZaloAI2026_Datamate`, nhánh main, source commit `c69d4da`.
-Đã đối chiếu remote SHA trùng local và CPU GitHub Actions run `41872674037`
-completed/success. CPU local trước push: 59 passed in 7.49s, lint/format pass;
-artifact `runs/cpu-check-20261104T165544622253Z-oze3s9zf/gate.json`.
+**Đồng bộ GitHub hiện tại, ngày 05/11:** theo yêu cầu người dùng, toàn bộ code,
+tests và tài liệu A-T1/A-T2 đã push lên repo public
+`vuongnguyen16/ZaloAI2026_Datamate`, nhánh main, source commit `62d67b9`.
+Đã đối chiếu remote SHA trùng local; CPU GitHub Actions run `41982405255`
+completed/success, 115 tests trong 9.03s trên Ubuntu, lint/format pass. CPU
+local mới trước push: 115 passed in 40.07s, lint/format pass; artifact
+`runs/cpu-check-20261105T064100622730Z-u8zuplsa/gate.json`, đã đọc JSON/log,
+source không đổi/current. Các commit tài liệu sau source commit này chỉ ghi
+kết quả publish; không thay implementation. 25 path đã được rà, staged diff,
+UTF-8/NFC/JSON, 49 link và credential patterns pass; kit hashes không đổi.
 Bản timeline Markdown giữ đủ 137 paragraph/15 bảng/123 dòng bảng và một sơ đồ,
 có nguồn/hash DOCX. Dữ liệu BTC, credentials, model, runs và môi trường local
-tiếp tục được ignore. Chi tiết ở `reports/github_publish.md`.
+tiếp tục được ignore. A-T2 research vẫn hoãn, không model/PA/Docker. Chi tiết
+ở `reports/github_publish.md`, evidence local `runs/github-sync-20261105/`.
 
 **Hiệu đính tài liệu ngày 05/11:** đã rà 15 tệp Markdown, sửa dấu tiếng Việt bị
 thay bằng `?` ở tiêu đề/lời dẫn/chú thích ảnh của timeline và tám trường trong

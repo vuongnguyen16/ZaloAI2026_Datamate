@@ -12,15 +12,16 @@ import tempfile
 import time
 import xml.etree.ElementTree as ET
 from contextlib import closing
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from zipfile import BadZipFile
 
 import duckdb
 
 from datamate.artifacts import sha256, write_json
-from datamate.ingest.model import IngestError, LoaderOptions
+from datamate.ingest.model import CsvFormat, IngestError, LoaderOptions
 from datamate.ingest.readers import check_row, dump, read_source
+from datamate.ingest.text_format import inspect_encoding
 
 SCHEMA_VERSION = 1
 TABLE_SUFFIXES = {".csv", ".xlsx", ".sqlite"}
@@ -314,12 +315,27 @@ def _ingest_business(
     options = options or LoaderOptions()
     source, cache = roots(Path(input_dir), Path(cache_root))
     business = business_path(source, business_id)
+    options = replace(
+        options,
+        csv_formats=tuple(
+            f for f in options.csv_formats if f.business_id == business_id
+        ),
+    )
     files = snapshot(business, options)
+    for override in options.csv_formats:
+        if not any(
+            f["path"] == override.source_file and f["sha256"] == override.source_sha256
+            for f in files
+        ):
+            raise IngestError(
+                "csv_override_stale",
+                "CSV format override references an unknown or changed source",
+            )
     signature = {
         "schema_version": SCHEMA_VERSION,
         "business_id": business_id,
         "files": files,
-        "options": asdict(options),
+        "options": json.loads(dump(asdict(options))),
         "loader_code_sha256": code_hash(),
         "duckdb_version": duckdb.__version__,
         "python_version": platform.python_version(),
@@ -384,9 +400,16 @@ def _ingest_business(
             )
             con.execute("CREATE TABLE __dm_readme(text VARCHAR)")
             try:
-                readme = (business / "README.md").read_text(
-                    encoding="utf-8-sig", errors="strict"
+                readme_format = inspect_encoding(
+                    business / "README.md", error_code="readme_encoding"
                 )
+                readme = (business / "README.md").read_text(
+                    encoding=readme_format["encoding"], errors="strict"
+                )
+                source_metadata["README.md"] = readme_format
+            except IngestError as exc:
+                exc.location["source_file"] = "README.md"
+                raise
             except UnicodeError as exc:
                 raise IngestError(
                     "readme_encoding",
@@ -401,7 +424,19 @@ def _ingest_business(
                 relative = f["path"]
                 if relative == "README.md":
                     continue
-                with closing(read_source(business / relative, options)) as readers:
+                override = next(
+                    (v for v in options.csv_formats if v.source_file == relative), None
+                )
+                file_options = (
+                    replace(
+                        options,
+                        csv_encoding=override.encoding,
+                        csv_delimiter=override.delimiter,
+                    )
+                    if override
+                    else options
+                )
+                with closing(read_source(business / relative, file_options)) as readers:
                     for unit in readers:
                         name = unit.name
                         if len(units) >= options.max_units:
@@ -528,6 +563,11 @@ def ingest_split(
         raise IngestError(
             "business_id", "Select at least one business, without duplicates"
         )
+    if {f.business_id for f in (options or LoaderOptions()).csv_formats} - set(ids):
+        raise IngestError(
+            "csv_override_unknown",
+            "CSV format map references a business outside this run",
+        )
     results = []
     for bid in ids:
         try:
@@ -562,6 +602,7 @@ def run_ingest(
     output_dir: Path,
     options: LoaderOptions | None = None,
     business_ids: list[str] | None = None,
+    format_map: Path | None = None,
 ) -> dict:
     source, cache = roots(Path(input_dir), Path(cache_root))
     output = output_dir.resolve()
@@ -569,7 +610,40 @@ def run_ingest(
         raise IngestError(
             "output_overlap", "Report output must be new and disjoint from input/cache"
         )
+    map_hash = None
+    if format_map is not None:
+        mapping = Path(format_map).resolve(strict=True)
+        if (
+            not disjoint(mapping, source)
+            or not disjoint(mapping, cache)
+            or not disjoint(mapping, output)
+            or mapping.stat().st_size > 8 * 1024 * 1024
+        ):
+            raise IngestError(
+                "csv_override_map",
+                "Format map must be bounded and outside source/cache/output",
+            )
+        try:
+            obj = json.loads(mapping.read_text("utf-8"))
+            if (
+                set(obj) != {"version", "files"}
+                or type(obj["version"]) is not int
+                or obj["version"] != 1
+            ):
+                raise ValueError
+            options = replace(
+                options or LoaderOptions(),
+                csv_formats=tuple(CsvFormat(**v) for v in obj["files"]),
+            )
+            map_hash = sha256(mapping)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            raise IngestError(
+                "csv_override_map", "Invalid source-bound format map"
+            ) from exc
     result = ingest_split(source, cache, options, business_ids)
+    if format_map is not None and sha256(mapping) != map_hash:
+        raise IngestError("input_changed", "CSV format map changed during ingestion")
+    result["format_map_sha256"] = map_hash
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "ingest.json", result)
     return result

@@ -154,17 +154,28 @@
     "title": "Profile schema, encoding và header",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
     "source_section": "A/T2",
-    "status": "in_progress",
+    "status": "done",
     "depends_on": [
       "A-T1"
     ],
     "acceptance": [
       "Profile bảng/cột/type/sample/null/min-max",
-      "Encoding/header có ca tái hiện",
-      "Baseline dùng được schema profile"
+      "Runtime BOM/strict codec/delimiter và source-bound overrides có fixture; text QA không sửa raw",
+      "Header/data-start có benchmark nhãn và partition khóa trước chọn rule, có unresolved fallback",
+      "Descriptor/header/data-start dùng được qua consumer contract; actual prompt/PA integration được giữ ở D-E-T2",
+      "Raw/frame preservation, deterministic profiles và CPU gate current có evidence"
     ],
     "evidence": [
       "docs/research/a_t2_engineering.md",
+      "docs/research/a_t2_completion.md",
+      "reports/a_t2_completion_results.md",
+      "runs/a-t2-completion-20261105/handoff_verification.json (local, ignored): A-T2 done, CPU passed/current; final acceptance and frozen rule current; raw/old cache/kit unchanged; protected configs, UTF-8/NFC/JSON/links/diff/format pass; D-E-T2 integration still todo",
+      "docs/runtime_format.md",
+      "runs/a-t2-completion-20261105/final_acceptance.json (local, ignored): current 30/30 businesses, 339 units/3184 columns/3997599 rows; 311 auto/11 unresolved/17 source_schema; 0 wrong selected against frozen labels; 60 repeat profile/schema hashes identical; independent profile audit pass; raw/cache/source unchanged; no text flags observed",
+      "runs/a-t2-completion-20261105/ingest_acceptance.json, source-audit/verification.json (local, ignored): all 339 raw frame hashes match previous generation; independent source value/type/position audit pass; old cache unchanged",
+      "runs/cpu-check-20261105T081753167962Z-qao9tpkg/gate.json (local, ignored): current after README NEL fix; exit 0, 144 passed in 44.83s, Ruff/format pass, source unchanged during gate; fingerprint matches final acceptance",
+      "runs/a-t2-completion-20261105/labels_freeze.json, rule_selection.json, header-dev-final.json, header-check-final.json (local, ignored): 322 units, 34 multirow headers, 80 grouped partitions; chosen B2 check 218/219 selected, 0 wrong; same-author labels, not unseen holdout",
+      "runs/cpu-check-20261105T075931003043Z-u0j0tql3/gate.json (local, ignored): exit 0; 143 passed in 38.03s; source unchanged; Ruff/format pass",
       "docs/profiling.md",
       "reports/a_t2_engineering_results.md",
       "runs/a-t2-engineering-20261105/handoff_verification.json (local, ignored): engineering done/research deferred, CPU passed/current/no warnings; kit and ingest code unchanged; protected config/UTF-8/NFC/JSON/links/diff/format pass",
@@ -172,15 +183,16 @@
       "runs/a-t2-engineering-20261105/audit/verification.json (local, ignored): full counts/types/length/lexical and numeric extrema/sample-coordinate/schema audit; gold not parsed",
       "runs/cpu-check-20261105T062508275441Z-5p01bmls/gate.json (local, ignored): exit 0; 115 passed in 27.51s; Ruff/format pass; source unchanged during gate"
     ],
-    "scope_decision": "Người dùng ngày 05/11/2026 chỉ giao engineering; hoãn research tự dò encoding/header và chiến lược biểu diễn cho LLM",
+    "scope_decision": "Yêu cầu mới 05/11 hoàn thiện T2 sau phản biện Claude cho phép runtime policy và nghiên cứu header CPU trên train; actual prompt/model/PA thuộc D-E-T2, legacy converter/multi-region chưa có evidence",
     "engineering_status": "done",
-    "research_status": "deferred_by_user",
+    "research_status": "complete_bounded_cpu",
     "limitations": [
-      "CSV/XLSX header unresolved nếu chưa có annotation tường minh; annotation không phải xác nhận header đúng",
-      "Codec/delimiter là cấu hình loader, không phải detection; chưa TCVN3/VNI/mojibake hoặc chuyển mã",
-      "Profile chỉ kiểu vật lý/raw, không semantic type, normalized money/date, fill/dedup/join hoặc prompt/model validation"
+      "11/322 CSV/XLSX units unresolved có preview; nhãn README/source self-review không có human reviewer thứ hai; check train đã từng khảo sát, không phải unseen holdout",
+      "Strict decoding/delimiter evidence không chứng minh văn bản đúng nghĩa; text flags không repair; chưa converter legacy hoặc multi-table regions",
+      "Raw statistics gồm header/totals/duplicates; data_start chỉ cận dưới, không semantic cleaning; actual prompt/model/PA acceptance được giữ ở D-E-T2"
     ],
-    "next_action": "Phần engineering đã nghiệm thu. Giữ research tự dò encoding/header/table-region và prompt representation ở trạng thái hoãn theo người dùng; chưa nghiệm thu prompt baseline thật, không tự mở A-T3/T4 hoặc research"
+    "acceptance_ownership_note": "Theo yêu cầu hoàn thiện và review Claude: làm rõ A-T2 handoff API; không xóa yêu cầu baseline, thêm dependency và acceptance actual descriptor-in-prompt vào D-E-T2; chi tiết docs/research/a_t2_completion.md",
+    "next_action": "Bàn giao descriptor/header/data-start cho D-E-T2 khi model/scorer/split prerequisite sẵn sàng; giữ actual schema-in-prompt và PA acceptance tại đó. Không tự mở cleaning/model/public tuning hoặc converter legacy chưa có evidence"
   },
   {
     "id": "C-T2",
@@ -221,6 +233,7 @@
     "status": "todo",
     "depends_on": [
       "A-T1",
+      "A-T2",
       "E-T1",
       "C-T2",
       "D-G-T1",
@@ -228,6 +241,7 @@
     ],
     "acceptance": [
       "Input thật → model/SQL → output có log",
+      "Schema descriptor A-T2 thực sự được dùng trong prompt baseline; đo riêng ảnh hưởng header/serialization khi đủ scorer và split, không lấy consumer synthetic thay PA",
       "Có PA baseline với scorer và split/config đã khai báo",
       "Fake/stub không dùng làm baseline"
     ],

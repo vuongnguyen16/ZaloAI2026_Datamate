@@ -46,10 +46,12 @@ def main() -> int:
     ingest.add_argument("--cache", type=Path, required=True)
     ingest.add_argument("--output", type=Path, required=True)
     ingest.add_argument("--business", action="append")
-    ingest.add_argument("--csv-encoding", default="utf-8-sig")
-    ingest.add_argument("--csv-delimiter", default=",")
+    ingest.add_argument("--csv-encoding", default="auto")
+    ingest.add_argument("--csv-delimiter", default="auto")
+    ingest.add_argument("--format-map", type=Path)
     profile = commands.add_parser(
-        "profile", help="Profile raw cache without encoding/header/semantic inference"
+        "profile",
+        help="Profile raw cache, format evidence and conservative header structure",
     )
     profile.add_argument("--input", type=Path, required=True)
     profile.add_argument("--ingest-report", type=Path, required=True)
@@ -58,6 +60,8 @@ def main() -> int:
     profile.add_argument("--samples", type=int, default=3)
     profile.add_argument("--preview-rows", type=int, default=6)
     profile.add_argument("--value-bytes", type=int, default=256)
+    profile.add_argument("--no-auto-header", action="store_true")
+    profile.add_argument("--header-scan-rows", type=int, default=64)
     args = parser.parse_args()
     try:
         if args.command == "profile":
@@ -66,6 +70,8 @@ def main() -> int:
                 args.ingest_report,
                 args.output,
                 ProfileOptions(
+                    detect_headers=not args.no_auto_header,
+                    header_scan_rows=args.header_scan_rows,
                     samples_per_column=args.samples,
                     preview_rows=args.preview_rows,
                     value_bytes=args.value_bytes,
@@ -81,6 +87,7 @@ def main() -> int:
                     csv_encoding=args.csv_encoding, csv_delimiter=args.csv_delimiter
                 ),
                 args.business,
+                args.format_map,
             )
         elif args.command == "validate-input":
             output = inspect_input(args.input)

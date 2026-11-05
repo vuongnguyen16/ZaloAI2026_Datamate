@@ -208,6 +208,15 @@ def verify(input_dir: Path, ingest_report: Path, output_dir: Path) -> dict:
             raise ValueError("Duplicate unit in ingest report")
         seen = set()
         with connect(Path(business["database"]), read_only=True) as con:
+            readme_codec = (
+                manifest["source_metadata"]
+                .get("README.md", {})
+                .get("encoding", "utf-8-sig")
+            )
+            if con.execute("SELECT text FROM __dm_readme").fetchone()[0] != (
+                root / "README.md"
+            ).read_text(encoding=readme_codec):
+                raise ValueError("Cached README differs from strictly decoded source")
             files = sorted(
                 p
                 for p in root.rglob("*")
@@ -223,7 +232,21 @@ def verify(input_dir: Path, ingest_report: Path, output_dir: Path) -> dict:
                 if sha256(path) != expected_hash:
                     raise ValueError("Source hash differs from ingestion manifest")
                 for name, kind, rows in independent_sources(
-                    path, manifest["signature"]["options"]
+                    path,
+                    {
+                        **manifest["signature"]["options"],
+                        "csv_encoding": manifest["source_metadata"]
+                        .get(rel, {})
+                        .get(
+                            "encoding", manifest["signature"]["options"]["csv_encoding"]
+                        ),
+                        "csv_delimiter": manifest["source_metadata"]
+                        .get(rel, {})
+                        .get(
+                            "delimiter",
+                            manifest["signature"]["options"]["csv_delimiter"],
+                        ),
+                    },
                 ):
                     key = (rel, name, kind)
                     unit = units[key]

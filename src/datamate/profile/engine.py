@@ -16,9 +16,14 @@ from datamate.ingest import IngestError, LoaderOptions, loader
 from datamate.ingest.readers import dump
 from datamate.profile.model import ProfileOptions
 from datamate.profile.stats import ColumnStats, Retention, preview
+from datamate.profile.structure import VERSION as STRUCTURE_VERSION
+from datamate.profile.structure import detect
+from datamate.profile.text_quality import TextQuality
 
 VERSION = 1
-SCOPE = "A-T2 engineering raw statistics; no encoding/header/semantic inference"
+SCOPE = (
+    "A-T2 raw profile, format evidence and conservative structure; no cleaning/model"
+)
 
 
 def code_hash():
@@ -54,27 +59,43 @@ def header_selections(path):
         )
     selections = {}
     for entry in record["selections"]:
-        if not isinstance(entry, dict) or set(entry) != {
+        required = {
             "business_id",
             "ingest_fingerprint",
             "source_file",
             "source_name",
             "source_kind",
             "rows",
-        }:
+        }
+        if (
+            not isinstance(entry, dict)
+            or not required <= set(entry)
+            or set(entry) - required - {"data_start_row"}
+        ):
             raise IngestError("profile_header_map", "Invalid explicit header entry")
-        if any(not isinstance(entry[k], str) for k in entry if k != "rows"):
+        if any(
+            not isinstance(entry[k], str)
+            for k in entry
+            if k not in {"rows", "data_start_row"}
+        ):
             raise IngestError(
                 "profile_header_map", "Header identity fields must be strings"
             )
         rows = entry["rows"]
         if (
             not isinstance(rows, list)
-            or not 1 <= len(rows) <= 64
+            or not 0 <= len(rows) <= 64
+            or not rows
+            and "data_start_row" not in entry
             or any(type(r) is not int or r < 1 for r in rows)
             or rows != sorted(set(rows))
             or not re.fullmatch(r"[0-9a-f]{64}", entry["ingest_fingerprint"])
             or entry["source_kind"] not in {"csv", "xlsx_sheet"}
+            or "data_start_row" in entry
+            and (
+                type(entry["data_start_row"]) is not int
+                or entry["data_start_row"] <= max(rows, default=0)
+            )
         ):
             raise IngestError(
                 "profile_header_map", "Invalid header rows/fingerprint/source kind"
@@ -117,6 +138,8 @@ def profile_unit(con, unit, options, selection, cells_budget):
     count = nonempty = previous = max_width = 0
     digest = hashlib.sha256()
     first_rows, selected_rows = [], {}
+    prefix, prefix_bytes, evidence_limited = [], 0, False
+    quality = TextQuality()
     chosen = set(selection["rows"]) if selection else set()
     cursor = con.execute(
         f"SELECT __row,__width,CAST(__payload AS VARCHAR) FROM {loader.identifier(unit['storage_table'])} ORDER BY __row"
@@ -143,6 +166,12 @@ def profile_unit(con, unit, options, selection, cells_budget):
             ):
                 raise IngestError("profile_payload", "Invalid raw frame structure")
             values, meta = parsed["v"], parsed["m"]
+            if count <= options.header_scan_rows:
+                prefix_bytes += len(payload.encode("utf-8"))
+                if prefix_bytes <= options.header_scan_bytes:
+                    prefix.append({"row": number, "width": row_width, **parsed})
+                else:
+                    evidence_limited = True
             cells_budget[0] += len(values)
             if cells_budget[0] > options.max_cells_per_business:
                 raise IngestError(
@@ -187,6 +216,15 @@ def profile_unit(con, unit, options, selection, cells_budget):
                 i = int(key)
                 typ = cell_type(kind, meta, i)
                 columns[i - 1].add(value, typ, number, location)
+                if typ in {
+                    "csv:text",
+                    "xlsx:i",
+                    "xlsx:s",
+                    "xlsx:x",
+                    "xlsx:d",
+                    "sqlite:t",
+                }:
+                    quality.add(value, number, i)
                 if capture and (i <= options.preview_columns or number in chosen):
                     preview_cells[key] = {
                         "physical_type": typ,
@@ -233,6 +271,78 @@ def profile_unit(con, unit, options, selection, cells_budget):
         raise IngestError(
             "profile_header_rows", "An explicit header row does not exist in source"
         )
+    if kind == "sqlite_table":
+        structure = {
+            "status": "source_schema",
+            "header_rows": [],
+            "data_start_row": 1 if count else None,
+            "rule_version": STRUCTURE_VERSION,
+            "reason": "declared_sqlite_schema",
+        }
+    elif selection:
+        data_start = selection.get("data_start_row")
+        if data_start is None:
+            data_start = con.execute(
+                f"SELECT min(__row) FROM {loader.identifier(unit['storage_table'])} WHERE __row>? AND EXISTS(SELECT 1 FROM json_each(json_extract(__payload,'$.v')) j WHERE json_extract_string(j.value,'$') IS NOT NULL AND json_extract_string(j.value,'$')<>'')",
+                [max(chosen, default=0)],
+            ).fetchone()[0]
+        if (
+            data_start is not None
+            and con.execute(
+                f"SELECT count(*) FROM {loader.identifier(unit['storage_table'])} WHERE __row=?",
+                [data_start],
+            ).fetchone()[0]
+            != 1
+        ):
+            raise IngestError(
+                "profile_header_rows", "Explicit data_start_row is absent from source"
+            )
+        structure = {
+            "status": "explicit_annotation" if chosen else "no_header",
+            "header_rows": sorted(chosen),
+            "data_start_row": data_start,
+            "rule_version": STRUCTURE_VERSION,
+            "reason": "source_bound_annotation",
+        }
+    elif options.detect_headers:
+        effective_width = max(
+            (int(k) for r in prefix for k, v in r["v"].items() if v not in (None, "")),
+            default=0,
+        )
+        structure = detect(
+            prefix,
+            effective_width,
+            complete_empty=count == 0,
+            evidence_limited=evidence_limited,
+        )
+        chosen = set(structure["header_rows"])
+        for r in prefix:
+            if r["row"] in chosen:
+                selected_rows[r["row"]] = {
+                    "source_row": r["row"],
+                    "width": r["width"],
+                    **{
+                        k: v
+                        for k, v in r["m"].items()
+                        if k in {"line_start", "line_end"}
+                    },
+                    "cells": {
+                        k: {
+                            "physical_type": cell_type(kind, r["m"], int(k)),
+                            **preview(v, options.value_bytes),
+                        }
+                        for k, v in r["v"].items()
+                    },
+                    "omitted_cells": 0,
+                }
+    else:
+        structure = {
+            "status": "unresolved",
+            "header_rows": [],
+            "data_start_row": None,
+            "rule_version": STRUCTURE_VERSION,
+            "reason": "automatic_selection_disabled",
+        }
     result_columns = [column.finish(count) for column in columns]
     if kind == "sqlite_table":
         declared = unit["metadata"]["columns"]
@@ -247,6 +357,39 @@ def profile_unit(con, unit, options, selection, cells_budget):
             {"source_row": r, "cell": selected_rows[r]["cells"].get(str(c["position"]))}
             for r in sorted(chosen)
         ]
+        c["data_samples"] = []
+    sample_rows = 0
+    if structure["data_start_row"] is not None:
+        seen_samples = [set() for _ in columns]
+        for number, payload in con.execute(
+            f"SELECT __row,CAST(__payload AS VARCHAR) FROM {loader.identifier(unit['storage_table'])} WHERE __row>=? ORDER BY __row LIMIT ?",
+            [structure["data_start_row"], options.data_sample_rows],
+        ).fetchall():
+            sample_rows += 1
+            parsed = json.loads(payload)
+            for key, value in parsed["v"].items():
+                i = int(key) - 1
+                if (
+                    value is None
+                    or value == ""
+                    or len(result_columns[i]["data_samples"])
+                    >= options.samples_per_column
+                ):
+                    continue
+                token = hashlib.sha256(value.encode("utf-8")).hexdigest()
+                if token not in seen_samples[i]:
+                    seen_samples[i].add(token)
+                    result_columns[i]["data_samples"].append(
+                        {
+                            "source_row": number,
+                            **{
+                                k: v
+                                for k, v in parsed["m"].items()
+                                if k in {"line_start", "line_end"}
+                            },
+                            **preview(value, options.value_bytes),
+                        }
+                    )
     return {
         **{
             k: unit[k]
@@ -264,18 +407,23 @@ def profile_unit(con, unit, options, selection, cells_budget):
         "frame_sha256": digest.hexdigest(),
         "statistics_scope": "all physical raw rows, including headers/totals/duplicates/blanks",
         "header": {
-            "status": "source_schema"
-            if kind == "sqlite_table"
-            else "explicit_annotation"
-            if selection
-            else "unresolved",
+            "status": structure["status"],
             "rows": sorted(chosen),
             "selected_row_evidence": [selected_rows[r] for r in sorted(chosen)],
-            "automatic_detection": False,
+            "data_start_row": structure["data_start_row"],
+            "automatic_detection": structure["status"] == "auto_rule",
             "rows_filtered_from_statistics": False,
         },
         "source_structure": unit["metadata"],
         "row_preview": first_rows,
+        "structure": structure,
+        "text_quality": quality.record(),
+        "data_samples_scope": {
+            "from_row": structure["data_start_row"],
+            "rows_scanned": sample_rows,
+            "max_rows": options.data_sample_rows,
+            "totals_notes_duplicates_still_present": True,
+        },
         "columns": result_columns,
     }
 
@@ -298,6 +446,33 @@ def schema_descriptor(profile):
                 "row_count": u["row_count"],
                 "row_coordinate_column": "__row",
                 "header_status": u["header"]["status"],
+                "header_rows": u["header"]["rows"],
+                "data_start_row": u["header"]["data_start_row"],
+                "structure": u["structure"],
+                "row_preview": u["row_preview"]
+                if u["header"]["status"] == "unresolved"
+                else [],
+                "format": {
+                    k: v
+                    for k, v in profile["provenance"]["source_metadata"]
+                    .get(u["source_file"], {})
+                    .items()
+                    if k
+                    in {
+                        "encoding",
+                        "encoding_status",
+                        "bom",
+                        "delimiter",
+                        "delimiter_status",
+                        "format_policy_version",
+                        "format",
+                        "workbook_properties",
+                        "row_order",
+                        "sqlite_version",
+                    }
+                },
+                "text_quality": u["text_quality"],
+                "data_samples_scope": u["data_samples_scope"],
                 "columns": [
                     {
                         k: c[k]
@@ -307,6 +482,7 @@ def schema_descriptor(profile):
                             "sql_type",
                             "physical_types",
                             "samples",
+                            "data_samples",
                             "header_cells",
                             "declared_name",
                             "declared_type",
@@ -320,7 +496,7 @@ def schema_descriptor(profile):
         ],
         "limitations": [
             "Raw rows include headers/totals/duplicates; VARCHAR values are not normalized",
-            "No semantic types, encoding detection, automatic header choice, joins or model validation",
+            "Conservative header rule can abstain; no legacy text repair, semantic types, joins or model validation",
         ],
     }
 
@@ -388,6 +564,11 @@ def profile_business(
         )
     profiles, cells_budget = [], [0]
     with loader.connect(database, read_only=True) as con:
+        readme_quality = TextQuality()
+        for row, text in enumerate(
+            con.execute("SELECT text FROM __dm_readme").fetchone()[0].split("\n"), 1
+        ):
+            readme_quality.add(text, row, None)
         for unit in units:
             try:
                 profiles.append(
@@ -436,6 +617,7 @@ def profile_business(
             "source_metadata": manifest["source_metadata"],
         },
         "units": profiles,
+        "readme_text_quality": readme_quality.record(),
         "summary": {
             "units": len(profiles),
             "columns": sum(u["max_width"] for u in profiles),
@@ -444,6 +626,7 @@ def profile_business(
             "headers_unresolved": sum(
                 u["header"]["status"] == "unresolved" for u in profiles
             ),
+            "headers_auto": sum(u["header"]["status"] == "auto_rule" for u in profiles),
         },
         "gold_content_read": False,
         "model": "not_run",
@@ -614,13 +797,14 @@ def _run_profile(input_dir, ingest_report, output_dir, options, header_map):
                     "rows",
                     "present_cells",
                     "headers_unresolved",
+                    "headers_auto",
                 )
             },
         },
-        "deferred_by_user": [
-            "automatic encoding/TCVN3/VNI detection",
-            "automatic true header/table-region selection",
-            "semantic inference and prompt strategy research",
+        "deferred": [
+            "legacy-font converter without verified real examples",
+            "multi-table region discovery and semantic inference",
+            "actual model/prompt/PA integration owned by D-E-T2",
         ],
         "gold_content_read": False,
         "model": "not_run",

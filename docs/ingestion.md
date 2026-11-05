@@ -3,6 +3,8 @@
 Loader đọc business từ `<split>/data/<business_id>/`, ghi cache DuckDB ngoài
 input. Không mở questions/gold/rulebook để nạp bảng, không gọi model/cloud.
 Thiết kế và trade-off: [spec](research/a_t1_raw_loader.md).
+Policy codec/delimiter runtime đã được bổ sung khi hoàn thiện A-T2:
+[BOM/strict decoding, delimiter và format-map](runtime_format.md).
 
 ## Chạy CLI
 
@@ -21,7 +23,8 @@ Exit 0 khi mọi business thành công, exit 2 khi thất bại. Business lỗi 
 được publish cache complete; các business khác vẫn được thử.
 
 `--business BUSINESS_ID` có thể lặp để chọn subset. Mặc định nạp tất cả business
-trong data/. CSV mặc định strict UTF-8-sig và dấu phẩy theo train; có thể đặt
+trong data/. CSV mặc định policy auto BOM/strict UTF-8 và delimiter hữu hạn;
+có thể đặt
 `--csv-encoding`/`--csv-delimiter` khi đã xác nhận format nguồn. Không dò bằng
 decode thay ký tự lỗi hoặc tự đổi số/ngày.
 
@@ -52,7 +55,7 @@ Mỗi generation có `raw.duckdb` và `manifest.json`. Catalog trong DB:
 | Đối tượng | Nội dung |
 |---|---|
 | `__dm_sources` | File tương đối, hash, byte size, metadata nguồn |
-| `__dm_readme` | README nguyên nội dung sau decode UTF-8-sig; không thực thi |
+| `__dm_readme` | README decode strict theo BOM/UTF-8 policy; không thực thi |
 | `__dm_units` | File/sheet/bảng → storage table/view, counts, width, frame hash và metadata |
 | `rows_<hash>` | Frame JSON raw vật lý: `__row`, `__width`, `__payload` |
 | `raw_<hash>` | View positional: `__row`, `__width`, `__metadata`, `c0001`… |

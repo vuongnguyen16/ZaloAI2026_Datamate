@@ -4,13 +4,39 @@ Cập nhật 05/11/2026, giờ Việt Nam. Theo yêu cầu người dùng, timel
 Research là nguồn kế hoạch hiện tại; toàn bộ tracker cũ đã được thay thế.
 Các mốc ngày trong DOCX là dự kiến, không tự thay lịch/contract BTC.
 
-**Hiện tại:** A-T1 đã hoàn tất; **phần engineering A-T2 đã nghiệm thu**:
-profile raw đầy đủ và schema descriptor dùng tên view/cột thật. A-T2 vẫn
-`in_progress`, `engineering_status=done`, `research_status=deferred_by_user`.
-Người dùng ngày 05/11 chỉ giao engineering; chưa tự dò encoding/header/table
-region, semantic inference hoặc nghiên cứu biểu diễn cho LLM. Cleaner A-T3/T4
-và prompt baseline thật chưa được nghiệm thu. `G-FOUNDATION`/`A-INVENTORY`
-vẫn chỉ công nhận phạm vi kế thừa của chúng.
+**Hiện tại:** **A-T2 đã hoàn thiện và done** ở phạm vi format/profile/structure/
+descriptor/consumer contract, theo yêu cầu mới sau phản biện Claude. Đã có
+runtime BOM/codec/delimiter policy, source-bound overrides, text QA, header/
+data-start và data_samples/fallback preview. CPU mới **144 tests pass** sau
+fix README NEL/C1, Ruff/format pass; artifact
+`runs/cpu-check-20261105T081753167962Z-qao9tpkg/`, source không đổi, đã đọc log.
+Final proof `runs/a-t2-completion-20261105/final_acceptance.json` valid=true,
+source fingerprint trùng gate hiện hành; raw/cache/source unchanged, 60
+business profile/schema repeat hashes giống nhau. Đã đọc source/profile
+audits: đủ 339 unit/3.184 cột/3.997.599 hàng/33.628.129 present cells, frame
+digests trùng A-T1 trước đổi policy. Spec [hoàn thiện](research/a_t2_completion.md),
+[báo cáo](../reports/a_t2_completion_results.md), [runtime policy](runtime_format.md).
+Không ghi nhận text flags trong train; không coi đó là chứng minh không có
+mọi legacy encoding. Source mới giữ local, chưa commit/push phiên này.
+Handoff đã xác nhận A-T2 done, CPU passed/current/no warning, frozen
+labels/rule và final proof current; kit/cache cũ/protected configs không đổi.
+12 tài liệu/tracker UTF-8/NFC/JSON, 53 link local và diff/format pass; evidence
+`runs/a-t2-completion-20261105/handoff_verification.json`.
+
+Nhãn source/README đã chốt trước chọn rule, 322 unit, 34 header hai tầng;
+group template/file duplicates thành 80 nhóm, dev 103 unit/52 nhóm, check
+219 unit/28 nhóm. B2 chọn trước check: 218/219 check tự chọn, 0 sai; còn 1
+unresolved. Đây là self-reviewed train structure check (đầu vào từng xem),
+không phải independent-human labels, unseen QA holdout hoặc PA. Toàn train
+profile hiện hành: 311 auto, 11 unresolved, 17 SQLite schema, không special-case
+theo ID. Consumer contract có data-start/header labels; actual prompt/PA
+acceptance được giữ tại D-E-T2 và task đó đã thêm dependency A-T2.
+
+Yêu cầu hoàn thiện này thay chỉ định hoãn research trước đó trong phạm vi
+header CPU. Converter legacy, multi-region, model/prompt optimization và
+cleaner A-T3/T4 chưa mở. A-T1 đã hoàn tất; cache generation mới do code policy
+đổi, raw/cache cũ giữ nguyên và 339 frame digests trùng trước/sau.
+`G-FOUNDATION`/`A-INVENTORY` vẫn chỉ công nhận phạm vi kế thừa của chúng.
 
 **Đã có:** CPython 3.11.18 + uv 0.13.6 + lock; strict schema/validators;
 fake/stub runner, logging/hash; khảo sát sâu train, raw loader/cache và raw
@@ -19,7 +45,7 @@ Modal CPU smoke lịch sử. Xem `docs/foundation.md` và
 [hướng dẫn loader](ingestion.md), [hướng dẫn profile](profiling.md).
 Chưa có real model, scorer, PA/B0.
 
-**Kiểm chứng A-T2 khi nghiệm thu engineering:** CPU gate exit 0, Ruff/format pass, **115 tests
+**Kiểm chứng A-T2 engineering trước hoàn thiện (lịch sử):** CPU gate exit 0, Ruff/format pass, **115 tests
 pass trong 27.51s**, không skip; đã đọc JSON/log tại
 `runs/cpu-check-20261105T062508275441Z-5p01bmls/`. CPU trước push mới hơn được
 ghi ở mục đồng bộ GitHub bên dưới. Full train 30/30 business, 339 unit, 3.184 cột, 3.997.599 hàng,
@@ -36,7 +62,7 @@ Handoff xác nhận CPU passed/current, không warning; kit train/public/thể l
 hash không đổi, 7 tài liệu/tracker UTF-8/NFC/JSON và 36 link local hợp lệ,
 diff/format pass. Evidence: `runs/a-t2-engineering-20261105/handoff_verification.json`.
 
-322 CSV/XLSX units giữ header unresolved, 17 SQLite dùng declared schema.
+Trong increment engineering trước: 322 CSV/XLSX units giữ header unresolved, 17 SQLite dùng declared schema.
 Chỉ nhận explicit annotation gắn fingerprint, không tự chọn/fill/ghép header;
 codec là cấu hình loader, không coi là detection. Numeric extrema chỉ từ
 numeric vật lý; không normalize text money/date/ID hoặc bỏ hàng raw.
@@ -75,12 +101,12 @@ upload BTC data khi chưa rõ quyền; không tuning bằng public/private test;
 split/access policy phải rõ trước tuning/huấn luyện; model thật chỉ trên Modal.
 Docker nháp giữ nguyên tới bước đóng gói nhóm G sau khi pipeline hoàn chỉnh.
 
-**Phần còn lại của A-T2:** tự dò encoding cũ/mojibake, tìm header thật/table
-region và lựa chọn biểu diễn cho LLM đang hoãn theo người dùng. Descriptor đã
-có consumer synthetic, chưa có prompt baseline thật để nghiệm thu acceptance
-đó. Không tự mở research hoặc chuyển A-T3/T4 trong phiên này. E-T1 scorer và
-C-T1 rulebook/calendar vẫn todo; timeline ghi scorer “đã có” không phải bằng
-chứng repo hiện có scorer. Khi có nhiệm vụ mới, đọc timeline/contract và tracker.
+**Handoff tiếp theo:** D-E-T2 nhận schema/header/data-start/preview khi các
+model/scorer/split prerequisite của nó sẵn sàng. Actual descriptor-in-prompt
+và PA vẫn là acceptance mở tại D-E-T2; không dùng consumer synthetic thay
+model. A-T3/T6 vẫn phụ thuộc baseline và E-SPLIT, chưa mở trong phiên này.
+Không đọc public/private hoặc gold để chọn rule. Bằng chứng local toàn lượt:
+`runs/a-t2-completion-20261105/`.
 
 **Phiên mới:** chạy `uv run --locked python scripts/harness.py context --task A-T2`,
 đọc `read_first` và DOCX timeline, review diff rồi chạy CPU gate. Context trả
@@ -90,7 +116,7 @@ path/hash timeline; nếu thiếu thì báo thiếu, không hồi sinh plan đã
 SHA-256 trước sửa/xóa, local/ignored. Không xóa data, lịch sử Git, runs cũ,
 môi trường uv hoặc tài liệu gốc; phiên cleanup không commit/push.
 
-**Đồng bộ GitHub hiện tại, ngày 05/11:** theo yêu cầu người dùng, toàn bộ code,
+**Đồng bộ GitHub trước phiên hoàn thiện (lịch sử 05/11):** theo yêu cầu người dùng, toàn bộ code,
 tests và tài liệu A-T1/A-T2 đã push lên repo public
 `vuongnguyen16/ZaloAI2026_Datamate`, nhánh main, source commit `62d67b9`.
 Đã đối chiếu remote SHA trùng local; CPU GitHub Actions run `41982405255`

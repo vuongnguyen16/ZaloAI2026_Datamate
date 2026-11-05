@@ -12,6 +12,7 @@ from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
 from datamate.ingest.model import IngestError, LoaderOptions, RawRow, RawUnit
+from datamate.ingest.text_format import inspect_csv
 
 S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
@@ -64,16 +65,16 @@ def check_row(row: RawRow, options: LoaderOptions) -> None:
 
 
 def read_csv(path: Path, options: LoaderOptions):
-    metadata = {"encoding": options.csv_encoding, "delimiter": options.csv_delimiter}
+    metadata = inspect_csv(path, options)
 
     def rows():
         limit = csv.field_size_limit()
         csv.field_size_limit(options.max_cell_bytes)
         try:
             with path.open(
-                encoding=options.csv_encoding, errors="strict", newline=""
+                encoding=metadata["encoding"], errors="strict", newline=""
             ) as h:
-                reader = csv.reader(h, delimiter=options.csv_delimiter, strict=True)
+                reader = csv.reader(h, delimiter=metadata["delimiter"], strict=True)
                 previous = 0
                 for number, values in enumerate(reader, 1):
                     yield RawRow(

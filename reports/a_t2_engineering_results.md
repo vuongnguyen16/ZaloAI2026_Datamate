@@ -1,5 +1,9 @@
 # A-T2 — Nghiệm thu phần engineering của profile raw
 
+Đây là kết quả increment engineering đầu; việc hoàn thiện runtime/header
+theo yêu cầu mới có [spec riêng](../docs/research/a_t2_completion.md).
+Các trạng thái hoãn/unresolved bên dưới mô tả phiên đó; xem tracker hiện hành.
+
 Ngày 05/11/2026. Người dùng giao **chỉ engineering**, hoãn research. Nguồn kế
 hoạch vẫn là timeline DOCX A/T2 hiện hành, hash
 e74b1292119f01ca3eae7d20d709921219efc30e655e01909685c50d5363eb51.

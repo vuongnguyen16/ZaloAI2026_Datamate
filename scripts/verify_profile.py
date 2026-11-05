@@ -185,6 +185,9 @@ def audit_unit(con, unit, options, bid):
         for r in unit["row_preview"] + unit["header"]["selected_row_evidence"]
     }
     coordinates.update(s["source_row"] for c in unit["columns"] for s in c["samples"])
+    coordinates.update(
+        s["source_row"] for c in unit["columns"] for s in c.get("data_samples", [])
+    )
     evidence = {}
     if coordinates:
         for row, rowwidth, payload in con.execute(
@@ -257,7 +260,7 @@ def audit_unit(con, unit, options, bid):
             i,
             "numeric extrema",
         )
-        for s in c["samples"]:
+        for s in c["samples"] + c.get("data_samples", []):
             original = evidence[s["source_row"]][1]
             value = original["v"][str(i)]
             check(
@@ -280,6 +283,30 @@ def audit_unit(con, unit, options, bid):
                     i,
                     "CSV sample lines",
                 )
+        for s in c.get("data_samples", []):
+            check(
+                unit["header"].get("data_start_row") is not None
+                and s["source_row"] >= unit["header"]["data_start_row"],
+                bid,
+                unit["source_name"],
+                i,
+                "data sample boundary",
+            )
+        for label in c["header_cells"]:
+            original = evidence[label["source_row"]][1]["v"]
+            cell = label["cell"]
+            check(
+                (cell is None and str(i) not in original)
+                or (
+                    cell is not None
+                    and {k: v for k, v in cell.items() if k != "physical_type"}
+                    == expected_preview(original[str(i)], options["value_bytes"])
+                ),
+                bid,
+                unit["source_name"],
+                i,
+                "header cell provenance",
+            )
     return {
         "source_name": unit["source_name"],
         "source_file": unit["source_file"],
@@ -365,6 +392,24 @@ def verify(input_dir, profile_report, output_dir):
                     0,
                     "query schema",
                 )
+                if "structure" in unit:
+                    check(
+                        descriptor["header_status"] == unit["header"]["status"]
+                        and descriptor["header_rows"] == unit["header"]["rows"]
+                        and descriptor["data_start_row"]
+                        == unit["header"]["data_start_row"],
+                        b["business_id"],
+                        unit["source_name"],
+                        0,
+                        "structure descriptor",
+                    )
+                    check(
+                        descriptor["text_quality"] == unit["text_quality"],
+                        b["business_id"],
+                        unit["source_name"],
+                        0,
+                        "text evidence descriptor",
+                    )
                 records.append(
                     {
                         "business_id": b["business_id"],

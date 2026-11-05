@@ -5,6 +5,10 @@ from datamate.ingest import IngestError
 
 @dataclass(frozen=True)
 class ProfileOptions:
+    detect_headers: bool = True
+    header_scan_rows: int = 64
+    header_scan_bytes: int = 1024 * 1024
+    data_sample_rows: int = 128
     samples_per_column: int = 3
     preview_rows: int = 6
     preview_columns: int = 32
@@ -18,7 +22,11 @@ class ProfileOptions:
     max_numeric_chars: int = 128
 
     def __post_init__(self):
-        if any(type(v) is not int or v < 1 for v in asdict(self).values()):
+        if type(self.detect_headers) is not bool or any(
+            type(v) is not int or v < 1
+            for k, v in asdict(self).items()
+            if k != "detect_headers"
+        ):
             raise IngestError(
                 "profile_config", "Profile limits must be positive integers"
             )
@@ -29,6 +37,8 @@ class ProfileOptions:
             or not 4 <= self.value_bytes <= 8192
             or self.max_columns > 16384
             or self.max_numeric_chars > 4096
+            or self.header_scan_rows > 256
+            or self.data_sample_rows > 1024
         ):
             raise IngestError(
                 "profile_config",

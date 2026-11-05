@@ -1,5 +1,6 @@
 import codecs
 from dataclasses import asdict, dataclass, field
+from pathlib import PurePosixPath
 from typing import Iterator
 
 
@@ -16,9 +17,49 @@ class IngestError(ValueError):
 
 
 @dataclass(frozen=True)
+class CsvFormat:
+    business_id: str
+    source_file: str
+    source_sha256: str
+    encoding: str = "auto"
+    delimiter: str = "auto"
+
+    def __post_init__(self):
+        import re
+
+        if (
+            not self.business_id
+            or any(c in self.business_id for c in "/\\:\0")
+            or not isinstance(self.source_file, str)
+            or "\\" in self.source_file
+            or PurePosixPath(self.source_file).is_absolute()
+            or any(p in {".", ".."} for p in self.source_file.split("/"))
+            or not self.source_file.lower().endswith(".csv")
+            or not re.fullmatch(r"[0-9a-f]{64}", self.source_sha256)
+        ):
+            raise IngestError("config", "Invalid source-bound CSV format override")
+        validate_format(self.encoding, self.delimiter)
+
+
+def validate_format(encoding, delimiter):
+    try:
+        if encoding != "auto":
+            codecs.lookup(encoding)
+    except (LookupError, TypeError) as exc:
+        raise IngestError("config", "Unknown CSV encoding") from exc
+    if not isinstance(delimiter, str) or (
+        delimiter != "auto" and (len(delimiter) != 1 or delimiter in '\r\n"\0')
+    ):
+        raise IngestError(
+            "config", "CSV delimiter must be auto or one supported character"
+        )
+
+
+@dataclass(frozen=True)
 class LoaderOptions:
-    csv_encoding: str = "utf-8-sig"
-    csv_delimiter: str = ","
+    csv_encoding: str = "auto"
+    csv_delimiter: str = "auto"
+    csv_formats: tuple[CsvFormat, ...] = ()
     max_source_bytes: int = 1024 * 1024 * 1024
     max_business_bytes: int = 2 * 1024 * 1024 * 1024
     max_units: int = 1024
@@ -34,12 +75,13 @@ class LoaderOptions:
     sqlite_timeout_seconds: float = 60.0
 
     def __post_init__(self):
-        try:
-            codecs.lookup(self.csv_encoding)
-        except LookupError as exc:
-            raise IngestError("config", "Unknown CSV encoding") from exc
-        if len(self.csv_delimiter) != 1 or self.csv_delimiter in '\r\n"\0':
-            raise IngestError("config", "CSV delimiter must be one supported character")
+        validate_format(self.csv_encoding, self.csv_delimiter)
+        formats = tuple(
+            f if isinstance(f, CsvFormat) else CsvFormat(**f) for f in self.csv_formats
+        )
+        if len({(f.business_id, f.source_file) for f in formats}) != len(formats):
+            raise IngestError("config", "Duplicate source-bound CSV format override")
+        object.__setattr__(self, "csv_formats", formats)
         for key, value in asdict(self).items():
             if key.startswith("max_") and (type(value) is not int or value < 1):
                 raise IngestError("config", "Resource limits must be positive integers")

@@ -1,8 +1,10 @@
-# Profile raw — phần engineering A-T2
+# Profile raw và cấu trúc bảng — A-T2
 
-`datamate profile` tạo thống kê từ cache A-T1 đã nghiệm thu. Không đoán kiểu
-nghiệp vụ, encoding/header, không làm sạch và không chạy model. Quyết định
-phạm vi: [spec](research/a_t2_engineering.md). Toàn bộ profile chứa mẫu dữ liệu
+`datamate profile` tạo thống kê từ cache raw đã xác minh, cùng rule header
+thận trọng và data-start. Không đoán kiểu nghiệp vụ, làm sạch hoặc chạy model.
+Spec hiện hành: [hoàn thiện A-T2](research/a_t2_completion.md); policy format:
+[runtime text/CSV](runtime_format.md). Spec [engineering ban đầu](research/a_t2_engineering.md)
+giữ như lịch sử. Toàn bộ profile chứa mẫu dữ liệu
 phải giữ local trong `runs/`; không publish cùng source.
 
 ## Chạy
@@ -23,6 +25,9 @@ Hash README chỉ để xác minh nguồn, không đọc nó làm lệnh.
 CLI có `--samples` (1–10, mặc định 3), `--preview-rows` (1–64, mặc định 6),
 `--value-bytes` (4–8192, mặc định 256), `--header-map` tùy chọn. Các giới hạn
 khác cấu hình qua `ProfileOptions` API; không tự dò/đổi encoding.
+`--no-auto-header` tắt rule để kiểm đối chứng; `--header-scan-rows` mặc định
+64, tối đa 256. Codec/delimiter thực dùng và status do loader ghi; profiler
+không tự sửa text.
 
 ```python
 from pathlib import Path
@@ -95,12 +100,30 @@ type codes theo [ingestion](ingestion.md). Chưa có inferred semantic/logical t
 - Mẫu/extrema/row preview dài có `truncated=true`, byte length và SHA-256 đầy
   đủ; cắt preview ở ranh giới code point. Giá trị gốc không đổi trong raw cache.
 
-## Header và encoding: chỉ evidence/annotation
+## Header, data-start và fallback
 
 SQLite lấy tên/type từ schema khai báo, trạng thái `source_schema`. CSV/XLSX
-mặc định `unresolved`; row preview giữ các hàng vật lý đầu tiên (có giới hạn
-cột), merges/visibility/style/epoch nằm ở metadata. Không tự chọn dòng đầu,
-điền ô merged, đặt tên cột nghiệp vụ hoặc loại header khỏi phép tính.
+được rule CPU `header-conservative-1` xem tối đa 64 record raw, budget 1 MiB,
+không bị giới hạn 6×32 của preview hiển thị. Rule đòi leaf header có label
+dense, anchor ngôn ngữ cột phổ thông, thay đổi dạng giá trị ở hàng sau; nhiều
+candidate, nhãn lặp, bảng toàn text không đủ bằng chứng hoặc budget thiếu
+trả unresolved. Sparse group header ngay phía trên được giữ thành tập hàng;
+title/filter metadata không mặc định là tầng header. Unit rỗng no_header.
+
+Structure giữ version/status/reason/candidate evidence, header_rows và
+data_start_row theo tọa độ vật lý. Rule không đọc ID, survey, nhãn benchmark,
+README dictionary hoặc header-map train. Không dùng confidence số như bảo
+đảm đúng. Không fill merged cells hoặc tạo SQL alias từ label.
+Tọa độ dùng đúng __row: XLSX là số hàng worksheet; CSV là record ordinal
+(không phải số dòng text nếu có quoted newline), có line_start/end riêng;
+SQLite là scan ordinal. Không tự chèn hàng XML bị thiếu.
+
+Descriptor xuất header rows, data-start, header_cells, format/text flags;
+unit unresolved còn có bounded row_preview. Có data_samples riêng lấy N
+giá trị nonempty distinct từ data-start trong tối đa 128 hàng raw; samples
+cũ và thống kê toàn raw giữ nguyên. Data-start chỉ là cận bắt đầu, không
+chứng minh mọi hàng sau là giao dịch hợp lệ: totals/notes/duplicates vẫn
+có thể nằm trong đó, chưa cleaning.
 
 Nếu đã có quyết định header từ ngoài increment, có thể khai báo JSON:
 
@@ -128,10 +151,16 @@ bị từ chối. Trạng thái `explicit_annotation` chỉ xác nhận đã nh�
 không khẳng định đó là header đúng. Label nhiều tầng giữ từng cell cùng tọa
 độ, kể cả missing/NULL/empty/trùng; không ghép/fill/dedup hoặc tạo SQL alias.
 
-Encoding CSV lấy nguyên codec/delimiter trong manifest đã decode strict ở A-T1.
-Không coi đó là detection hay chứng minh văn bản đúng nghĩa. Tự nhận diện
-TCVN3/VNI/mojibake, lựa chọn codec/header/table region và cách biểu diễn tối ưu
-cho LLM đang hoãn theo người dùng; không nhập thuật toán từ khảo sát vào đây.
+Annotation có thể thêm data_start_row; nếu bỏ qua, lấy hàng nonempty đầu
+sau tập header đã khai báo. `rows: []` cùng data_start tường minh biểu diễn
+nguồn không header. Annotation là cấu hình dev gắn fingerprint, không có
+vai trò nhãn oracle runtime cho business mới. Converter legacy, multi-table
+region và cách biểu diễn tối ưu cho LLM vẫn chưa triển khai.
+
+Encoding CSV lấy codec/delimiter đã resolve theo [policy runtime](runtime_format.md).
+Text QA chỉ ghi cờ/tọa độ. Rule header có benchmark train cấu trúc dev/check
+theo nhóm template/file duplicate; không phải unseen holdout hoặc bằng chứng
+PA. Nhãn có README corroboration và self-review, chưa human reviewer thứ hai.
 
 ## Giới hạn và kiểm chứng
 

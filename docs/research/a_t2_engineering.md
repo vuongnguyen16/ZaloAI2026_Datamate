@@ -1,5 +1,9 @@
 # A-T2 — Spec phần engineering của profile raw
 
+Ghi chép increment engineering đầu. Yêu cầu hoàn thiện sau phản biện Claude
+đã mở header CPU và runtime format policy; xem [spec hiện hành](a_t2_completion.md).
+Các trạng thái unresolved/hoãn bên dưới là lịch sử, không thay tracker hiện tại.
+
 Ngày 05/11/2026. Người dùng chỉ giao phần engineering; hoãn mọi phần research.
 Nguồn: timeline DOCX hiện hành A/T2 (hash
 e74b1292119f01ca3eae7d20d709921219efc30e655e01909685c50d5363eb51),

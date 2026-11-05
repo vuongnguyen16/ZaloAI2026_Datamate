@@ -13,7 +13,7 @@ Không gọi validator hoặc fake smoke là kết quả chấm điểm hoặc b
 | ID | Yêu cầu được giữ | Nguồn | Bằng chứng/giới hạn |
 |---|---|---|---|
 | I01 | Question: id, business_id, question, as_of_date ISO; không dùng ngày máy | DOCX §1 ¶8–17, Overview | Schema/validator hiện có |
-| I02 | Split có questions/rulebook/calendar và data/business_id với README, CSV/XLSX/SQLite | DOCX §3.2 ¶77–89, kit | Loader raw A-T1 đã nghiệm thu; profile A-T2 có phần engineering, chưa dò header/encoding |
+| I02 | Split có questions/rulebook/calendar và data/business_id với README, CSV/XLSX/SQLite | DOCX §3.2 ¶77–89, kit | Loader A-T1, runtime format/header/profile A-T2 đã nghiệm thu; actual prompt integration ở D-E-T2 |
 | I03 | Rulebook/calendar đúng split, giữ provenance/hash | DOCX §3.4 ¶109, kit | Hai rulebook khác hash; calendar cùng hash |
 | O01 | JSONL id/type/answer; reason tùy chọn; 9 type | DOCX §2.1, §3.5 ¶117–127 | Strict shape/type, chưa semantics matching |
 | O02 | Missing answer tính abstain; PA=(correct−wrong)/N | DOCX §2.1–2.3 ¶21,67–70,127 | require-complete là policy runner; scorer E chưa có |

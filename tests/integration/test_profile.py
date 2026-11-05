@@ -111,7 +111,9 @@ def test_full_scan_stats_and_raw_cache_nonmutation(
 
     with monkeypatch.context() as m:
         m.setattr(Path, "open", guard)
-        result = run_profile(root, report, tmp_path / "profile")
+        result = run_profile(
+            root, report, tmp_path / "profile", ProfileOptions(detect_headers=False)
+        )
     assert result["valid"] and result["summary"] == dict(
         businesses=1,
         successful=1,
@@ -120,6 +122,7 @@ def test_full_scan_stats_and_raw_cache_nonmutation(
         rows=13,
         present_cells=11 + 7 + 12,  # CSV records + sparse OOXML cells + SQLite cells.
         headers_unresolved=3,
+        headers_auto=0,
     )
     profile = read_business(result)
     csv = get_unit(profile, "sales")
@@ -470,9 +473,11 @@ def test_encoding_is_explicit_evidence_not_detection(profiled_input, tmp_path):
         root, tmp_path / "latin-ingest/ingest.json", tmp_path / "profile"
     )
     profile = read_business(result)
-    assert profile["provenance"]["source_metadata"]["sales.csv"] == {
-        "encoding": "latin-1",
-        "delimiter": ";",
-    }
+    metadata = profile["provenance"]["source_metadata"]["sales.csv"]
+    assert metadata["encoding"] == "latin-1" and metadata["delimiter"] == ";"
+    assert (
+        metadata["encoding_status"] == "configured_override"
+        and metadata["delimiter_status"] == "configured"
+    )
     assert get_unit(profile, "sales")["columns"][1]["samples"][1]["value"] == "café"
     assert get_unit(profile, "sales")["header"]["status"] == "unresolved"

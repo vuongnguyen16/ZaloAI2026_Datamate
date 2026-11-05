@@ -6,7 +6,8 @@ có đầy đủ văn bản, bảng và sơ đồ từ DOCX gốc.
 Bắt đầu lại theo timeline từ 04/11/2026, kế thừa phần nền đã kiểm thử.
 Đã có loader raw CSV/XLSX/SQLite → DuckDB và cache theo business, được kiểm
 chứng trên toàn train; có profile raw và schema descriptor phần engineering
-A-T2. Chưa có scorer, model thật hoặc PA baseline.
+A-T2, nay có runtime format policy, header/data-start rule và descriptor.
+Chưa có scorer, model thật hoặc PA baseline.
 
 Để đọc/review trên web: bắt đầu từ [timeline Markdown](Research/Timeline_DataMate_A-G.md),
 [state hiện tại](docs/project_state.md), [backlog](tasks/backlog.json) và
@@ -34,16 +35,17 @@ Skill repo `$datamate-increment` dùng cùng tracker; [hướng dẫn harness](d
 
 | Nhóm timeline | Có thể dùng ngay | Chưa được coi là hoàn thành |
 |---|---|---|
-| A — Dữ liệu | [Khảo sát sâu train A-T1](docs/research/a_t1_deep_survey.md); [loader/cache DuckDB](docs/ingestion.md); [profile raw/schema descriptor engineering](docs/profiling.md) | A-T2 tự dò encoding/header và kiểm prompt baseline; cleaning production A-T3/T4 |
+| A — Dữ liệu | [Loader/cache](docs/ingestion.md); [runtime format](docs/runtime_format.md); [profile/header/data-start](docs/profiling.md); [nghiệm thu A-T2](reports/a_t2_completion_results.md) | Actual prompt/PA thuộc D-E-T2; legacy converter/multi-region chưa có evidence; cleaning A-T3/T4 |
 | E — Đánh giá | Strict output schema, validator input/submission/log | Matching scorer, run_eval, split/access policy, phân tích lỗi và PA |
 | G — Hạ tầng | uv/lock, CLI, fake runner, logging/hash, CPU gate/CI, Modal CPU smoke | GPU/model thật, cache/resume production, throughput và Docker offline |
 | B/C/D/F | Contract, config và giao diện để phát triển tiếp | Chưa triển khai module nghiệp vụ/ngôn ngữ/agent/huấn luyện |
 
 Nguồn và giới hạn bằng chứng kế thừa: [foundation](docs/foundation.md).
 Chỉ bắt đầu task mới trong phạm vi được giao; chưa tạo module rỗng theo tên thư mục timeline.
-A-T1 đã hoàn thành. **A-T2** chỉ triển khai phần engineering theo yêu cầu
-05/11; research tự dò encoding/header và chiến lược biểu diễn cho LLM được
-hoãn. E-T1 và C-T1 vẫn có thể lên kế hoạch theo tracker.
+A-T1 và **A-T2 đã hoàn thành** ở phạm vi loader/profile/format/structure và
+descriptor handoff. Tư vấn Claude và yêu cầu hoàn thiện mới đã mở header CPU;
+actual descriptor-in-prompt/PA được giữ tại D-E-T2, đã thêm dependency A-T2.
+E-T1 và C-T1 vẫn theo tracker; không tự mở model hoặc cleaning.
 
 ## Công cụ hiện có
 
@@ -72,14 +74,15 @@ và xử lý lỗi: [hướng dẫn ingestion](docs/ingestion.md). Bằng chứn
 [kết quả A-T1](reports/a_t1_loader_results.md).
 
 Profiler thống kê đầy đủ raw, phân biệt missing/NULL/rỗng, giữ kiểu vật lý,
-mẫu có tọa độ và min–max có định nghĩa rõ. CSV/XLSX header mặc định unresolved;
-chỉ nhận annotation tường minh gắn fingerprint. Encoding là cấu hình loader,
-không được gọi là detection. JSON schema dùng tên view/cột raw thật; đã kiểm
-consumer synthetic, chưa có prompt/model baseline. Profile có mẫu BTC phải
-giữ trong `runs/`. Xem [hướng dẫn profile](docs/profiling.md) và
+mẫu/min–max và lineage. Header rule CPU có thể từ chối chọn, fallback preview;
+descriptor xuất header/data-start/data_samples và format/text evidence. Byte
+policy BOM/UTF-8 strict không phải chứng nhận văn bản đúng nghĩa. JSON schema
+dùng tên view/cột raw thật; đã kiểm consumer synthetic, chưa prompt/model PA.
+Profile/nhãn BTC giữ trong `runs/`. Xem [hướng dẫn profile](docs/profiling.md) và
 [phạm vi engineering A-T2](docs/research/a_t2_engineering.md).
 Bằng chứng full train, determinism và kiểm chứng SQL riêng:
 [nghiệm thu engineering A-T2](reports/a_t2_engineering_results.md).
+Kết quả hiện hành sau hoàn thiện: [A-T2 completion](reports/a_t2_completion_results.md).
 
 `datamate stub --input INPUT --output OUTPUT` chỉ xuất abstain/log theo format.
 `predict.sh` hiện gọi stub tại `/data` → `/result`; chưa phải inference thật.

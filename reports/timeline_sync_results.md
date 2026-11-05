@@ -40,5 +40,13 @@ Kiểm chứng local cuối:
 - Lượt pytest trực tiếp ban đầu lỗi quyền thư mục TEMP/cache cũ. Cổng chuẩn
   dùng scratch riêng trong workspace và đã pass; không sửa expected hoặc bỏ test.
 
-Đồng bộ remote/CI được ghi sau khi push và đọc kết quả GitHub.
+Đã đồng bộ source migration lên main tại
+[e5cac96c149cf18f44ce38f15b4de5e1e6bd9b87](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/e5cac96c149cf18f44ce38f15b4de5e1e6bd9b87).
+Remote SHA trùng local. 35 path đã rà, index bytes khớp workspace và không
+credential patterns; không có kit/gold/profile/labels/runs/weights được stage.
+[GitHub CPU CI 42002438133](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42002438133)
+completed/success: **150 tests trong 10.71s**, Ruff/format pass trên Ubuntu.
+Đã đọc steps và log job `127160726014`; bằng chứng JSON lưu local. Commit
+state/report sau source chỉ ghi kết quả, không đổi fingerprint CPU hoặc task.
+Workspace không còn thay đổi chưa commit sau push cuối.
 Evidence local của phiên: `runs/timeline-sync-20261105/` (ignored).

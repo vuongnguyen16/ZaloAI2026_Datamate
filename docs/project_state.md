@@ -49,6 +49,13 @@ sync current, không warning. P0-SPLIT ready; P1 bị chặn bởi P0-GATE.
 Kết quả cuối tại [báo cáo](../reports/timeline_sync_results.md).
 CPU/Modal model/PA báo riêng; phiên này không chạy model, PA hoặc Docker.
 
+Đã push source migration [e5cac96](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/e5cac96c149cf18f44ce38f15b4de5e1e6bd9b87)
+lên main; SHA remote đã đối chiếu. [CI 42002438133](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42002438133)
+completed/success, **150 tests trong 10.71s** trên Ubuntu; Ruff/format pass,
+đã đọc job steps/log. Commit tài liệu sau source chỉ ghi kết quả; source
+fingerprint local vẫn current. 35 path được rà/stage, byte index khớp workspace;
+không stage kit, gold, profile, labels, runs, credentials hoặc weights.
+
 Mốc cũ đã push trước khi dọn: [archive/timeline-20261103](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103),
 commit `bd0061593698df76c05745c7ef1df3d31b1331f3`. Các note reset,
 engineering tạm và prompt review đã hết hiệu lực chỉ còn trong archive.

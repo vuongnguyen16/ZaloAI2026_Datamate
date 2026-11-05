@@ -97,3 +97,20 @@ CPU hiện hành: **238 passed in 79.02s (0:01:19)**, Ruff/format pass, exit0, s
 passed/current, ready/no warnings. Không thay acceptance P0 hoặc trạng thái
 task; P1 todo/ready, P2 blocked. Chưa có bằng chứng model/PA/B0.
 Lệnh kiểm tra: `uv run --locked python scripts/check.py`.
+
+## Source đã xuất bản — 05/11/2026
+
+Đã đẩy 45 file code/config/tài liệu và test synthetic lên `main` tại
+[02bac28](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/02bac28d4c324f647841e04a0cd97c9a3ab9184a):
+P0 split/scorer/scoped reader/evaluation/bootstrap/taxonomy và Graphify local.
+[GitHub CPU gate](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42043205165)
+success, **238 passed in 9.83s** trên Ubuntu; Ruff/format pass. Đã đọc job
+steps và log. Các câu chưa commit/push trong phần nghiệm thu trước mô tả
+thời điểm triển khai ban đầu; source hiện đã xuất bản theo commit trên.
+
+Kit, gold, membership, artifact BTC, runs, graph/cache, môi trường và credentials
+tiếp tục local/ignored. Review publication do tác giả thực hiện; chỉ provenance
+pointer/aggregate và fixture synthetic đi cùng source. CPU local phía trên
+vẫn passed/current; việc xuất bản không đổi acceptance P0 hoặc trạng thái P1/P2,
+không có model/Modal/B0/PA quality claim mới. Bước tiếp theo vẫn là P1 theo
+`uv run --locked python scripts/harness.py context --task P1`.

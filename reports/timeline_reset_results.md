@@ -6,7 +6,7 @@ Cleanup đã xong; task chức năng đầu tiên `A-T1` vẫn todo và sẵn s�
 
 ## Đã bỏ khỏi repo làm việc
 
-Tám file kể tiến độ/review theo roadmap cũ, sau khi gộp phần còn cần vào
+Tám file ghi nhận tiến độ/review theo roadmap cũ, sau khi gộp phần còn cần vào
 `docs/foundation.md`:
 
 - `docs/research/S00_setup.md`
@@ -29,7 +29,7 @@ Không khôi phục nó hoặc duy trì một bản plan song song.
 | Contracts, strict validation, fake runner, output/log/hash, predict.sh | E/G | Giữ behavior/regression; bỏ nhãn phase cũ khỏi chỉ dẫn code |
 | Inventory cơ học | A/T1 một phần | `scripts/inventory_p01.py` → `scripts/inventory.py` |
 | Kiểm tra contract | E/G | `scripts/verify_p00.py` → `scripts/verify_contract.py` |
-| Regression inventory/validation | A/E/G | Đổi tên thành `test_inventory.py` và `test_structural_validation.py`; giữ các ca và expected hành vi |
+| Regression inventory/validation | A/E/G | Đổi tên thành `test_inventory.py` và `test_structural_validation.py`; giữ các ca và hành vi mong đợi |
 | Provenance/contract evidence | E/G | `manifests/p00_sources.json` → `manifests/contract_sources.json`; `reports/p00_contract_checks.json` → `reports/contract_checks.json`; payload lịch sử giữ nguyên |
 | Kit manifest/raw, thể lệ và timeline gốc | Dữ liệu/nguồn | Không sửa; hash được kiểm tra |
 | Modal config/app và ghi nhận smoke cũ | D/G | Giữ; runbook gọn và history trong foundation; chưa có real model/GPU |
@@ -39,12 +39,12 @@ Không khôi phục nó hoặc duy trì một bản plan song song.
 Backlog mới có 20 task theo A–G, bao gồm hai phần nền kế thừa và task reset.
 Không chuyển toàn bộ status done cũ sang module mới. Timeline nói scorer “đã có”
 được ghi là chưa đúng hiện trạng repo: `E-T1` vẫn todo. Không tạo module rỗng hoặc
-build loader/scorer/model trong phiên cleanup.
+build loader/scorer/model trong phiên dọn repo.
 
 Context schema v2 trả `timeline` path/hash thay `plan`. Thiếu timeline thì báo
 thiếu, không lấy plan cũ trên đĩa hoặc Git. `P01` không còn là task đang hoạt động.
 
-## Backup và phạm vi an toàn
+## Backup và phạm vi bảo toàn dữ liệu
 
 Backup trước sửa/xóa: `runs/timeline-reset-backup-20261104-233607/` (ignored),
 32 file đã được copy và đối chiếu SHA-256, gồm cả file chưa commit.

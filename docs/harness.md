@@ -13,7 +13,7 @@ uv run --locked python scripts/check.py
 
 Chưa có uv PATH thì dùng `.tools/uv/uv.exe` và cache theo README. Dùng skill
 repo `$datamate-increment` để research/build/review task đã giao. Không có task
-cụ thể thì đọc state và backlog trước chọn increment, không tự mở rộng cả nhóm.
+cụ thể thì đọc state và backlog trước khi chọn increment, không tự mở rộng cả nhóm.
 
 Context schema v2 trả `timeline.path/sha256/status`, các file `read_first`, task,
 dependency, state và CPU evidence mới nhất. `ready` chỉ nói dependency backlog
@@ -30,8 +30,9 @@ ID cũ không còn trong backlog bị từ chối. Lệnh chỉ đọc, không c
 
 CPU gate không gọi cloud và luôn để GPU/model/PA chưa kiểm chứng. Marker `gpu`
 và `modal` bị loại; test cloud không được gọi dịch vụ ở import/collection.
-Marker/hướng dẫn không thay sandbox thực. Một stage lỗi thì dừng, chuyển tiếp
-exit code; pytest không thu test trả 5. Source đổi trong lúc chạy khiến gate fail.
+Marker và hướng dẫn không thay thế sandbox thực. Một stage lỗi thì dừng, chuyển tiếp
+exit code; pytest trả mã 5 nếu không thu thập được test. Source đổi trong lúc chạy
+khiến gate fail.
 Context báo record `current` hay `stale`, không tìm một green run cũ để che fail mới.
 
 Fingerprint gồm src/scripts/tests/infra/configs/.agents/.github, pyproject/lock,
@@ -42,8 +43,9 @@ tài liệu Markdown vẫn cần review; fingerprint không chứng minh accepta
 ## Hoàn thành increment
 
 Scope/acceptance phải rõ trong task. Ghi research note trước quyết định kiến
-trúc; bug cần tái hiện nguyên nhân và regression có ý nghĩa. Giữ test dữ liệu,
-ID, type, raw bảo toàn; không xóa để làm gate pass. Review contract/SQL/scorer/
+trúc; với bug, cần tái hiện lỗi, xác định nguyên nhân và có regression có ý nghĩa.
+Giữ các test về dữ liệu, ID, type và bảo toàn raw; không xóa để làm gate pass.
+Review contract/SQL/scorer/
 inference có xét leakage, failure paths và tài nguyên; ghi self/independent review.
 Chạy gate sau thay code cuối, đọc log/JSON rồi cập nhật state và evidence.
 

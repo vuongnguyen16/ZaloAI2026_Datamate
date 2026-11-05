@@ -1,19 +1,17 @@
 <!-- Generated reading copy; the DOCX remains the planning source. -->
-# Timeline DataMate theo nh?m vi?c A?G
+# Timeline DataMate theo nhóm việc A–G
 
-B?n ??c tr?n GitHub t? [Timeline DataMate theo nhóm việc A–G.docx](<Timeline DataMate theo nhóm việc A–G.docx>). N?i dung v?n b?n/b?ng gi? theo ngu?n; m?c ng?y l? d? ki?n trong t?i li?u, kh?ng ph?i x?c nh?n l?ch BTC m?i.
+Bản đọc trên GitHub từ [Timeline DataMate theo nhóm việc A–G.docx](<Timeline DataMate theo nhóm việc A–G.docx>). Nội dung văn bản và bảng được giữ theo nguồn; các mốc ngày là dự kiến trong tài liệu, không phải xác nhận lịch mới của BTC.
 
 SHA-256 DOCX: `e74b1292119f01ca3eae7d20d709921219efc30e655e01909685c50d5363eb51`.
 
-Timeline DataMate theo nhóm việc A–G
-
 Nov 3, 2026 · @Quinnie
 
-Tổng quan
+## Tổng quan
 
 Kế hoạch 8 tuần, từ 30/10 đến hạn ước tính 25/12/2026, chia thành T1–T8, mỗi tuần bắt đầu từ thứ Sáu. Hôm nay 03/11 đang ở T1. Phân công gợi ý cho đội 4 người: người 1 làm A + G, người 2 làm D + B, người 3 làm C và phần thời gian của B, người 4 làm E + F.
 
-![S? ?? timeline trong t?i li?u g?c](timeline_assets/image1.png)
+![Sơ đồ timeline trong tài liệu gốc](timeline_assets/image1.png)
 
 timeline 8 tuần · 7 nhóm việc, 6 mốc
 
@@ -23,7 +21,7 @@ Sáu mốc chung: evaluator + loader 05/11, baseline PA 12/11, nộp public lầ
 
 Trọng tâm ở T1–T4: dữ liệu sạch và hồ sơ schema phải có trước khi đầu tư vào agent. Thư mục: ingest/, profile/.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: dữ liệu mỗi hộ nằm trong nhiều định dạng và rất bẩn. LLM không thể làm việc trực tiếp trên một file Excel lộn xộn. Mọi bước phía sau đều chạy trên dữ liệu do A tạo ra.
 
@@ -41,7 +39,7 @@ Mục đích của nhóm
 | T6 (04–10/12) | Chạy trên holdout loại hình mới, sửa những chỗ vỡ | Tổng quát hóa sang loại hình chưa gặp | Không business holdout nào lỗi khi nạp |
 | T7–T8 | Chỉ sửa lỗi |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - Khảo sát train (T1): nhìn dữ liệu thật trước khi viết code, để biết loại bẩn nào thật sự có. Nhờ vậy không làm thừa những bộ xử lý vô ích và không bỏ sót loại lỗi phổ biến.
 
@@ -69,7 +67,7 @@ Mục đích từng công việc
 
 - Chỉ sửa lỗi (T7–T8): giữ hệ thống ổn định, tránh đưa lỗi mới vào sát hạn.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 Từ khóa tiếng Anh cho kết quả tốt nhất khi tìm paper, blog và video.
 
@@ -92,7 +90,7 @@ Từ khóa tiếng Anh cho kết quả tốt nhất khi tìm paper, blog và vid
 
 Bắt đầu từ T3, sau khi baseline cho thấy câu hỏi gây sai ở đâu. Thư mục: understand/. Danh sách các dạng câu hỏi được thu thập ở T1 (phần thống kê của E).
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: câu hỏi do người thật gõ nên thường không dấu, viết tắt, văn nói, và dùng thời gian tương đối. Trong khi đó dữ liệu và rulebook lại viết có dấu, đầy đủ.
 
@@ -108,7 +106,7 @@ Mục đích của nhóm
 | T6 (04–10/12) | Khớp thực thể phía câu hỏi với từ điển của A, theo cả hai chiều | Fuzzy matching tiếng Việt, character n-gram | Nhóm lỗi "tên" giảm |
 | T7–T8 | Chỉ sửa lỗi |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - Bảng viết tắt, khôi phục dấu (T3): để từ ngữ trong câu hỏi khớp được với tên trong dữ liệu và trong rulebook. Từ điển thực thể của A được dùng làm gợi ý, nên tên riêng của từng hộ được khôi phục đúng như cách dữ liệu viết.
 
@@ -122,7 +120,7 @@ Mục đích từng công việc
 
 - Chỉ sửa lỗi (T7–T8): giữ ổn định trước hạn.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 | Công việc | Dạng | Chủ đề | Từ khóa tìm kiếm | Tài liệu nền tảng |
 | --- | --- | --- | --- | --- |
@@ -136,7 +134,7 @@ Chủ đề để tìm hiểu
 
 Chạy song song với A từ T1, vì lịch và định nghĩa sai sẽ làm sai hàng loạt câu hỏi. Thư mục: knowledge/, compute/domain_lib/.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: cùng một câu "doanh thu tháng này" có thể có nhiều cách tính. Có trừ đơn hủy không? Tính theo ngày đặt hay ngày giao? Tuần bắt đầu từ thứ mấy? BTC chốt các định nghĩa này trong rulebook, và đáp án tham chiếu được tính theo đúng rulebook. Rulebook có thể khác giữa các split.
 
@@ -153,7 +151,7 @@ Mục đích của nhóm
 | T6 (04–10/12) | Thử với rulebook biến thể (tự sửa vài định nghĩa) để kiểm tra tính tổng quát | Hệ thống phản ứng ra sao khi định nghĩa đổi | PA ổn định, không vỡ khi rulebook đổi |
 | T5, T7–T8 | Hỗ trợ D và E, sửa lỗi |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - Đọc rulebook, viết thành checklist (T1): rulebook là "đề bài thật" của phần tính toán, vì đáp án tham chiếu được tính theo nó. Đọc kỹ để hiểu chính xác BTC định nghĩa doanh thu, bán chạy, tuần, giá vốn, Tết ra sao. Checklist biến văn bản thành danh sách điều kiện kiểm tra được, dùng làm đầu vào cho domain_lib, unit test và prompt. Việc đọc sớm cũng giúp tìm ra chỗ mơ hồ để hỏi BTC kịp thời.
 
@@ -169,7 +167,7 @@ Mục đích từng công việc
 
 - Hỗ trợ D và E, sửa lỗi (T5, T7–T8): nghiệp vụ là chỗ D và E hay cần hỏi lại; người làm C giải đáp và sửa hàm khi phân tích lỗi chỉ ra.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 | Công việc | Dạng | Chủ đề | Từ khóa tìm kiếm | Tài liệu nền tảng |
 | --- | --- | --- | --- | --- |
@@ -184,7 +182,7 @@ Chủ đề để tìm hiểu
 
 Đây là nhóm cho PA tăng nhiều nhất, chạy từ T1 đến T7. Mỗi chiến lược mới là một file trong ground/ hoặc compute/, được so sánh với bản cũ bằng cách đổi config. Thư mục: ground/, compute/, infra/llm.py.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: đây là phần biến câu hỏi và dữ liệu thành con số đáp án. A, B, C chuẩn bị nguyên liệu; D là nơi thực sự giải câu hỏi.
 
@@ -203,7 +201,7 @@ Mục đích của nhóm
 | T7 (11–17/12) | Chốt cấu hình, chỉ tinh chỉnh tham số (K, số bước, temperature) |  | Cấu hình cuối được ghi vào configs/ |
 | T8 | Đóng băng |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - Chọn mô hình ≤15B, chạy trên vLLM, thử 20 câu bằng tay (T1): luật thi giới hạn cỡ mô hình. Thử sớm bằng tay để biết mô hình làm được gì và hỏng ở đâu trước khi dựng khung. Dùng ngay mô hình sẽ nộp, để tránh bất ngờ khi chuyển từ mô hình lớn xuống.
 
@@ -225,7 +223,7 @@ Mục đích từng công việc
 
 - Đóng băng (T8): không thay đổi gì nữa, để bản nộp đúng là bản đã đánh giá.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 | Công việc | Dạng | Chủ đề | Từ khóa tìm kiếm | Tài liệu nền tảng |
 | --- | --- | --- | --- | --- |
@@ -243,7 +241,7 @@ Chủ đề để tìm hiểu
 
 Nhóm này chạy suốt 8 tuần và giữ phần lớn các mốc. Mỗi tuần nên có một báo cáo PA cùng các nguyên nhân sai hàng đầu. Thư mục: eval/, verify/, format/.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: không đo thì không biết thay đổi nào thật sự tốt hơn. PA trừ điểm khi trả lời sai, nên biết lúc nào nên im lặng cũng quan trọng như trả lời đúng.
 
@@ -262,7 +260,7 @@ Mục đích của nhóm
 | T7 (11–17/12) | repro_check.py (cùng G); chốt ngưỡng abstain |  | Hai lần chạy cho PA lệch trong mức cho phép |
 | T8 (18–25/12) | Đánh giá bản đóng băng lần cuối |  | Có báo cáo PA của bản nộp |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - scorer.py và run_eval.py (T1): chấm giống hệt BTC thì điểm nội bộ mới phản ánh điểm thật. Chấm sai luật thì cả đội tối ưu nhầm hướng.
 
@@ -286,7 +284,7 @@ Mục đích từng công việc
 
 - Đánh giá bản đóng băng (T8): biết chắc chất lượng bản nộp, và chắc rằng không có thay đổi vô tình nào lọt vào.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 | Công việc | Dạng | Chủ đề | Từ khóa tìm kiếm | Tài liệu nền tảng |
 | --- | --- | --- | --- | --- |
@@ -306,7 +304,7 @@ Chủ đề để tìm hiểu
 
 Đây là nhánh có điều kiện. Nó chỉ đi tiếp sau mốc 10/12 nếu mô hình fine-tune cho PA trên holdout cao hơn mô hình gốc; nếu không, giữ mô hình gốc. Thư mục: training/, models/.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: luật giới hạn mô hình ở mức ≤15B. Mô hình nhỏ chưa quen với dữ liệu hộ kinh doanh Việt Nam, câu hỏi không dấu, và cách gọi domain_lib của đội.
 
@@ -323,7 +321,7 @@ Mục đích của nhóm
 | T7 (11–17/12) | Nếu đạt: gộp trọng số, lượng tử hóa, kiểm tra tốc độ và tái lập | Lượng tử hóa không làm mất độ chính xác | models/ có bản cuối, hoặc quyết định giữ mô hình gốc |
 | T1–T2, T8 | Không làm |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - So sánh mô hình nền (T3): chọn điểm xuất phát tốt nhất cho chính pipeline này, không dựa vào benchmark chung. Kiểm tra giấy phép để tránh bị loại vì dùng mô hình không hợp lệ.
 
@@ -337,7 +335,7 @@ Mục đích từng công việc
 
 - Không làm ở T1–T2, T8: khi chưa có phân tích lỗi thì chưa biết nên luyện gì, còn sát hạn thì không đủ thời gian để kiểm chứng.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 | Công việc | Dạng | Chủ đề | Từ khóa tìm kiếm | Tài liệu nền tảng |
 | --- | --- | --- | --- | --- |
@@ -351,7 +349,7 @@ Chủ đề để tìm hiểu
 
 Nhóm này làm dồn ở đầu (T1–T2), giữa (T5) và cuối (T7–T8). Hỏng ở đây là mất toàn bộ điểm. Thư mục: infra/, runner.py, Dockerfile, configs/.
 
-Mục đích của nhóm
+### Mục đích của nhóm
 
 - Vì sao cần: điểm chỉ được tính khi BTC chạy được bài nộp trên máy của họ, với Docker, không có mạng, có giới hạn thời gian, và yêu cầu kết quả tái lập.
 
@@ -368,7 +366,7 @@ Mục đích của nhóm
 | T8 (18–25/12) | Đóng băng code 18/12; nộp trước hạn ít nhất 48 giờ; chỉ sửa lỗi nghiêm trọng |  | Bản cuối đã nộp |
 | T3–T4, T6 | Hỗ trợ các nhóm khác, theo dõi thời gian chạy |  |  |
 
-Mục đích từng công việc
+### Mục đích từng công việc
 
 - Repo, môi trường, khóa phiên bản (T1): cả đội chạy trên cùng một môi trường, tránh tình trạng "máy tôi chạy được". Khóa phiên bản là điều kiện để kết quả tái lập.
 
@@ -390,7 +388,7 @@ Mục đích từng công việc
 
 - Hỗ trợ các nhóm khác (T3–T4, T6): theo dõi thời gian chạy khi các module mới được ghép vào, để phát hiện sớm module nào làm chậm hệ thống.
 
-Chủ đề để tìm hiểu
+### Chủ đề để tìm hiểu
 
 Toàn bộ nhóm G là kỹ thuật, nên tài liệu chính là docs chính thức và blog kỹ thuật thay vì paper.
 
@@ -406,11 +404,11 @@ Toàn bộ nhóm G là kỹ thuật, nên tài liệu chính là docs chính th�
 | Dockerfile, chạy không mạng | Kỹ thuật | Containerization, air-gapped deployment | docker multi-stage build; air-gapped docker; NVIDIA container toolkit |  |
 | Đóng băng, nộp sớm | Kỹ thuật | Release management | code freeze; release checklist |  |
 
-Phụ thuộc, rủi ro và điều chỉnh
+## Phụ thuộc, rủi ro và điều chỉnh
 
 Đường găng của kế hoạch là E và G (T1–T2) → A và C (T1–T4) → D (T3–T6) → abstain (T5). F chỉ chạy song song và không chặn bản nộp.
 
-Phụ thuộc chính
+### Phụ thuộc chính
 
 - D cần hồ sơ schema của A và domain_lib của C. Nếu A trễ, D vẫn chạy baseline trên schema thô.
 
@@ -420,7 +418,7 @@ Phụ thuộc chính
 
 - B và C cùng làm phần biểu thức thời gian ở T4.
 
-Rủi ro và phương án dự phòng
+### Rủi ro và phương án dự phòng
 
 | Rủi ro | Dấu hiệu | Phương án |
 | --- | --- | --- |
@@ -430,6 +428,6 @@ Rủi ro và phương án dự phòng
 | Chạy quá giới hạn thời gian | Ước lượng ở T5 vượt giới hạn | Giảm K, giảm số bước, dùng router đường nhanh nhiều hơn |
 | Kết quả không tái lập | repro_check.py lệch ở T7 | Tắt lấy mẫu ngẫu nhiên, cố định seed, khóa lại phiên bản |
 
-Khi có lịch chính thức của BTC
+### Khi có lịch chính thức của BTC
 
 Hạn 25/12 hiện là ước tính. Khi BTC công bố lịch, giữ nguyên thứ tự và dời ba mốc theo lịch thật: nộp public lần đầu (đang là 03/12), đóng băng code (một tuần trước hạn), và nộp bản cuối (ít nhất 48 giờ trước hạn).

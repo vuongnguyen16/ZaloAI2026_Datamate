@@ -1,12 +1,12 @@
 # Trạng thái DataMate theo Timeline A–G
 
-Cập nhật 04/11/2026, giờ Việt Nam. Theo yêu cầu người dùng, timeline DOCX trong
+Cập nhật 05/11/2026, giờ Việt Nam. Theo yêu cầu người dùng, timeline DOCX trong
 Research là nguồn kế hoạch hiện tại; toàn bộ tracker cũ đã được thay thế.
 Các mốc ngày trong DOCX là dự kiến, không tự thay lịch/contract BTC.
 
 **Hiện tại:** đã dọn tài liệu cũ và giữ foundation có ích. Chưa bắt đầu build
 task chức năng mới theo timeline. `G-FOUNDATION` và `A-INVENTORY` chỉ công nhận
-phạm vi kế thừa, không tương đương G/T1 hay A/T1 hoàn thành.
+phạm vi kế thừa, không có nghĩa là G/T1 hoặc A/T1 đã hoàn thành.
 
 **Đã có:** CPython 3.11.18 + uv 0.13.6 + lock; strict schema/validators;
 fake/stub runner, logging/hash; inventory cơ học; CPU gate/CI; Modal CPU smoke
@@ -14,7 +14,7 @@ lịch sử. Xem `docs/foundation.md`. Chưa có real model, scorer, PA/B0.
 
 **Kiểm chứng phiên reset:** cổng CPU chuẩn exit 0, Ruff/format pass và **59 tests
 pass trong 12.07s**; artifact `runs/cpu-check-20261104T164734905777Z-5kmhmukp/gate.json`.
-Context A-T1: todo/ready, timeline đúng hash, không warnings, CPU passed/current;
+Context A-T1: todo/ready, timeline đúng hash, không có cảnh báo, CPU passed/current;
 20 task không lỗi dependency/vòng lặp, ID cũ bị từ chối. Audit kit: hash train/public
 và thể lệ giữ nguyên. Skill validator pass. Kết quả ở `reports/timeline_reset_results.md`.
 GPU/model không chạy; PA chưa đánh giá. CI GitHub đã pass sau publish, xem phần
@@ -51,3 +51,10 @@ artifact `runs/cpu-check-20261104T165544622253Z-oze3s9zf/gate.json`.
 Bản timeline Markdown giữ đủ 137 paragraph/15 bảng/123 dòng bảng và một sơ đồ,
 có nguồn/hash DOCX. Dữ liệu BTC, credentials, model, runs và môi trường local
 tiếp tục được ignore. Chi tiết ở `reports/github_publish.md`.
+
+**Hiệu đính tài liệu ngày 05/11:** đã rà 15 tệp Markdown, sửa dấu tiếng Việt bị
+thay bằng `?` ở tiêu đề/lời dẫn/chú thích ảnh của timeline và tám trường trong
+task `G-GITHUB`; hiệu đính câu chữ và khôi phục các cấp tiêu đề. Kiểm tra UTF-8,
+Unicode NFC, liên kết nội bộ và JSON đều hợp lệ; 656 đoạn văn gồm nội dung các ô
+bảng vẫn khớp DOCX gốc. Code, dữ liệu, luật chấm và các số liệu lịch sử giữ nguyên.
+Chi tiết kiểm chứng ở phần hiệu đính trong `reports/github_publish.md`.

@@ -1,6 +1,6 @@
 # Môi trường phát triển
 
-Dữ liệu kiểm kê lịch sử ngày 01/11/2026; không phải máy BTC hoặc số đo mới.
+Dữ liệu kiểm kê lịch sử ngày 01/11/2026; không phải thông số của máy BTC hoặc số đo mới.
 
 | Mục | Giá trị |
 |---|---|
@@ -14,12 +14,13 @@ Dữ liệu kiểm kê lịch sử ngày 01/11/2026; không phải máy BTC ho�
 RAM khả dụng lúc kiểm kê khoảng 1.8–2.0 GiB; tên CPU thương mại/SSD chưa xác
 minh do WMI/CIM bị từ chối. `scripts/doctor.py` đọc lại thông tin không cần cloud.
 Local chỉ CPU nhẹ/fake: 2 threads, DuckDB 256 MiB, fixture ≤1 MiB/100 câu.
-Memory limit DuckDB không là hard RAM cap toàn process.
+Giới hạn bộ nhớ của DuckDB không phải giới hạn RAM cứng cho toàn bộ process.
 
 Mọi model thật, embedding/reranker/huấn luyện ở Modal. Profile/workspace
 `vuonghungnguyen07`, tối đa 30 USD/thí nghiệm, cần xác minh lại trước job mới.
-Cloud CPU smoke lịch sử xem `docs/foundation.md`; GPU/quota/billing chưa đo.
+Kết quả cloud CPU smoke trước đây được ghi tại `docs/foundation.md`; GPU/quota/billing chưa đo.
 
 Raw `data/train/`, `data/public_test/`; hash ở `manifests/kit_files.json`.
 Fixture source chỉ synthetic. Run/model/credentials không track; chưa upload kit.
-Backup kit ngoài ổ D chưa được xác minh; Git ignore không là backup/bảo mật.
+Backup kit ngoài ổ D chưa được xác minh. Quy tắc Git ignore không thay thế việc
+sao lưu hoặc cơ chế bảo mật.

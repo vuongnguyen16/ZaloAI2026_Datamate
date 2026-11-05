@@ -350,18 +350,18 @@
   },
   {
     "id": "G-GITHUB",
-    "title": "??ng b? source/t?i li?u l?n GitHub ?? ??c tr?n web",
+    "title": "Đồng bộ mã nguồn và tài liệu lên GitHub để đọc trên web",
     "source": "user request 2026-11-04",
-    "source_section": "G ? v?n h?nh repository",
+    "source_section": "G — vận hành repository",
     "status": "done",
     "depends_on": [
       "RESET-TIMELINE"
     ],
     "acceptance": [
-      "Source/config/tests/docs v? timeline ???c push main",
-      "C? b?n timeline Markdown gi? ?? n?i dung v? s? ??",
-      "Remote SHA kh?p source commit; CPU local v? GitHub CI c? b?ng ch?ng ri?ng",
-      "Data BTC/credentials/models/runs kh?ng upload"
+      "Mã nguồn, cấu hình, tests, tài liệu và timeline đã được push lên main",
+      "Có bản timeline Markdown giữ đủ nội dung và sơ đồ",
+      "Remote SHA khớp source commit; CPU local và GitHub CI có bằng chứng riêng",
+      "Dữ liệu BTC, credentials, model và run artifacts không được upload"
     ],
     "evidence": [
       "reports/github_publish.md",
@@ -370,8 +370,29 @@
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41872674037"
     ],
     "limitations": [
-      "GPU/model kh?ng ch?y; PA ch?a ??nh gi?",
-      "Kit v? run artifacts ch? local; AI web ??c ???c source/t?i li?u public"
+      "GPU/model không chạy; PA chưa được đánh giá",
+      "Kit và run artifacts chỉ lưu local; AI web đọc được mã nguồn và tài liệu công khai"
+    ]
+  },
+  {
+    "id": "G-DOCS-UTF8",
+    "title": "Hiệu đính chính tả và sửa lỗi mất dấu tiếng Việt trong tài liệu",
+    "source": "user request 2026-11-05",
+    "source_section": "G — tài liệu và chất lượng repository",
+    "status": "done",
+    "depends_on": ["G-GITHUB"],
+    "acceptance": [
+      "Rà toàn bộ Markdown và sửa các đoạn mất dấu tiếng Việt",
+      "Các trường JSON bị hỏng được khôi phục; các task chức năng giữ nguyên",
+      "UTF-8, Unicode NFC và liên kết nội bộ hợp lệ",
+      "Văn bản, bảng và sơ đồ của bản timeline vẫn khớp DOCX gốc"
+    ],
+    "evidence": [
+      "reports/github_publish.md",
+      "runs/editorial-review-20261105.json (local, ignored)"
+    ],
+    "limitations": [
+      "Chỉ hiệu đính tài liệu và metadata; không thay đổi code, dữ liệu hoặc luật chấm"
     ]
   }
 ]

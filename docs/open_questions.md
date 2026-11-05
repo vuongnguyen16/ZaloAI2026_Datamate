@@ -2,8 +2,8 @@
 
 - A: format/schema thực tế, header/encoding/dirty patterns; inventory cơ học
   chưa trả lời các câu này. Revision/changelog kit chưa rõ.
-- E: chưa có scorer project. BTC không cung cấp executable evaluator theo xác
-  nhận người dùng; xây matching từ thể lệ, ghi policy provisional cho rounding
+- E: chưa có scorer của dự án. BTC không cung cấp executable evaluator theo xác
+  nhận của người dùng; xây matching từ thể lệ, ghi policy provisional cho rounding
   ties, alias, table order/null/cell và trường hợp đặc tả chưa rõ.
 - E: split/access policy trước tuning/huấn luyện; không chọn cấu hình trên
   holdout hoặc public/private test. Chưa có manifest split đã khóa.
@@ -17,4 +17,4 @@
   khác. Khi lập lịch/nộp phải xác minh BTC hiện hành, không tự coi ngày trong
   tài liệu kế hoạch là deadline BTC đã xác nhận.
 - Backup raw/artifact ngoài ổ D chưa xác minh. Backup cleanup trong runs chỉ
-  bảo vệ 32 file code/tài liệu bị đổi, không thay backup kit.
+  bảo vệ 32 file code/tài liệu bị đổi, không thay thế bản sao lưu kit.

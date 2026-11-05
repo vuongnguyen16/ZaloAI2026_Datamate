@@ -6,9 +6,9 @@ kit local và website BTC; provenance ở `manifests/contract_sources.json`,
 registry ở `manifests/competition_contract.json`, hash ở `manifests/kit_files.json`.
 Đây là quan sát lịch sử; kiểm tra lại quy định/lịch khi cần nộp hoặc chọn model.
 
-**BTC không có runner/evaluator executable theo xác nhận người dùng.**
+**BTC không có runner/evaluator executable theo xác nhận của người dùng.**
 Validator/runner là code project; scorer nhóm E tự xây từ quy tắc thành văn.
-Không gọi validator hoặc fake smoke là scoring/quality baseline chính thức.
+Không gọi validator hoặc fake smoke là kết quả chấm điểm hoặc baseline chất lượng chính thức.
 
 | ID | Yêu cầu được giữ | Nguồn | Bằng chứng/giới hạn |
 |---|---|---|---|
@@ -33,6 +33,7 @@ Quan sát lịch sử: train 30 business/3.000 câu/162 file; public 14 business
 gold hoặc chấm câu hỏi public. Report giữ ở `reports/contract_checks.json`.
 
 Thông tin lịch/quotas đã đọc ngày 01/11 nằm trong contract/provenance. Timeline
-mới là tài liệu chia việc, không tự sửa các facts nguồn đó. Trước lập lịch/nộp
-cần xác minh BTC hiện hành. Docker nháp chờ nhóm G sau pipeline hoàn chỉnh;
+mới là tài liệu chia việc, không tự thay đổi các thông tin được ghi trong những
+nguồn đó. Trước khi lập lịch hoặc nộp bài, cần xác minh thông tin hiện hành từ BTC.
+Docker nháp chờ nhóm G sau pipeline hoàn chỉnh;
 Modal Image không thuộc phần Docker bị hoãn.

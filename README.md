@@ -23,8 +23,9 @@ uv run --locked python scripts/check.py
 ```
 
 Đọc [trạng thái](docs/project_state.md), [backlog](tasks/backlog.json), timeline và
-[contract](docs/requirements.md) trước sửa. Dùng interpreter `.venv/Scripts/python.exe`,
-không dùng Python MSYS2 trên PATH. Python pin ở `.python-version`, dependency ở `uv.lock`.
+[contract](docs/requirements.md) trước khi sửa. Dùng interpreter `.venv/Scripts/python.exe`,
+không dùng Python MSYS2 trên PATH. Phiên bản Python được pin ở `.python-version`,
+dependency được khóa trong `uv.lock`.
 Skill repo `$datamate-increment` dùng cùng tracker; [hướng dẫn harness](docs/harness.md).
 
 ## Phần nền giữ lại
@@ -50,9 +51,9 @@ uv run --locked datamate validate-input --input data/train
 uv run --locked python scripts/audit_kit.py
 ```
 
-Smoke chỉ chạy hai câu synthetic: tổng `12.35` và mã `0012`. SQL fixture tin cậy,
-không phải worker an toàn cho SQL do model sinh. Local giới hạn 2 threads,
-DuckDB 256 MiB, fixture tối đa 1 MiB. Inventory chỉ cơ học; chưa đọc header/sheet/catalog.
+Smoke chỉ chạy hai câu synthetic: tổng bằng `12.35` và mã `0012`. SQL fixture tin cậy,
+không phải worker an toàn cho SQL do model sinh. Local được giới hạn ở 2 threads,
+DuckDB 256 MiB, fixture tối đa 1 MiB. Inventory chỉ kiểm tra cơ học; chưa đọc header/sheet/catalog.
 Output inventory phải mới và ở ngoài input, kể cả alias/junction.
 
 `datamate stub --input INPUT --output OUTPUT` chỉ xuất abstain/log theo format.

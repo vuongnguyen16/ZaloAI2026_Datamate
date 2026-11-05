@@ -114,3 +114,138 @@ pointer/aggregate và fixture synthetic đi cùng source. CPU local phía trên
 vẫn passed/current; việc xuất bản không đổi acceptance P0 hoặc trạng thái P1/P2,
 không có model/Modal/B0/PA quality claim mới. Bước tiếp theo vẫn là P1 theo
 `uv run --locked python scripts/harness.py context --task P1`.
+
+
+## Superpowers cho phát triển — 05/11/2026
+
+Đã cài Superpowers **7.0.2**, ghim `22f0b463e7a5e579904dd6211a520321035526f7`,
+15 skill gốc/80 file trong `.agents/skills/superpowers/`, MIT/provenance đi kèm.
+[Cách dùng](superpowers.md), [nghiệm thu](../reports/superpowers_setup_results.md),
+[quyết định](research/superpowers_setup.md). Native registry Codex nhận15/15
+enabled,0error; 80blob khớp source,12script syntax pass, sdd-workspace synthetic
+exit0. Chỉ initialize/initialized/skills/list, không gọi model hoặc mở thread.
+
+AGENTS bootstrap using-superpowers trước coding; tên local gọi trực tiếp như
+$brainstorming/$systematic-debugging. Thư viện repo-scoped, không plugin global;
+không nhúng toàn bộ body vào context. Giữ datamate-increment/Graphify, timeline,
+state/backlog và scoped data. Spec/plan ở docs/research/ cho task hiện hành.
+Dependency/runtime/uv.lock giữ nguyên; pyproject chỉ thêm Ruff exclusion cho
+vendor để không sửa ví dụ trong tài liệu upstream. Gate đầu format fail đã
+ghi ở report, không bỏ first-party test hoặc đổi expected.69hash source/config/
+test/lock và hai skill cũ khớp baseline. Không kit/gold/Modal job, không PA/B0.
+
+CPU hiện hành: **238 passed in 124.97s (0:02:04)**, Ruff/format pass, exit0, source không đổi;
+`runs/cpu-check-20261105T145024412015Z-vo2acxq5/gate.json`. Đã đọc JSON/ba log, context P1
+passed/current, ready/no warnings. Backlog chỉ thêm development_tooling;
+P1 todo/ready, P2 blocked giữ nguyên. Self-review, không reviewer độc lập.
+Chưa đánh giá chất lượng coding/token savings của LLM bằng Superpowers.
+Skill dùng được từ lượt tiếp theo; optional visual companion chưa chạy.
+
+## Archify cho onboarding — 05/11/2026
+
+Đã cài Archify **3.2.0**, ghim `208acba8d412335185b2056fedf54b3405df43fb`,
+skill workspace `.agents/skills/archify/`; [cách dùng/prompt](archify.md),
+[nghiệm thu](../reports/archify_setup_results.md),
+[scope](research/archify_setup.md). 203/203 blob upstream khớp, MIT/notices
+giữ nguyên. Native Codex registry nhận archify enabled, 0 load error; doctor
+pass; demo synthetic finalize đủ validate/deliver/check/browser-check pass
+trên Chrome có sẵn. Chưa review cảm nhận hình ảnh hoặc vẽ kiến trúc DataMate.
+
+Output/receipt trong `.archify/` local/ignored; AGENTS yêu cầu tắt update check
+và dùng source evidence sau context/Graphify. Có prompt onboarding tiếng Việt,
+phân biệt code đã có với kế hoạch. Không sửa runtime/lock hoặc config global;
+110 file baseline runtime/config/test/lock giữ nguyên. Không đọc kit/gold hoặc
+artifact BTC, không model/Modal/PA/B0. Giữ các thay đổi Superpowers có sẵn.
+Backlog chỉ thêm development_tooling của P1; P1 todo, không mở thêm task.
+
+CPU hiện hành sau setup Archify: **238 passed in 93.84s (0:01:33)**,
+Ruff lint/format pass, exit0;
+`runs/cpu-check-20261105T150151673404Z-bkz19z94/gate.json`. Đã đọc JSON/ba log;
+context P1 passed/current, ready, không planning error/warning. Timeline check
+current. P0/G0 done, P1 todo/ready, P2 blocked; không commit/push trong phiên.
+Skill dùng từ lượt tiếp theo; catalog chưa hiện thì mở lại phiên workspace.
+
+## Trang onboarding DataMate — 05/11/2026
+
+Đã tạo [trang onboarding tiếng Việt local](../.archify/explainer-datamate-onboarding-20261105-220839/datamate-onboarding.html)
+cho đồng nghiệp mới: bài toán/contract, luồng ingest/profile đã có, evaluator
+scoped, sơ đồ kiến trúc mục tiêu và thứ tự đọc code. Phân biệt A-T1/A-T2/P0
+đã hoàn thành với model/pipeline P1–P9 còn kế hoạch; không tạo module hoặc job.
+23 source range kiểm tại `fce24e8579cb852ea7add3459c92a90d459aab56`;
+README trích committed bytes vì working tree có chèn tài liệu tooling. Trang
+ghi rõ các path dirty và nguồn ghim; không coi thay đổi local là source HEAD.
+
+Archify finalize explainer cuối: validate/deliver/check/browser-check pass,
+0 warning; receipt trong `.archify/explainer-datamate-onboarding-20261105-220839/review-2/`,
+audit nguồn `source-audit.json` cùng thư mục artifact. Lượt đầu browser fail
+vì chữ sơ đồ nhỏ; đã gộp cache vào bước nạp và verifier/formatter vào bước
+chốt đáp án, giữ chi tiết trong lời dẫn. Không đổi renderer hoặc ngưỡng kiểm.
+Chỉ kiểm tự động, chưa review cảm nhận hình ảnh; nút Viewer dùng English fallback.
+Artifact/draft/evidence local/ignored, không đọc kit/gold hoặc chạy evaluation.
+Runtime/backlog/status không đổi; CPU hiện hành vẫn là gate Archify setup ở trên.
+
+## Archify chỉ dùng Anh/Việt — 05/11/2026
+
+Theo phản hồi người dùng, đã sửa skill/default explainer: nội dung chỉ tiếng
+Anh hoặc Việt theo yêu cầu, UI cố định tiếng Anh. Renderer trước đây thiếu
+locale thì chọn `zh-CN`; đã đổi fallback thành `en`, đồng thời yêu cầu
+`meta.locale=en` trong mọi draft. Bỏ câu mẫu tiếng Trung trong SKILL và các
+hướng dẫn authoring chính. [Kết quả](../reports/archify_language_results.md).
+
+Hai test render HTML thật từ draft Anh/Việt thiếu locale: trước sửa 2 fail
+đúng lỗi, sau sửa 2 pass. Quick skill validation, doctor/syntax pass. Trang
+onboarding đã được tạo lại ở cùng đường dẫn; finalize đủ bốn gate pass.
+12 body-text sample từ browser và 47 menu-word field không có chữ Trung.
+Chỉ kiểm tự động, chưa review cảm nhận hình ảnh.
+
+Provenance hiện hành ghi rõ 4 file upstream sửa local, 1 test thêm; 199 file
+khác nguyên hash, license/notices giữ nguyên. Phải giữ/áp lại patch khi nâng
+cấp. Hướng dẫn tuyên bố upstream nguyên bản phía trên là lịch sử setup.
+Backlog chỉ cập nhật development_tooling, P1 vẫn todo; không code DataMate,
+gold/kit, job model/Modal hoặc PA/B0 mới.
+
+CPU hiện hành: **238 passed in 127.90s (0:02:07)**, Ruff lint/format pass,
+exit0; `runs/cpu-check-20261105T152236134716Z-x5pxobyq/gate.json`. Đã đọc JSON
+và ba log, source không đổi trong gate; context P1 passed/current, ready/no
+warnings. Test Node ngôn ngữ 2/2 pass chạy riêng. Không commit/push.
+
+## Sơ đồ runtime hiện có — 05/11/2026
+
+Đã tạo [HTML kiến trúc runtime tổng quan](../.archify/architecture-datamate-runtime-20261105-224342/datamate-runtime.html)
+cho đồng nghiệp mới: luồng CLI/predict → format stub → JSONL/log, nhánh
+loader/profiler và evaluator/scoped reader riêng. Phụ thuộc Modal CPU synthetic,
+ranh giới account cloud và policy gold được giải thích trong card; không coi
+actor policy là xác thực danh tính hoặc guard ứng dụng là OS ACL. Phần model,
+domain_lib và Docker được ghi rõ là kế hoạch P1/P2/P3.
+
+Source ghim `fce24e8579cb852ea7add3459c92a90d459aab56`; 20 range hợp lệ,
+README đối chiếu committed bytes vì working tree dirty. Danh sách path local
+có ở source-scope.md cạnh artifact. Archify finalize architecture đủ
+validate/deliver/check/browser-check pass, không diagnostic; audit nhãn/tiêu đề
+tiếng Việt hiện diện trong HTML và không có Han trong authored candidate.
+Chỉ kiểm tự động, chưa review cảm nhận hình ảnh. Receipt/audit local cùng folder.
+
+Không sửa runtime/config/skill/backlog, không mở data/gold/membership/artifact BTC,
+không gọi model/cloud hoặc publish. P0/G0 done, P1 todo/ready và P2 blocked giữ
+nguyên; timeline check current, context CPU passed/current/no warnings trước
+khi tạo artifact. Không chạy lại CPU gate vì chỉ thêm HTML ignored và handoff
+tài liệu; gate hiện hành vẫn là record language-patch phía trên.
+
+## Xác minh trước cập nhật GitHub — 05/11/2026
+
+Theo yêu cầu người dùng, chuẩn bị xuất bản 301 file tooling/config/tài liệu:
+Superpowers 7.0.2, Archify 3.2.0 cùng patch Anh/Việt, hướng dẫn và báo cáo.
+Hash provenance khớp 204 file Archify (gồm test thêm) và 81 file Superpowers
+(gồm license); giữ executable bit của 10 script upstream. Rà soát publication
+do tác giả thực hiện; không phát hiện mẫu credential, tài liệu first-party
+UTF-8/NFC hợp lệ. Kit/gold/membership/runs/cache và HTML DataMate trong
+`.archify/` tiếp tục local/ignored; các HTML đi kèm vendor là ví dụ upstream.
+
+Kiểm tra mới: `uv run --locked python scripts/timeline.py check` current;
+`node --test .agents/skills/archify/tests/language-default.test.mjs` 2/2 pass;
+`uv run --locked python scripts/check.py` exit0, **238 passed in 139.38s**,
+Ruff lint/format pass, source không đổi trong gate. Đã đọc gate.json và ba log:
+`runs/cpu-check-20261105T160330296462Z-mdbwuv9t/gate.json`.
+Bản ghi này mô tả kiểm tra local trước push; CI GitHub kiểm riêng sau push.
+Các câu chưa commit/push ở phần trước là lịch sử các phiên triển khai.
+P0/G0 done, P1 todo/ready, P2 blocked; không có model/Modal/PA/B0 mới.

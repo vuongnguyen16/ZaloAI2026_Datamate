@@ -312,7 +312,9 @@
     "title": "Model chạy được trên Modal và GPU proxy",
     "development_tooling": {
       "graphify": "Local AST navigation 0.9.102; docs/graphify.md; reports/graphify_setup_results.md. Công cụ hỗ trợ theo yêu cầu người dùng, không phải prerequisite hoặc acceptance của P1.",
-      "graphify_token_benchmark": "reports/graphify_token_benchmark.md: một retrieval replay audit run-eval; graph 26716 tokens, giảm77.80% so toàn49 file, giảm27.21% so rg-whole-file, tăng12.22% so rg-scoped; o200k_base tham chiếu, không phải billing hoặc A/B hai agent độc lập. P1 vẫn todo."
+      "graphify_token_benchmark": "reports/graphify_token_benchmark.md: một retrieval replay audit run-eval; graph 26716 tokens, giảm77.80% so toàn49 file, giảm27.21% so rg-whole-file, tăng12.22% so rg-scoped; o200k_base tham chiếu, không phải billing hoặc A/B hai agent độc lập. P1 vẫn todo.",
+      "superpowers": "Superpowers 7.0.2 pinned 22f0b463e7a5e579904dd6211a520321035526f7; 15 official repo-scoped skills with AGENTS bootstrap, 80 upstream files byte-verified, Codex skills/list 15 enabled/0 errors, 12 syntax checks and synthetic SDD helper pass. docs/superpowers.md; reports/superpowers_setup_results.md. Tooling only, not P1 acceptance or model/PA/token-savings evidence.",
+      "archify": "Archify 3.2.0 pinned 208acba8d412335185b2056fedf54b3405df43fb; workspace skill, 203 upstream blobs verified, Codex registry enabled/0 errors, doctor and synthetic demo finalize validate/deliver/check/browser-check pass. docs/archify.md; reports/archify_setup_results.md. Onboarding tooling only; no DataMate diagram, model/PA/B0 acceptance or task status change. Local language patch 2026-11-05: English/Vietnamese authored copy only, English UI default; renderer regression 2/2 pass after 2/2 reproduced failures. Local modified/added hashes in UPSTREAM.json; keep patch on upgrade."
     },
     "phase": "P1",
     "groups": [

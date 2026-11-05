@@ -32,6 +32,13 @@ Tra cứu quan hệ code bằng [Graphify local](docs/graphify.md), skill `$grap
 `python scripts/graphify_local.py query "run_eval read_scoped"`.
 Graph chỉ gồm code, không có dữ liệu BTC/gold; dependency tool khóa riêng.
 
+[Archify](docs/archify.md), skill `$archify`, đã cài theo workspace để tạo sơ đồ
+và trang onboarding HTML local có source evidence cho đồng nghiệp mới.
+
+[Superpowers](docs/superpowers.md) đã tích hợp theo dự án: 15 skill gốc cho
+thiết kế, plan, TDD, debug và review; bootstrap qua AGENTS.md. Dùng chung với
+`$datamate-increment` và `$graphify`, theo các ràng buộc dữ liệu/gate của repo.
+
 ## Phần đã có
 
 | Thành phần | Bằng chứng và giới hạn |

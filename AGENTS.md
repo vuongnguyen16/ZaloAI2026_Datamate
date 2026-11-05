@@ -25,3 +25,42 @@ Sau context bắt buộc, câu hỏi kiến trúc/liên kết nhiều file dùng
 `.agents/skills/graphify/SKILL.md`: `python scripts/graphify_local.py query "symbol/câu hỏi"`.
 Graph stale thì `update`; đọc source liên quan trước sửa, dùng rg khi thiếu kết quả.
 Giữ truy vấn hẹp, không đọc toàn graph/report. Setup và phạm vi: `docs/graphify.md`.
+
+## Archify cho onboarding
+
+Skill `$archify` tại `.agents/skills/archify/` tạo sơ đồ/trang giải thích HTML
+local; cách dùng và prompt onboarding ở `docs/archify.md`. Trước lệnh Archify
+đặt `ARCHIFY_UPDATE_CHECK_DISABLED=1`; dùng `.archify/` (gitignored) cho output.
+Với sơ đồ code, lấy context bắt buộc, dùng Graphify theo scope rồi đọc source
+để gắn evidence. Phân biệt phần đã triển khai với kế hoạch; không đưa data,
+gold, membership, artifact BTC trong runs hoặc credentials vào diagram/export.
+Không tự publish/upload. Archify có patch local chỉ sinh nội dung Anh/Việt,
+giao diện cố định tiếng Anh (`meta.locale=en`); giữ patch khi nâng cấp và xem
+provenance. Ràng buộc DataMate có ưu tiên. Không bật proactive explainer toàn cục
+từ yêu cầu setup này.
+
+## Superpowers cho phát triển
+
+Bộ Superpowers gốc nằm trong `.agents/skills/superpowers/`. Trước công việc
+phát triển, đọc `using-superpowers/SKILL.md` tại đó rồi chọn skill phù hợp:
+brainstorming/writing-plans cho yêu cầu mới, systematic-debugging cho lỗi,
+test-driven-development khi sửa hành vi và verification-before-completion
+trước kết luận. Đọc skill thực, không dùng bản tóm tắt này thay hướng dẫn.
+Skill local gọi bằng `$brainstorming`, `$writing-plans`, ...; tham chiếu
+`superpowers:<tên>` trong upstream tương ứng skill local cùng tên.
+
+Các ràng buộc DataMate phía trên và yêu cầu người dùng có ưu tiên. Đọc context,
+timeline/contract và dùng Graphify theo scope trước sửa. Spec/plan trong
+`docs/research/` chỉ là thiết kế cho task hiện hành; state/backlog vẫn là
+tracker duy nhất, không tạo roadmap cạnh tranh hoặc mở nhiều task active.
+Dependency dùng uv/lock và kiểm bằng check.py; không chạy ví dụ pip/poetry/npm
+khác stack. Không xóa code cũ chỉ vì chưa theo TDD hoặc đổi expected để pass.
+Không hỏi lại quyền/quyết định đã được chấp thuận trong phiên.
+
+Subagent chỉ phục vụ increment hiện hành khi skill/người dùng yêu cầu; dùng
+tool/model allowlist thực, không copy tên model hoặc cú pháp không hỗ trợ.
+Không truyền gold/kit/transcript nhạy cảm cho review/export hoặc tự gửi issue.
+Visual companion là tùy chọn; nếu dùng đặt SUPERPOWERS_DISABLE_TELEMETRY=1
+cho tiến trình đó. Trên Windows dùng Git Bash của Git for Windows khi cần
+script Bash upstream, không dùng bash.exe shim WSL mặc định.
+Hướng dẫn, phiên bản và giới hạn: `docs/superpowers.md`.

@@ -68,9 +68,11 @@ Review contract/SQL/scorer/
 inference có xét leakage, failure paths và tài nguyên; ghi self/independent review.
 Chạy gate sau thay code cuối, đọc log/JSON rồi cập nhật state và evidence.
 
-Skill DataMate dùng độc lập; không phụ thuộc plugin workflow bên ngoài hoặc
-việc cài Superpowers. Nếu dùng plugin đã cài trong tương lai, phải đọc đúng
-skill/version thực và tuân theo phạm vi/nguồn timeline của repo.
+Skill DataMate giữ context/contract/gate của dự án. [Superpowers](superpowers.md)
+7.0.2 đã cài đủ 15 skill project-local, bootstrap bằng using-superpowers trong
+AGENTS.md; đọc đúng skill/version trước dùng. Superpowers hỗ trợ quy trình,
+không thay timeline, state/backlog, scoped data hoặc cổng CPU/Modal/PA.
+Spec/plan là thiết kế của task hiện hành trong docs/research/, không tracker mới.
 
 CI `.github/workflows/cpu.yml` dùng cùng gate, action pin commit, uv 0.13.6,
 Python theo `.python-version`; chỉ upload gate.json và ba stage log synthetic.

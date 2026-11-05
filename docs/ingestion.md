@@ -62,7 +62,7 @@ Mỗi generation có `raw.duckdb` và `manifest.json`. Catalog trong DB:
 
 `c0001`… là VARCHAR hoặc NULL, không phải tên header nghiệp vụ. Các hàng header,
 lời dẫn, tổng, ghi chú, dòng trùng và hàng trống có thật trong nguồn vẫn được
-giữ. Không fill nhóm, dedup, gộp sheet hay chọn header ở A-T1. A-T2 sẽ tạo lớp
+giữ. Không fill nhóm, dedup, gộp sheet hay chọn header ở A-T1. A-T2 đã tạo lớp
 profile/bản đồ schema với nguồn gốc rõ ràng trên nền raw này.
 
 ## Ý nghĩa hàng, ô và kiểu

@@ -1,5 +1,7 @@
 # Nghiệm thu A-T1 — loader raw và cache theo business
 
+> Bằng chứng module được giữ từ các phiên A-T1/A-T2 trước migration. Tham chiếu tuần, hash kế hoạch và handoff bên dưới là lịch sử; kế hoạch hiện hành là P0–P9 trong [state](../docs/project_state.md) và [backlog](../tasks/backlog.json).
+
 Ngày 05/11/2026. Phạm vi: hoàn tất A/T1 của timeline DOCX hiện hành, tiếp nối
 khảo sát train đã lưu. Implementation và dữ liệu được kiểm tra local; chưa
 commit/push hoặc upload kit. Review do tác giả thực hiện (self-review).
@@ -8,7 +10,7 @@ commit/push hoặc upload kit. Review do tác giả thực hiện (self-review).
 
 | Acceptance A-T1 | Bằng chứng |
 |---|---|
-| Khảo sát định dạng/dòng/cột/README | [Khảo sát ban đầu](../docs/research/a_t1_train_survey.md), [khảo sát sâu](../docs/research/a_t1_deep_survey.md) và các artifact local liên kết trong hai note |
+| Khảo sát định dạng/dòng/cột/README | [Khảo sát sâu](../docs/research/a_t1_deep_survey.md) và các artifact local; note sơ bộ đã lưu trong [archive](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103) |
 | Mọi business nạp được, có lỗi cấu trúc | Full train 30/30 business thành công; fixture kiểm lỗi CSV/XML/ZIP/SQLite/limits và cô lập business lỗi |
 | Giữ raw, fingerprint/cache theo business | Đối chiếu đầy đủ nguồn–cache, read-back frame digest, 162 hash raw bất biến; warm run 30/30 cache hits; regression invalidation/corruption/atomic build |
 

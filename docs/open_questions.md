@@ -1,20 +1,19 @@
-# Những mục còn cần xác minh theo A–G
+# Những điểm cần xác minh trước từng pha
 
-- A: format/schema thực tế, header/encoding/dirty patterns; inventory cơ học
-  chưa trả lời các câu này. Revision/changelog kit chưa rõ.
-- E: chưa có scorer của dự án. BTC không cung cấp executable evaluator theo xác
-  nhận của người dùng; xây matching từ thể lệ, ghi policy provisional cho rounding
-  ties, alias, table order/null/cell và trường hợp đặc tả chưa rõ.
-- E: split/access policy trước tuning/huấn luyện; không chọn cấu hình trên
-  holdout hoặc public/private test. Chưa có manifest split đã khóa.
-- C: rulebook/checklist và calendar semantics phải được nghiên cứu trực tiếp;
-  không lấy giả định của timeline làm định nghĩa chính thức.
-- D/G/F: quyền gửi BTC data lên Modal, quota GPU, usage/billing/spend cap chưa
-  được xác minh. Chỉ synthetic đã được gửi cloud; budget 30 USD/thí nghiệm.
-- G: offline/mount/quyền/temp/cache, cold start/full runtime và Docker digest
-  chưa kiểm chứng. Chờ pipeline hoàn chỉnh để đóng gói, không chặn việc CPU sớm.
-- Nguồn lịch trong contract được đối chiếu 01/11; timeline DOCX có mốc ước tính
-  khác. Khi lập lịch/nộp phải xác minh BTC hiện hành, không tự coi ngày trong
-  tài liệu kế hoạch là deadline BTC đã xác nhận.
-- Backup raw/artifact ngoài ổ D chưa xác minh. Backup cleanup trong runs chỉ
-  bảo vệ 32 file code/tài liệu bị đổi, không thay thế bản sao lưu kit.
+- P0: matching corner cases từ thể lệ; phần chưa rõ gắn provisional. Khóa nhóm
+  business/template và access policy trước khi đọc gold; taxonomy holdout không
+  làm nguồn chọn cấu hình. Chưa scorer hoặc split manifest.
+- P1: model card/revision/license/cutoff/tổng tham số, runtime và proxy sm_120;
+  không coi danh sách ứng viên trong DOCX là eligibility đã xác minh.
+- P1/P8b: account/quota/usage/billing, budget 30 USD/thí nghiệm và phạm vi dữ liệu.
+  DOCX ghi chủ project cho phép dữ liệu BTC trên Modal; phiên migration không
+  dùng câu đó để tự upload. Không upload kit/gold lên GitHub/API ngoài Modal.
+- P2/P4: rulebook/calendar semantics có nguồn; 38 status từ khảo sát là giả thuyết,
+  không tự trở thành mapping production. Chưa domain_lib, cleaner hay baseline.
+- P3: offline/mount/read-only/cache, cold start/tail/full runtime và digest;
+  đóng gói sau G2, không chờ P4–P8.
+- P7/P8: holdout mở một lần; nếu tiếp tục tối ưu sau P7 phải có đánh giá độc lập
+  mới hoặc công bố giới hạn, không tái dùng holdout làm unseen test.
+- Nguồn có hai cách dùng X12: sổ thí nghiệm dành cho tất định, F2 dẫn cho SFT/RL.
+  P8B ghi control riêng, không thay X12. Ngưỡng đề xuất trong kế hoạch là mục tiêu nội bộ.
+- Lịch/quota nộp cần xác minh BTC lúc nộp; backup kit ngoài ổ D chưa xác minh.

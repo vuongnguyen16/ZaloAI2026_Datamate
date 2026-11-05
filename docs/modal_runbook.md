@@ -49,4 +49,4 @@ không ghi 0 USD. Timeout một function không giới hạn chi phí nhiều l�
 Model integration thuộc D/G: eligibility ≤15B gồm auxiliary/MoE, full revision,
 license/cutoff, tokenizer/template, cloud runtime, output thật và budget phải có
 trước khi khẳng định model adapter hoạt động. Không tạo Volume/tải weights như side effect cleanup.
-Docker offline/full run giữ tới bước đóng gói nhóm G sau pipeline hoàn chỉnh.
+Docker offline/full run ở P3 thuộc G, sau lát cắt P2/G2; không chờ tối ưu P4–P8.

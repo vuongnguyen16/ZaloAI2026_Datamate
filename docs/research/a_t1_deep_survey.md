@@ -1,8 +1,10 @@
 # A-T1 — Khảo sát sâu train
 
+> Bằng chứng module được giữ từ các phiên A-T1/A-T2 trước migration. Tham chiếu tuần, hash kế hoạch và handoff bên dưới là lịch sử; kế hoạch hiện hành là P0–P9 trong [state](../project_state.md) và [backlog](../../tasks/backlog.json).
+
 Ghi chép lịch sử trước implementation. A-T1 hiện đã hoàn tất;
 [loader](../../reports/a_t1_loader_results.md) và
-[engineering A-T2](../../reports/a_t2_engineering_results.md) có nghiệm thu riêng.
+[hoàn thiện A-T2](../../reports/a_t2_completion_results.md) có nghiệm thu riêng.
 Các giả thuyết nghiên cứu ở đây không tự trở thành contract của hai module đó.
 
 Phạm vi mở rộng theo yêu cầu người dùng ngày 05/11/2026: giải quyết các điểm
@@ -12,7 +14,7 @@ trên dữ liệu local; không thay contract, không làm sạch raw hoặc xâ
 Nguồn: timeline DOCX hiện hành mục A/T1–T4 (các công việc sau T1 chỉ được
 khảo sát để hiểu dữ liệu, chưa nghiệm thu module), docs/requirements.md,
 manifests/competition_contract.json, rulebook và README của train. Kế thừa
-bằng chứng tại docs/research/a_t1_train_survey.md. Không parse gold, không
+bằng chứng sơ bộ tại [archive GitHub](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/blob/archive/timeline-20261103/docs/research/a_t1_train_survey.md). Không parse gold, không
 đọc nội dung public/private, không tuning/huấn luyện hoặc gọi cloud/model.
 
 ## Câu hỏi cần giải đáp và phép kiểm chứng

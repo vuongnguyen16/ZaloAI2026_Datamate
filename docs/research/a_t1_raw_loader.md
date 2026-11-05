@@ -1,5 +1,7 @@
 # A-T1 — Spec loader raw và cache theo business
 
+> Bằng chứng module được giữ từ các phiên A-T1/A-T2 trước migration. Tham chiếu tuần, hash kế hoạch và handoff bên dưới là lịch sử; kế hoạch hiện hành là P0–P9 trong [state](../project_state.md) và [backlog](../../tasks/backlog.json).
+
 Ngày 05/11/2026; người dùng đã giao triển khai loader/cache sau khảo sát sâu.
 Nguồn kế hoạch: timeline DOCX hiện hành A/T1, hash
 e74b1292119f01ca3eae7d20d709921219efc30e655e01909685c50d5363eb51.

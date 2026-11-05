@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "files": {
+    "Research/Timeline DataMate theo nhóm việc A–G.docx": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "Research/Timeline_DataMate_A-G.md": "40f567fc47bfafdfc8332939f86dce60f37234b34b4744d51bc918a355945e52",
+    "Research/timeline_assets/277e6aadb74d9262f6e4716774b5a3ff3a62eba0.png": "c0b70d81293974ef5782fb6f8ced96f32a75ad9421257c226365a15d85215324"
+  },
+  "superseded_archive": "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103",
+  "superseded_commit": "bd0061593698df76c05745c7ef1df3d31b1331f3",
+  "legacy_task_map": {
+    "E-T1": [
+      "P0-SCORER",
+      "P0-TAXONOMY"
+    ],
+    "E-SPLIT": [
+      "P0-SPLIT"
+    ],
+    "D-G-T1": [
+      "P1"
+    ],
+    "C-T1": [
+      "P2"
+    ],
+    "C-T2": [
+      "P2"
+    ],
+    "G-T2": [
+      "P2"
+    ],
+    "D-E-T2": [
+      "P2"
+    ],
+    "A-T3-T6": [
+      "P2",
+      "P4",
+      "P7"
+    ],
+    "B-T3-T6": [
+      "P2",
+      "P4"
+    ],
+    "C-T3-T6": [
+      "P4",
+      "P7"
+    ],
+    "D-T3-T7": [
+      "P5"
+    ],
+    "E-T3-T8": [
+      "P6",
+      "P7",
+      "P9"
+    ],
+    "F-CONDITIONAL": [
+      "P8B"
+    ],
+    "G-T5": [
+      "P3"
+    ],
+    "G-PACKAGING": [
+      "P3",
+      "P9"
+    ]
+  }
+}

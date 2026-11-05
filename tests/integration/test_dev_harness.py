@@ -1,5 +1,6 @@
 """Exercise the developer gate in isolated, synthetic workspaces."""
 
+import hashlib
 import importlib.util
 import json
 import shutil
@@ -17,6 +18,29 @@ def load_harness():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def synchronize_fixture(root, tasks):
+    """Give synthetic plans the same provenance contract as real plans."""
+    harness = load_harness()
+    timeline = root / harness.TIMELINE
+    timeline.parent.mkdir(exist_ok=True)
+    if not timeline.exists():
+        timeline.write_bytes(b"synthetic timeline")
+    web = root / "Research/Timeline_DataMate_A-G.md"
+    web.write_text("synthetic reading copy", encoding="utf-8")
+    hashes = {
+        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (timeline, web)
+    }
+    (root / "manifests").mkdir(exist_ok=True)
+    (root / "manifests/timeline_source.json").write_text(
+        json.dumps({"schema_version": 1, "files": hashes}), encoding="utf-8"
+    )
+    for task in tasks:
+        task.update(source=harness.TIMELINE, source_sha256=hashes[harness.TIMELINE])
+    (root / "tasks").mkdir(exist_ok=True)
+    (root / "tasks/backlog.json").write_text(json.dumps(tasks), encoding="utf-8")
 
 
 def gate_workspace(tmp_path):
@@ -141,7 +165,7 @@ def test_context_resolves_timeline_and_group_dependencies(tmp_path):
         {"id": "A-T1", "status": "in_progress", "depends_on": ["G-FOUNDATION"]},
         {"id": "D-E-T2", "status": "todo", "depends_on": ["A-T1"]},
     ]
-    (tmp_path / "tasks/backlog.json").write_text(json.dumps(tasks), encoding="utf-8")
+    synchronize_fixture(tmp_path, tasks)
     current = harness.build_context(tmp_path, "A-T1")
     assert current["task"]["id"] == "A-T1"
     assert current["dependency_status"] == "ready"
@@ -189,3 +213,72 @@ def test_context_never_resurrects_superseded_plan(tmp_path, monkeypatch):
     assert "git_reference" not in context["timeline"]
     assert "plan" not in context
     assert any("Timeline" in warning for warning in context["warnings"])
+
+
+def test_context_blocks_changed_docx_web_and_task_source(tmp_path):
+    harness = load_harness()
+    tasks = [{"id": "P0-SPLIT", "status": "todo", "depends_on": []}]
+    synchronize_fixture(tmp_path, tasks)
+    assert harness.build_context(tmp_path, "P0-SPLIT")["dependency_status"] == "ready"
+    for path in (harness.TIMELINE, "Research/Timeline_DataMate_A-G.md"):
+        original = (tmp_path / path).read_bytes()
+        (tmp_path / path).write_bytes(original + b" changed")
+        result = harness.build_context(tmp_path, "P0-SPLIT")
+        assert result["dependency_status"] == "blocked"
+        assert result["planning_errors"]
+        (tmp_path / path).write_bytes(original)
+    tasks[0]["source_sha256"] = "old-source"
+    (tmp_path / "tasks/backlog.json").write_text(json.dumps(tasks), encoding="utf-8")
+    assert harness.build_context(tmp_path, "P0-SPLIT")["dependency_status"] == "blocked"
+
+
+def test_context_blocks_broken_graph_and_multiple_active_tasks(tmp_path):
+    harness = load_harness()
+    tasks = [
+        {"id": "P0", "status": "todo", "depends_on": ["P1", "missing"]},
+        {"id": "P1", "status": "todo", "depends_on": ["P0"]},
+    ]
+    synchronize_fixture(tmp_path, tasks)
+    result = harness.build_context(tmp_path, "P0")
+    assert result["dependency_status"] == "blocked"
+    assert any("cycle" in error for error in result["planning_errors"])
+    assert any("Unknown dependency" in error for error in result["planning_errors"])
+    for t in tasks:
+        t.update(status="in_progress", depends_on=[])
+    synchronize_fixture(tmp_path, tasks)
+    result = harness.build_context(tmp_path, "P0")
+    assert any("Only one" in error for error in result["planning_errors"])
+
+
+def test_context_serializes_work_and_requires_skip_decision(tmp_path):
+    harness = load_harness()
+    tasks = [
+        {"id": "P8A", "status": "in_progress", "depends_on": [], "optional": True},
+        {"id": "P9", "status": "todo", "depends_on": ["P8A"]},
+    ]
+    synchronize_fixture(tmp_path, tasks)
+    result = harness.build_context(tmp_path, "P9")
+    assert result["dependency_status"] == "blocked"
+    assert result["other_active_tasks"] == ["P8A"]
+    tasks[0]["status"] = "skipped"
+    synchronize_fixture(tmp_path, tasks)
+    assert harness.build_context(tmp_path, "P9")["dependency_status"] == "blocked"
+    tasks[0]["skip_reason"] = "No improvement over the base model"
+    synchronize_fixture(tmp_path, tasks)
+    assert harness.build_context(tmp_path, "P9")["dependency_status"] == "ready"
+
+
+def test_repository_phase_dependencies_and_source_are_current():
+    harness = load_harness()
+    result = harness.build_context(ROOT)
+    assert result["planning_errors"] == []
+    tasks = json.loads((ROOT / "tasks/backlog.json").read_text("utf-8"))
+    by_id = {t["id"]: t for t in tasks}
+    assert by_id["A-T1"]["status"] == by_id["A-T2"]["status"] == "done"
+    assert "P0-SPLIT" in by_id["P0-TAXONOMY"]["depends_on"]
+    assert by_id["P1"]["depends_on"] == ["P0-GATE"]
+    for phase in range(3, 8):
+        assert f"P{phase - 1}" in by_id[f"P{phase}"]["depends_on"]
+    assert "P1" in by_id["P2"]["depends_on"]
+    assert {"P7", "P8A", "P8B"} <= set(by_id["P9"]["depends_on"])
+    assert "descriptor" in " ".join(by_id["P2"]["acceptance"]).lower()

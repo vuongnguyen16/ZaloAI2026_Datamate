@@ -1,50 +1,16 @@
-# Foundation kế thừa cho Timeline A–G
+# Foundation giữ lại theo Timeline hiện hành
 
-Bản ghi gọn thay các báo cáo tiến độ theo roadmap đã bỏ. Ngày tổng hợp 04/11/2026.
-Các con số dưới đây đã được ghi nhận trong những phiên trước, không phải phép đo mới trong phiên reset.
+Đối chiếu 05/11/2026. Đây là bằng chứng module, không phải roadmap thứ hai.
 
-## A — Inventory cơ học
+| Thành phần | Bằng chứng lịch sử | Giới hạn và nơi tiếp nối |
+|---|---|---|
+| A-T1 | [Nghiệm thu loader](../reports/a_t1_loader_results.md): raw/cache, 30 business/339 unit, toàn cell/type/position được đối chiếu | Raw không semantic cleaning; P2/P4 dùng tiếp |
+| A-T2 | [Nghiệm thu hoàn thiện](../reports/a_t2_completion_results.md): runtime format/text QA/profile/header/data_start/descriptor; CI 144 tests tại source 790b1af | 11 unresolved, nhãn self-review; prompt/model/PA ở P2; biến thể P7 |
+| Contract/validator/stub | [Contract](requirements.md), [machine report lịch sử](../reports/contract_checks.json); output/log train/public đủ id, stub abstain | Chưa scorer hoặc PA; P0 tự xây từ đặc tả |
+| CPU harness/CI | Command/log/source hash, fail-fast và stale detection; uv 0.13.6/Python 3.11.18 | Gate phiên nào phải đọc record mới phiên đó; không chứng minh model/evaluation |
+| Modal CPU synthetic | Ngày 01/11, app ap-V5mZIojkntGhLow7r8ahUW; hai câu synthetic, block_network, 1 CPU/512 MiB; local runs/modal-cpu-1793514027877932400/ | Chưa GPU/model, throughput, bill hoặc hard spend cap; P1 xác minh lại |
 
-Code `scripts/inventory.py`, test `tests/integration/test_inventory.py`.
-Đã xử lý output trong input/alias/junction, JSON strict, ID nguyên văn và cách
-đếm câu hợp lệ. Các kiểm thử hồi quy được giữ lại, không thay đổi hành vi mong đợi.
-Inventory train ngày 01/11: 30 business, 3.000 câu, 162 file, 194.290.513 bytes,
-một nhóm bảng trùng hash, không lỗi cơ học. Artifact:
-`runs/p01-inventory-fixed-20261101/inventory.json` và `inventory.md` (local).
-Chưa khảo sát dòng/cột nội bộ, sheet/header/SQLite catalog hoặc nội dung README;
-chưa loader, profile hoặc split. Bảng trùng byte chưa chứng minh business trùng.
-
-## E/G — Contract, runner và bằng chứng
-
-Strict parser/schema/validation trong `src/datamate/`, cùng CLI smoke/stub.
-Contract nguồn tại `docs/requirements.md`, `manifests/competition_contract.json`
-và `manifests/contract_sources.json`; hash của dữ liệu gốc ở `manifests/kit_files.json`.
-Kiểm tra cấu trúc ngày 01/11 đã bao phủ train 3.000 câu/30 business và public
-1.000 câu/14 business: output/log đủ ID, không trùng/ngoài input; mọi output
-abstain. Bản JSON lịch sử: `reports/contract_checks.json` (giữ payload gốc).
-Không parse gold; không tính PA; không coi stub là baseline.
-`scripts/verify_contract.py` là lệnh tái hiện với tên hiện tại; các đường dẫn
-run lịch sử giữ nguyên để không sửa lịch sử artifact.
-
-Cổng CPU trước reset gần nhất: 58 tests pass trong 12.04s, Ruff/format pass.
-Artifact `runs/cpu-check-20261104T162620562569Z-1s4dntg2/gate.json`.
-CPU gate hiện lưu command/exit code/log/hash/runtime, dừng lỗi đầu, loại test
-GPU/Modal, từ chối pass khi source đổi; tại thời điểm đó, CI synthetic chưa chạy trên GitHub.
-
-## D/G — Modal và môi trường
-
-CPython 3.11.18, uv 0.13.6, dependencies từ uv.lock; core không import Modal SDK.
-Ngân sách được giao 30 USD/thí nghiệm, profile/workspace `vuonghungnguyen07`.
-Xác thực và smoke cloud CPU đã chạy ngày 01/11, cần kiểm tra lại trước job mới.
-App lịch sử: `ap-V5mZIojkntGhLow7r8ahUW`; image `im-aw8AXx4XzPdherlbygTxUN`.
-Artifact `runs/modal-cpu-1793514027877932400/`; app đã completed theo report cũ.
-1 CPU/512 MiB, tối đa một container, timeout 120s/startup 300s/retries 0;
-block_network, outbound request thất bại; hai câu synthetic đúng, không lỗi.
-Function chạy khoảng 0.539s, gồm probe/smoke; đây không phải thời gian cold-start
-hoặc kết quả benchmark model.
-Tám file tải về đã được kiểm tra SHA-256 sau xử lý LF/CRLF trong phiên trước.
-Chưa chạy GPU, tải weights hoặc upload dữ liệu BTC; chi phí thực tế và giới hạn chi tiêu cứng chưa được xác minh.
-
-Dockerfile/.dockerignore giữ nguyên bản nháp; chưa nghiệm thu container.
-Những module còn thiếu phải nghiệm thu theo task A–G mới, không chuyển các
-trạng thái done của roadmap cũ thành bằng chứng hoàn thành timeline.
+Mọi đầu vào train đã được khảo sát; gold chưa được dùng trong inference.
+P0 phải ghi access history khi chia split. Raw/cache/profile/labels/runs giữ
+local, không upload lên repo. Hash và kết quả đầy đủ nằm ở evidence task.
+Dockerfile/.dockerignore vẫn draft cho P3 sau G2; không build trong migration.

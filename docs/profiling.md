@@ -3,8 +3,8 @@
 `datamate profile` tạo thống kê từ cache raw đã xác minh, cùng rule header
 thận trọng và data-start. Không đoán kiểu nghiệp vụ, làm sạch hoặc chạy model.
 Spec hiện hành: [hoàn thiện A-T2](research/a_t2_completion.md); policy format:
-[runtime text/CSV](runtime_format.md). Spec [engineering ban đầu](research/a_t2_engineering.md)
-giữ như lịch sử. Toàn bộ profile chứa mẫu dữ liệu
+[runtime text/CSV](runtime_format.md). Bản engineering tạm đã lưu trong
+[archive GitHub](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103); dùng spec hoàn thiện trong workspace. Toàn bộ profile chứa mẫu dữ liệu
 phải giữ local trong `runs/`; không publish cùng source.
 
 ## Chạy

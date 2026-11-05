@@ -1,58 +1,48 @@
 # DataMate
 
-Dự án triển khai theo [Timeline DataMate A–G](<Research/Timeline DataMate theo nhóm việc A–G.docx>).
-Bản [timeline Markdown đọc trực tiếp trên web](Research/Timeline_DataMate_A-G.md)
-có đầy đủ văn bản, bảng và sơ đồ từ DOCX gốc.
-Bắt đầu lại theo timeline từ 04/11/2026, kế thừa phần nền đã kiểm thử.
-Đã có loader raw CSV/XLSX/SQLite → DuckDB và cache theo business, được kiểm
-chứng trên toàn train; có profile raw và schema descriptor phần engineering
-A-T2, nay có runtime format policy, header/data-start rule và descriptor.
-Chưa có scorer, model thật hoặc PA baseline.
+Lộ trình hiện hành: [Timeline một người theo giai đoạn](Research/Timeline_DataMate_A-G.md),
+nguồn [DOCX](<Research/Timeline DataMate theo nhóm việc A–G.docx>) cập nhật 05/11/2026.
+Triển khai tuần tự P0–P9, mỗi pha có cổng kiểm chứng. A–G là nhóm chuyên môn,
+không còn là bảy luồng song song theo tuần. Ước lượng trong DOCX là ngày công.
 
-Để đọc/review trên web: bắt đầu từ [timeline Markdown](Research/Timeline_DataMate_A-G.md),
-[state hiện tại](docs/project_state.md), [backlog](tasks/backlog.json) và
-[contract](docs/requirements.md). Source và fixture synthetic được đồng bộ;
-kit BTC, model, credentials và run artifacts giữ local.
+**Tiếp theo: P0 — đo lường.** Khóa split/access policy trước khi đọc gold cho
+taxonomy; xây scorer 9 type và run_eval. Chưa có scorer, model thật hoặc PA/B0.
+Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
-## Bắt đầu phiên làm việc
+## Bắt đầu phiên
 
 ```powershell
 $env:PATH = "$PWD\.tools\uv;$env:PATH"
 $env:UV_CACHE_DIR = "$PWD\.uv-cache"
 $env:UV_PYTHON_INSTALL_DIR = "$PWD\.uv-python"
 uv sync --locked
-uv run --locked python scripts/harness.py context --task A-T2
+uv run --locked python scripts/timeline.py check
+uv run --locked python scripts/harness.py context --task P0-SPLIT
 uv run --locked python scripts/check.py
 ```
 
-Đọc [trạng thái](docs/project_state.md), [backlog](tasks/backlog.json), timeline và
-[contract](docs/requirements.md) trước khi sửa. Dùng interpreter `.venv/Scripts/python.exe`,
-không dùng Python MSYS2 trên PATH. Phiên bản Python được pin ở `.python-version`,
-dependency được khóa trong `uv.lock`.
-Skill repo `$datamate-increment` dùng cùng tracker; [hướng dẫn harness](docs/harness.md).
+Chưa có uv PATH thì gọi `.tools/uv/uv.exe`. Dùng Python `.venv/Scripts/python.exe`,
+không dùng MSYS2 Python. Dependency chỉ qua pyproject.toml + uv.lock.
+Đọc AGENTS, state, backlog, DOCX và [contract](docs/requirements.md) trước sửa;
+dùng skill `$datamate-increment` và [harness](docs/harness.md).
 
-## Phần nền giữ lại
+## Phần đã có
 
-| Nhóm timeline | Có thể dùng ngay | Chưa được coi là hoàn thành |
-|---|---|---|
-| A — Dữ liệu | [Loader/cache](docs/ingestion.md); [runtime format](docs/runtime_format.md); [profile/header/data-start](docs/profiling.md); [nghiệm thu A-T2](reports/a_t2_completion_results.md) | Actual prompt/PA thuộc D-E-T2; legacy converter/multi-region chưa có evidence; cleaning A-T3/T4 |
-| E — Đánh giá | Strict output schema, validator input/submission/log | Matching scorer, run_eval, split/access policy, phân tích lỗi và PA |
-| G — Hạ tầng | uv/lock, CLI, fake runner, logging/hash, CPU gate/CI, Modal CPU smoke | GPU/model thật, cache/resume production, throughput và Docker offline |
-| B/C/D/F | Contract, config và giao diện để phát triển tiếp | Chưa triển khai module nghiệp vụ/ngôn ngữ/agent/huấn luyện |
+| Thành phần | Bằng chứng và giới hạn |
+|---|---|
+| A-T1 loader CSV/XLSX/SQLite → DuckDB, cache raw | [Hướng dẫn](docs/ingestion.md), [nghiệm thu](reports/a_t1_loader_results.md); 30 business/339 unit, bảo toàn raw |
+| A-T2 format/profile/header/data_start/descriptor | [Profile](docs/profiling.md), [format](docs/runtime_format.md), [nghiệm thu](reports/a_t2_completion_results.md); 311 auto/11 unresolved/17 schema; actual prompt/PA còn ở P2 |
+| Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử, chưa GPU/model/scorer |
 
-Nguồn và giới hạn bằng chứng kế thừa: [foundation](docs/foundation.md).
-Chỉ bắt đầu task mới trong phạm vi được giao; chưa tạo module rỗng theo tên thư mục timeline.
-A-T1 và **A-T2 đã hoàn thành** ở phạm vi loader/profile/format/structure và
-descriptor handoff. Tư vấn Claude và yêu cầu hoàn thiện mới đã mở header CPU;
-actual descriptor-in-prompt/PA được giữ tại D-E-T2, đã thêm dependency A-T2.
-E-T1 và C-T1 vẫn theo tracker; không tự mở model hoặc cleaning.
+Kiến trúc mục tiêu: domain_lib dựng từ dev, model nhỏ chọn/gọi hàm,
+SQL/Python dự phòng và abstain/verifier/formatter từ P2. single_sql là đối chứng.
+Không tạo module rỗng hoặc coi kế hoạch là code đã chạy.
 
 ## Công cụ hiện có
 
 ```powershell
 uv run --locked python scripts/doctor.py
 uv run --locked datamate smoke --config configs/smoke.yaml
-uv run --locked python scripts/inventory.py --input data/train --output runs/inventory-new
 uv run --locked datamate validate-input --input data/train
 uv run --locked python scripts/audit_kit.py
 uv run --locked datamate ingest --input data/train --cache runs/raw-cache --output runs/ingest-first
@@ -61,47 +51,25 @@ uv run --locked datamate profile --input data/train --ingest-report runs/ingest-
 uv run --locked python scripts/verify_profile.py --input data/train --report runs/profile-first/profile.json --output runs/profile-audit
 ```
 
-Smoke chỉ chạy hai câu synthetic: tổng bằng `12.35` và mã `0012`. SQL fixture tin cậy,
-không phải worker an toàn cho SQL do model sinh. Local được giới hạn ở 2 threads,
-DuckDB 256 MiB, fixture tối đa 1 MiB. Inventory chỉ kiểm tra cơ học; chưa đọc header/sheet/catalog.
-Output inventory phải mới và ở ngoài input, kể cả alias/junction.
-
-Loader giữ cả header/lời dẫn/tổng/dòng trùng và hàng trống vật lý; không tự
-parse tiền/ngày, chọn header, fill nhóm hoặc dedup. Mỗi business có một DB,
-mỗi CSV/sheet/bảng có một view với cột positional và metadata nguồn. Chạy lại
-với cùng cache và output report mới để dùng cache hit. Cách truy vấn, giới hạn
-và xử lý lỗi: [hướng dẫn ingestion](docs/ingestion.md). Bằng chứng nghiệm thu:
-[kết quả A-T1](reports/a_t1_loader_results.md).
-
-Profiler thống kê đầy đủ raw, phân biệt missing/NULL/rỗng, giữ kiểu vật lý,
-mẫu/min–max và lineage. Header rule CPU có thể từ chối chọn, fallback preview;
-descriptor xuất header/data-start/data_samples và format/text evidence. Byte
-policy BOM/UTF-8 strict không phải chứng nhận văn bản đúng nghĩa. JSON schema
-dùng tên view/cột raw thật; đã kiểm consumer synthetic, chưa prompt/model PA.
-Profile/nhãn BTC giữ trong `runs/`. Xem [hướng dẫn profile](docs/profiling.md) và
-[phạm vi engineering A-T2](docs/research/a_t2_engineering.md).
-Bằng chứng full train, determinism và kiểm chứng SQL riêng:
-[nghiệm thu engineering A-T2](reports/a_t2_engineering_results.md).
-Kết quả hiện hành sau hoàn thiện: [A-T2 completion](reports/a_t2_completion_results.md).
-
-`datamate stub --input INPUT --output OUTPUT` chỉ xuất abstain/log theo format.
-`predict.sh` hiện gọi stub tại `/data` → `/result`; chưa phải inference thật.
-`validate-submission` và `validate-logs` kiểm tra cấu trúc, không chấm PA.
-`scripts/verify_contract.py` kiểm tra input/stub/submission/log cả train và public
-theo contract, không parse gold; ghi report vào `reports/contract_checks.json`.
+Dùng output mới; không ghi đè input/cache cũ. Loader giữ header/tổng/trùng/trống,
+không semantic cleaning. Profile có unresolved fallback; data_start chỉ cận dưới.
+Smoke chỉ hai câu synthetic (`12.35`, `0012`), SQL fixture tin cậy, chưa sandbox
+SQL do model sinh. Local 2 threads/DuckDB 256 MiB/fixture ≤1 MiB.
+`predict.sh` gọi stub `/data` → `/result`, chưa inference thật; validator chỉ
+kiểm cấu trúc, không chấm PA. Bằng chứng CPU hiện hành nằm ở state/context.
 
 ## Modal, dữ liệu và đóng gói
 
-Mọi model thật chạy Modal; local không tải weights hoặc cài CUDA/PyTorch/vLLM.
-Profile/workspace `vuonghungnguyen07`, tối đa 30 USD/thí nghiệm; xác minh lại trước
-job theo [runbook](docs/modal_runbook.md). Trong phiên reset không chạy cloud.
+Mọi model thật/embedding/reranker/huấn luyện chỉ Modal, không tải weights hoặc
+cài CUDA/PyTorch/vLLM local. Profile/workspace `vuonghungnguyen07`, tối đa
+30 USD/thí nghiệm; xác minh account/budget/phạm vi dữ liệu trước job theo
+[runbook](docs/modal_runbook.md). Budget khai báo không phải hard billing cap.
 
-`data/`, models, runs, credentials và thể lệ gốc được giữ local qua `.gitignore`.
-Không upload kit khi chưa xác minh quyền; source chỉ dùng fixture synthetic.
-Dockerfile/.dockerignore là bản nháp giữ cho nhóm G sau khi pipeline hoàn chỉnh.
-Chưa build/test Docker. [CPU gate trên GitHub Actions](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41982405255)
-đã pass **115 tests** cho source A-T1/A-T2 commit `62d67b9`; bằng chứng local và CI được ghi riêng trong
-[báo cáo publish](reports/github_publish.md).
+Docker thuộc G tại **P3 sau G2/P2**; draft giữ nguyên tới đó. Không đợi tối ưu
+P4–P8 mới đóng gói. Modal Image dùng cho P1. Kit BTC, gold, profile, labels,
+runs, model và credentials tiếp tục giữ local/ignored; không publish lên repo.
 
-Chi tiết giữ/xóa và backup: [báo cáo reset](reports/timeline_reset_results.md).
+Kế hoạch tuần và tài liệu đã hết hiệu lực được lưu tại
+[archive/timeline-20261103](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103).
+Chỉ tra lịch sử; không phục hồi làm kế hoạch. [Báo cáo đồng bộ](reports/timeline_sync_results.md).
 Repo: https://github.com/vuongnguyen16/ZaloAI2026_Datamate.

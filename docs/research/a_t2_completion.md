@@ -1,5 +1,7 @@
 # A-T2 — Hoàn thiện runtime format, cấu trúc bảng và descriptor
 
+> Bằng chứng module được giữ từ các phiên A-T1/A-T2 trước migration. Tham chiếu tuần, hash kế hoạch và handoff bên dưới là lịch sử; kế hoạch hiện hành là P0–P9 trong [state](../project_state.md) và [backlog](../../tasks/backlog.json).
+
 Ngày 05/11/2026, người dùng giao hoàn thiện T2 sau phản biện Claude. Đây là
 ủy quyền mở phần kiểm chứng header trên CPU, thay chỉ định hoãn research trước
 đó; không mở model/PA, public tuning hoặc cleaning A-T3. Dùng skill increment.
@@ -62,8 +64,8 @@ Nếu rule không đạt, ship unresolved+preview thay vì thêm ngoại lệ th
 Theo phản biện và yêu cầu hoàn thiện của người dùng, A-T2 chịu trách nhiệm
 profile/format policy/structure detection được kiểm, descriptor và consumer
 contract. Acceptance gốc “Baseline dùng được schema profile” được giữ nghĩa
-handoff API và bổ sung dependency A-T2 cho D-E-T2. Kiểm actual prompt/PA và A/B
-oracle/detector/preview do D-E-T2/E thực hiện khi model/scorer/split sẵn sàng;
+handoff API và bổ sung dependency A-T2 cho P2 (trước đây D-E-T2). Kiểm actual prompt/PA và A/B
+oracle/detector/preview do P2 (trước đây D-E-T2)/E thực hiện khi model/scorer/split sẵn sàng;
 không dùng CPU tests để thay thế và không xóa yêu cầu tích hợp downstream.
 Đây là làm rõ chủ sở hữu dependency, không thay thể lệ BTC hoặc tạo roadmap mới.
 
@@ -92,7 +94,7 @@ overrides; scanner không ghi nhận cờ. Cổng sau fix QA NEL đạt 144 test
 Ruff/format pass, source fingerprint c8f3b52a611dd0ec042835aa2bcc7b9321814551cb130cffe78f5a455f994337
 trùng `runs/a-t2-completion-20261105/final_acceptance.json` và gate
 `runs/cpu-check-20261105T081753167962Z-qao9tpkg/gate.json`. Đã đọc JSON/log.
-A-T2 done, actual prompt/PA handoff còn mở tại D-E-T2. Không cloud/model/
+A-T2 done, actual prompt/PA handoff còn mở tại P2 (trước đây D-E-T2). Không cloud/model/
 weights/Docker trong phiên implementation; nhãn/profile có sample giữ local/
 ignored. Source sau đó được publish theo yêu cầu mới của người dùng, có
-[publication/CI evidence](../../reports/github_publish.md).
+[publication/CI evidence lịch sử](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/blob/archive/timeline-20261103/reports/github_publish.md).

@@ -1,29 +1,9 @@
 [
   {
-    "id": "RESET-TIMELINE",
-    "title": "Dọn foundation và chuyển tracker sang timeline A–G",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "Quyết định người dùng 04/11",
-    "status": "done",
-    "depends_on": [],
-    "acceptance": [
-      "Không còn điều hướng plan cũ",
-      "Giữ regression nền",
-      "Context đọc đúng timeline; cổng CPU pass"
-    ],
-    "evidence": [
-      "docs/research/timeline_reset.md",
-      "reports/timeline_reset_results.md",
-      "runs/cpu-check-20261104T164734905777Z-5kmhmukp/gate.json (local, ignored): exit 0; 59 passed in 12.07s",
-      "runs/timeline-reset-context.json (local, ignored)"
-    ],
-    "scope": "Cleanup/migration, không build các module mới"
-  },
-  {
     "id": "G-FOUNDATION",
     "title": "Nền môi trường, coding harness, contract và fake runner kế thừa",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "G/T1; E nền",
+    "source_section": "§1.3–1.4; §5 G1",
     "status": "done_with_limitations",
     "depends_on": [],
     "acceptance": [
@@ -36,40 +16,27 @@
     ],
     "inherited": true,
     "limitations": [
-      "Chưa hoàn thành G/T1 model thật",
-      "CI remote chưa chạy",
-      "GPU/PA chưa kiểm chứng"
-    ]
-  },
-  {
-    "id": "A-INVENTORY",
-    "title": "Inventory cơ học kế thừa",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "A/T1, một phần",
-    "status": "done_with_limitations",
-    "depends_on": [],
-    "acceptance": [
-      "File/hash/câu theo business và bảo vệ input",
-      "Regression ID/JSON/output alias giữ nguyên"
+      "Nền CPU/CI và Modal CPU synthetic đã có; chưa model/GPU hoặc PA. P1/P3 phải có bằng chứng riêng."
     ],
-    "evidence": [
-      "docs/foundation.md"
+    "phase": "inherited",
+    "groups": [
+      "G",
+      "E"
     ],
-    "inherited": true,
-    "limitations": [
-      "Chưa khảo sát dòng/cột/README nội dung hoặc loader"
-    ]
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_items": [
+      "G1"
+    ],
+    "handoff": "Giữ module và evidence; P2 phải dùng descriptor trong prompt và đo PA thật.",
+    "evidence_provenance": "Historical module evidence at recorded source revisions; use a new CPU gate for the current workspace."
   },
   {
     "id": "A-T1",
     "title": "Khảo sát schema và loader CSV/XLSX/SQLite → DuckDB giữ raw",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "A/T1",
+    "source_section": "§1.3–1.4; §5 A1",
     "status": "done",
-    "depends_on": [
-      "G-FOUNDATION",
-      "A-INVENTORY"
-    ],
+    "depends_on": [],
     "acceptance": [
       "Có khảo sát định dạng/dòng/cột/README với dữ liệu được phép",
       "Mọi business nạp được qua loader có lỗi có cấu trúc",
@@ -83,7 +50,6 @@
       "runs/a-t1-loader-acceptance-20261105T050128Z-j5zoovbj/final_acceptance.json (local, ignored): final warm 3.67s/30 hits; independent all-value/type/position audit 339/339 units pass in 241.32s; raw/source unchanged, fingerprint matches current CPU gate",
       "runs/a-t1-loader-acceptance-20261105T050128Z-j5zoovbj/acceptance.json (local, ignored): 30/30 business; 339 unit; 3997599 raw rows; cold 374.85s, warm 3.50s/30 hits; independent full value/type/position audit pass; 162 raw hashes unchanged",
       "runs/cpu-check-20261105T051420112942Z-h48l958o/gate.json (local, ignored): exit 0; Ruff/format pass; 87 passed in 15.77s; source fingerprint current, unchanged during gate",
-      "docs/research/a_t1_train_survey.md",
       "docs/research/a_t1_deep_survey.md",
       "runs/a-t1-deep-survey-20261105/report.md, metrics.json, catalog.md (local, ignored): 339 đơn vị/3184 cột, context/keyed-unkeyed/join/coverage/conversion audit",
       "runs/a-t1-deep-survey-20261105/verification.json (local, ignored): 38 kiểm tra pass; validator train pass; hash raw giữ nguyên",
@@ -93,67 +59,26 @@
       "runs/cpu-check-20261105T025942709843Z-6dd8b3eg/gate.json (local, ignored): exit 0; 59 passed in 8.87s; source nền không đổi"
     ],
     "limitations": [
-      "Raw loader giữ positional columns, header/totals/notes/duplicates/blank rows; profile/header mapping và cleaner production thuộc A-T2/T3/T4, chưa status mapping hoặc khóa split",
+      "Raw positional loader đã có; A-T2 bổ sung profile/header/format. Cleaning tối thiểu ở P2, đầy đủ/canonical ở P4; chưa semantic cleaning production.",
       "SQLite view/virtual/generated columns và WAL/journal snapshot bị từ chối rõ; không tính formula; cache hash không phải chữ ký chống sửa manifest và DB cùng lúc",
       "Toàn train đầu vào đã được khảo sát; cần ghi nhận mức truy cập này khi thiết kế holdout"
     ],
-    "next_action": "A-T2: ghi spec profile bảng/cột/type/sample/null/min-max và header/encoding có provenance; dùng raw cache đã nghiệm thu, research hẹp cho ambiguity có quyết định cần thử; không tự tuning/model/cleaning"
-  },
-  {
-    "id": "E-T1",
-    "title": "Scorer từ thể lệ, run_eval và taxonomy câu hỏi",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "E/T1",
-    "status": "todo",
-    "depends_on": [
-      "G-FOUNDATION"
+    "phase": "inherited",
+    "groups": [
+      "A"
     ],
-    "acceptance": [
-      "Matching từng type có nguồn/corner cases rõ",
-      "PA/correct/wrong/abstain có fixture đúng/sai",
-      "Taxonomy chỉ dùng split được phép, không gold vào inference"
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_items": [
+      "A1"
     ],
-    "evidence": [],
-    "limitations": [
-      "Timeline ghi scorer đã có nhưng repo hiện chưa có; không coi là done"
-    ]
-  },
-  {
-    "id": "C-T1",
-    "title": "Checklist rulebook và tiện ích calendar",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "C/T1",
-    "status": "todo",
-    "depends_on": [
-      "G-FOUNDATION"
-    ],
-    "acceptance": [
-      "Định nghĩa có trích nguồn",
-      "Tuần/tháng/cùng kỳ/Tết theo calendar và as_of_date có unit test"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "D-G-T1",
-    "title": "Model ban đầu ≤15B và runtime trên Modal",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "D/T1; G/T1",
-    "status": "todo",
-    "depends_on": [
-      "G-FOUNDATION"
-    ],
-    "acceptance": [
-      "Eligibility/revision/license/budget/profile đã xác minh",
-      "Lời gọi model thật trên Modal có artifact",
-      "Probe end-to-end có giới hạn, không model local"
-    ],
-    "evidence": []
+    "handoff": "Giữ module và evidence; P2 phải dùng descriptor trong prompt và đo PA thật.",
+    "evidence_provenance": "Historical module evidence at recorded source revisions; use a new CPU gate for the current workspace."
   },
   {
     "id": "A-T2",
     "title": "Profile schema, encoding và header",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "A/T2",
+    "source_section": "§1.3–1.4; §5 A1, A3, A4",
     "status": "done",
     "depends_on": [
       "A-T1"
@@ -162,11 +87,10 @@
       "Profile bảng/cột/type/sample/null/min-max",
       "Runtime BOM/strict codec/delimiter và source-bound overrides có fixture; text QA không sửa raw",
       "Header/data-start có benchmark nhãn và partition khóa trước chọn rule, có unresolved fallback",
-      "Descriptor/header/data-start dùng được qua consumer contract; actual prompt/PA integration được giữ ở D-E-T2",
+      "Descriptor/header/data-start dùng được qua consumer contract; actual prompt/PA integration được giữ ở P2",
       "Raw/frame preservation, deterministic profiles và CPU gate current có evidence"
     ],
     "evidence": [
-      "docs/research/a_t2_engineering.md",
       "docs/research/a_t2_completion.md",
       "reports/a_t2_completion_results.md",
       "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c: source/tests/docs A-T2 completion published to main, 26 files; no raw/profile/labels/runs upload",
@@ -179,281 +103,511 @@
       "runs/a-t2-completion-20261105/labels_freeze.json, rule_selection.json, header-dev-final.json, header-check-final.json (local, ignored): 322 units, 34 multirow headers, 80 grouped partitions; chosen B2 check 218/219 selected, 0 wrong; same-author labels, not unseen holdout",
       "runs/cpu-check-20261105T075931003043Z-u0j0tql3/gate.json (local, ignored): exit 0; 143 passed in 38.03s; source unchanged; Ruff/format pass",
       "docs/profiling.md",
-      "reports/a_t2_engineering_results.md",
       "runs/a-t2-engineering-20261105/handoff_verification.json (local, ignored): engineering done/research deferred, CPU passed/current/no warnings; kit and ingest code unchanged; protected config/UTF-8/NFC/JSON/links/diff/format pass",
       "runs/a-t2-engineering-20261105/acceptance.json (local, ignored): 30/30 business; 339 units/3184 columns/3997599 raw rows/33628129 present cells; 2 full scans 151.99s and 152.62s; all 60 profile/schema hashes identical; SQL independent audit pass in 153.29s; raw/cache/source unchanged",
       "runs/a-t2-engineering-20261105/audit/verification.json (local, ignored): full counts/types/length/lexical and numeric extrema/sample-coordinate/schema audit; gold not parsed",
       "runs/cpu-check-20261105T062508275441Z-5p01bmls/gate.json (local, ignored): exit 0; 115 passed in 27.51s; Ruff/format pass; source unchanged during gate"
     ],
-    "scope_decision": "Yêu cầu mới 05/11 hoàn thiện T2 sau phản biện Claude cho phép runtime policy và nghiên cứu header CPU trên train; actual prompt/model/PA thuộc D-E-T2, legacy converter/multi-region chưa có evidence",
     "engineering_status": "done",
     "research_status": "complete_bounded_cpu",
     "limitations": [
       "11/322 CSV/XLSX units unresolved có preview; nhãn README/source self-review không có human reviewer thứ hai; check train đã từng khảo sát, không phải unseen holdout",
       "Strict decoding/delimiter evidence không chứng minh văn bản đúng nghĩa; text flags không repair; chưa converter legacy hoặc multi-table regions",
-      "Raw statistics gồm header/totals/duplicates; data_start chỉ cận dưới, không semantic cleaning; actual prompt/model/PA acceptance được giữ ở D-E-T2"
+      "Raw statistics gồm header/totals/duplicates; data_start chỉ cận dưới, không semantic cleaning; actual prompt/model/PA acceptance được giữ ở P2"
     ],
-    "acceptance_ownership_note": "Theo yêu cầu hoàn thiện và review Claude: làm rõ A-T2 handoff API; không xóa yêu cầu baseline, thêm dependency và acceptance actual descriptor-in-prompt vào D-E-T2; chi tiết docs/research/a_t2_completion.md",
-    "next_action": "Bàn giao descriptor/header/data-start cho D-E-T2 khi model/scorer/split prerequisite sẵn sàng; giữ actual schema-in-prompt và PA acceptance tại đó. Không tự mở cleaning/model/public tuning hoặc converter legacy chưa có evidence"
+    "phase": "inherited",
+    "groups": [
+      "A"
+    ],
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_items": [
+      "A1",
+      "A3",
+      "A4"
+    ],
+    "handoff": "Giữ module và evidence; P2 phải dùng descriptor trong prompt và đo PA thật.",
+    "evidence_provenance": "Historical module evidence at recorded source revisions; use a new CPU gate for the current workspace."
   },
   {
-    "id": "C-T2",
-    "title": "domain_lib bản đầu",
+    "id": "PLAN-SYNC",
+    "title": "Đồng bộ Timeline mới và dọn kế hoạch cũ",
+    "phase": "maintenance",
+    "groups": [
+      "G"
+    ],
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "C/T2",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "Yêu cầu người dùng 05/11; §0, §4–8",
+    "source_items": [],
+    "status": "done",
+    "depends_on": [],
+    "acceptance": [
+      "DOCX, bản web, tracker, hướng dẫn cùng một nguồn/hash",
+      "Archive GitHub đã xác minh trước khi dọn tài liệu cũ",
+      "Context chặn nguồn stale và dependency lỗi; CPU mới pass; remote khớp local"
+    ],
+    "evidence": [
+      "docs/research/timeline_sync.md",
+      "reports/timeline_sync_results.md",
+      "runs/timeline-sync-20261105/verification.json (local, ignored)",
+      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103"
+    ],
+    "scope": "Chỉ migration; không thực hiện P0, model, Docker hoặc upload kit"
+  },
+  {
+    "id": "P0-SPLIT",
+    "title": "Khóa split, access policy và giao thức thống kê",
+    "phase": "P0",
+    "groups": [
+      "E"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 E3",
+    "source_items": [
+      "E3"
+    ],
     "status": "todo",
     "depends_on": [
-      "C-T1"
+      "A-T1",
+      "A-T2",
+      "G-FOUNDATION"
     ],
     "acceptance": [
-      "Hàm doanh thu/số lượng/đơn hủy/trả theo checklist",
-      "Có unit test và giao diện baseline gọi được"
+      "Manifest dev ~60% / calibration ~20% / holdout ~20% có hash/lý do; gom business/template/file trùng, ghi nhận input train đã từng khảo sát",
+      "Khóa manifest trước khi parse gold cho taxonomy; dev dùng phát triển, calibration chọn ngưỡng, holdout gold sealed tới P7",
+      "Giao thức bootstrap ghép cặp theo business ≥1000 lượt, CI95%; chính sách leaderboard và nhật ký lượt nộp; không tuning public/private"
     ],
-    "evidence": []
+    "evidence": [],
+    "next_action": "Ghi spec split/access trước; dùng metadata/nhóm A-T2, chưa đọc gold holdout. Không mở P1 khi G0 chưa đạt."
   },
   {
-    "id": "G-T2",
-    "title": "Tracing, cache theo business và seed",
+    "id": "P0-SCORER",
+    "title": "Scorer 9 type và run_eval theo thể lệ",
+    "phase": "P0",
+    "groups": [
+      "E"
+    ],
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "G/T2",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 E1",
+    "source_items": [
+      "E1"
+    ],
     "status": "todo",
     "depends_on": [
       "G-FOUNDATION"
     ],
     "acceptance": [
-      "Mọi ID có output/log kể cả lỗi",
-      "Cache không trộn data/rule/config",
-      "Ghi seed và giới hạn tái lập"
+      "Mỗi luật matching có nguồn/corner cases; policy rounding/alias/list/table/null chưa rõ phải provisional",
+      "Fixture đúng/sai/abstain/unanswerable, sai type, missing output và malformed có test; PA=(correct-wrong)/N",
+      "run_eval/log từng câu tách gold khỏi inference; bắt đầu bằng fixture synthetic, dùng dữ liệu thật sau access policy"
     ],
     "evidence": []
   },
   {
-    "id": "D-E-T2",
-    "title": "Baseline single_sql và PA theo business/type",
+    "id": "P0-TAXONOMY",
+    "title": "Taxonomy câu hỏi trong ranh giới split đã khóa",
+    "phase": "P0",
+    "groups": [
+      "E"
+    ],
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "D/T2; E/T2",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 E2",
+    "source_items": [
+      "E2"
+    ],
     "status": "todo",
     "depends_on": [
+      "P0-SPLIT",
+      "P0-SCORER"
+    ],
+    "acceptance": [
+      "Taxonomy type/họ câu/thời gian/viết tắt/unanswerable; ưu tiên họ câu hỏi từ dev",
+      "Gold chỉ đọc qua quyền đã khóa; không xuất gold holdout hoặc thống kê để chọn cấu hình; phần phân tích gold holdout hoãn P7",
+      "Báo coverage 3000 câu train và phần chưa mở, không gán nhãn suy đoán thành gold; artifact dữ liệu giữ local"
+    ],
+    "evidence": []
+  },
+  {
+    "id": "P0-GATE",
+    "title": "G0: nghiệm thu đo lường trước model",
+    "phase": "P0",
+    "groups": [
+      "E"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 E1, E2, E3",
+    "source_items": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P0-SPLIT",
+      "P0-SCORER",
+      "P0-TAXONOMY"
+    ],
+    "acceptance": [
+      "Fixture mọi type pass, manifest split/hash/access và báo cáo taxonomy được review",
+      "CPU current; ghi acceptance/evidence và giới hạn thống kê; không coi stub là baseline"
+    ],
+    "evidence": [],
+    "gate": "G0"
+  },
+  {
+    "id": "P1",
+    "title": "Model chạy được trên Modal và GPU proxy",
+    "phase": "P1",
+    "groups": [
+      "D",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 D1, G2",
+    "source_items": [
+      "D1",
+      "G2"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P0-GATE"
+    ],
+    "acceptance": [
+      "Xác minh model card/revision/license/cutoff/tổng tham số ≤15B; xác minh sm_120/proxy và bộ runtime từ nguồn chính thức",
+      "Xác minh account vuonghungnguyen07, budget ≤30 USD/thí nghiệm, quyền/phạm vi dữ liệu trước job; khai báo không phải billing cap",
+      "G1: ≥1 model thật chạy trên proxy với giới hạn ~30 GB; JSON hợp lệ ≥99%/50 câu được phép; 2 lượt cùng kết quả",
+      "Khóa vLLM/PyTorch/CUDA, weights/image/volume và probe offline; mọi model thật chỉ Modal"
+    ],
+    "evidence": [],
+    "gate": "G1",
+    "experiments": [
+      "X3",
+      "X4",
+      "X12"
+    ]
+  },
+  {
+    "id": "P2",
+    "title": "Lát cắt hybrid xuyên suốt và PA dev",
+    "phase": "P2",
+    "groups": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 A2, B1, B2, C1, C2, D2, E4, E5, G3",
+    "source_items": [
+      "A2",
+      "B1",
+      "B2",
+      "C1",
+      "C2",
+      "D2",
+      "E4",
+      "E5",
+      "G3"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P1",
       "A-T1",
-      "A-T2",
-      "E-T1",
-      "C-T2",
-      "D-G-T1",
-      "G-T2"
+      "A-T2"
     ],
     "acceptance": [
-      "Input thật → model/SQL → output có log",
-      "Schema descriptor A-T2 thực sự được dùng trong prompt baseline; đo riêng ảnh hưởng header/serialization khi đủ scorer và split, không lấy consumer synthetic thay PA",
-      "Có PA baseline với scorer và split/config đã khai báo",
-      "Fake/stub không dùng làm baseline"
+      "Checklist rulebook có nguồn, calendar/as_of_date bằng code; cleaning tối thiểu giữ raw/lineage; parser ý định JSON có failure tests",
+      "domain_lib cho 5 họ dev ưu tiên, mỗi hàm có test và đúng trên ≥2 nhóm; SQL fallback read-only/timeout; single_sql thuần làm đối chứng",
+      "Descriptor A-T2 thực sự được dùng trong prompt; actual schema/header serialization và PA có evidence, không thay bằng consumer synthetic",
+      "Abstain mặc định, formatter theo type, verifier cơ bản, tracing/cache/seed; kill/resume hoặc hết giờ vẫn đủ id với abstain/log",
+      "G2: mọi id hợp lệ; PA dev >0, sai trên câu trả lời ≤10% (mục tiêu nội bộ đề xuất); báo type/business/đường và lỗi",
+      "Chuẩn bị public #1; xác minh quy định/quota hiện hành và thao tác nộp theo scope người dùng trước khi gửi"
     ],
-    "evidence": []
-  },
-  {
-    "id": "E-SPLIT",
-    "title": "Khóa split và access policy",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "E/T3; trước tuning/huấn luyện",
-    "status": "todo",
-    "depends_on": [
-      "A-T1"
-    ],
-    "acceptance": [
-      "Development/calibration/holdout có manifest/lý do",
-      "Tách business/domain phù hợp, không leakage",
-      "Không chọn prompt/model/ngưỡng bằng holdout hoặc test"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "A-T3-T6",
-    "title": "Cleaning, semantic profile, join/entity và missing-data flags",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "A/T3–T6",
-    "status": "todo",
-    "depends_on": [
-      "A-T2",
-      "D-E-T2",
-      "E-SPLIT"
-    ],
-    "acceptance": [
-      "Giữ bảng raw, cleaning có test/lineage",
-      "Join/entity/coverage có bằng chứng",
-      "Đo trên dữ liệu được phép, không chỉ heuristic"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "B-T3-T6",
-    "title": "Tiếng Việt, thời gian, kiểu đáp án và entity linking",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "B/T3–T6",
-    "status": "todo",
-    "depends_on": [
+    "evidence": [],
+    "gate": "G2",
+    "migrated_from": [
       "D-E-T2",
       "C-T1",
-      "E-SPLIT"
-    ],
-    "acceptance": [
-      "Từ viết tắt/thời gian theo as_of/calendar có tests",
-      "Đánh giá normalization/type/entity và ambiguity"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "C-T3-T6",
-    "title": "Rulebook cấu trúc và mở rộng domain_lib theo lỗi",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "C/T3–T6",
-    "status": "todo",
-    "depends_on": [
       "C-T2",
-      "D-E-T2"
-    ],
-    "acceptance": [
-      "Đọc rulebook lúc chạy",
-      "Mỗi helper có test",
-      "Biến thể rulebook được kiểm chứng"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "D-T3-T7",
-    "title": "Repair/linking, ReAct có sandbox, voting và router",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "D/T3–T7",
-    "status": "todo",
-    "depends_on": [
-      "D-E-T2",
-      "E-SPLIT"
-    ],
-    "acceptance": [
-      "Mỗi chiến lược có config/control và failure tests",
-      "Có giới hạn worker/timeout",
-      "Chỉ giữ khi chất lượng/chi phí có bằng chứng"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "E-T3-T8",
-    "title": "Error analysis, verification/format, abstain và evaluation freeze",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "E/T3–T8",
-    "status": "todo",
-    "depends_on": [
-      "D-E-T2",
-      "E-SPLIT"
-    ],
-    "acceptance": [
-      "Báo lỗi và regression theo type/business",
-      "Ngưỡng chọn bằng calibration",
-      "Holdout/freeze/repro có báo cáo đúng phạm vi"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "F-CONDITIONAL",
-    "title": "Model bake-off, synthetic/SFT/LoRA nếu có bằng chứng",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "F/T3–T7",
-    "status": "todo",
-    "depends_on": [
-      "D-E-T2",
-      "E-SPLIT"
-    ],
-    "acceptance": [
-      "Chỉ dùng dữ liệu được phép và trace kiểm chứng",
-      "So control có split/access policy",
-      "Go/no-go và chi phí rõ; có thể giữ base model"
-    ],
-    "evidence": [],
-    "start_condition": "Có phân tích lỗi và ngân sách; không là blocker của baseline/bản nộp"
-  },
-  {
-    "id": "G-T5",
-    "title": "Throughput và ngân sách full run",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "G/T5",
-    "status": "todo",
-    "depends_on": [
-      "D-E-T2"
-    ],
-    "acceptance": [
-      "Đo throughput/tail/cold start thật",
-      "Budget đủ bằng phép đo, không chỉ ngoại suy câu dễ"
-    ],
-    "evidence": []
-  },
-  {
-    "id": "G-PACKAGING",
-    "title": "Docker offline, reproducibility, freeze và nộp",
-    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
-    "source_section": "G/T7–T8",
-    "status": "todo",
-    "depends_on": [
-      "D-E-T2",
-      "G-T5"
-    ],
-    "acceptance": [
-      "Pipeline hoàn chỉnh trước Docker",
-      "Offline/read-only/full run có evidence",
-      "Freeze/checksum/repro và lịch nộp đã xác minh"
-    ],
-    "evidence": [],
-    "start_condition": "Chỉ bắt đầu đóng gói sau khi pipeline và cấu hình giải pháp hoàn chỉnh"
-  },
-  {
-    "id": "G-GITHUB",
-    "title": "Đồng bộ mã nguồn và tài liệu lên GitHub để đọc trên web",
-    "source": "user request 2026-11-04",
-    "source_section": "G — vận hành repository",
-    "status": "done",
-    "depends_on": [
-      "RESET-TIMELINE"
-    ],
-    "acceptance": [
-      "Mã nguồn, cấu hình, tests, tài liệu và timeline đã được push lên main",
-      "Có bản timeline Markdown giữ đủ nội dung và sơ đồ",
-      "Remote SHA khớp source commit; CPU local và GitHub CI có bằng chứng riêng",
-      "Dữ liệu BTC, credentials, model và run artifacts không được upload"
-    ],
-    "evidence": [
-      "reports/github_publish.md",
-      "Research/Timeline_DataMate_A-G.md",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c (05/11): A-T2 completion source/tests/docs, 26 files; remote SHA verified",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193 (05/11): source CI success, 144 tests in 12.02s, Ruff/format pass; logs read",
-      "runs/github-sync-t2-completion-20261105/prepublish.json, source-ci.json, source-ci-logs.json (local, ignored): staged review, UTF-8/NFC/JSON/links, credential patterns and kit hashes verified; no BTC raw/cache/profile/labels/runs uploaded",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/62d67b9c97b1f3722ca5339412f2125347c44696 (05/11): toàn bộ source/tests/docs A-T1 và engineering A-T2, 25 file; remote SHA trùng local",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41982405255 (05/11): source CPU CI success, 115 tests trong 9.03s trên Ubuntu; Ruff/format pass",
-      "runs/cpu-check-20261105T064100622730Z-u8zuplsa/gate.json (local, ignored): prepush CPU passed/current, 115 tests trong 40.07s, source unchanged",
-      "runs/github-sync-20261105/prepublish.json, source-ci.json, source-ci-logs.json (local, ignored): staged paths/secret patterns/UTF-8/NFC/links/kit hashes và CI verified; raw/cache/run artifacts không upload",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/c69d4da0952d9ea8acf96f87f841071b8f0f806d",
-      "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41872674037"
-    ],
-    "limitations": [
-      "GPU/model không chạy; PA chưa được đánh giá",
-      "Kit và run artifacts chỉ lưu local; AI web đọc được mã nguồn và tài liệu công khai"
+      "G-T2"
     ]
   },
   {
-    "id": "G-DOCS-UTF8",
-    "title": "Hiệu đính chính tả và sửa lỗi mất dấu tiếng Việt trong tài liệu",
-    "source": "user request 2026-11-05",
-    "source_section": "G — tài liệu và chất lượng repository",
-    "status": "done",
-    "depends_on": ["G-GITHUB"],
+    "id": "P3",
+    "title": "Đóng gói sớm, throughput và tái lập",
+    "phase": "P3",
+    "groups": [
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 G4, G5",
+    "source_items": [
+      "G4",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P2"
+    ],
     "acceptance": [
-      "Rà toàn bộ Markdown và sửa các đoạn mất dấu tiếng Việt",
-      "Các trường JSON bị hỏng được khôi phục; các task chức năng giữ nguyên",
-      "UTF-8, Unicode NFC và liên kết nội bộ hợp lệ",
-      "Văn bản, bảng và sơ đồ của bản timeline vẫn khớp DOCX gốc"
+      "Gói Docker sau G2 có weights, offline/network none/input read-only, runtime proxy đã xác minh; đo 2 replica nếu phù hợp",
+      "G3: 1000 câu public ≤2 giờ (1/3 ngân sách 6 giờ); measured cold start/tail/load, ngoại suy private với giả định rõ",
+      "2 lượt lệch PA ≤0.01 là mục tiêu nội bộ, luật giữ ≤0.03; có digest/checksum/log và hạn toàn cục",
+      "Public chỉ smoke/runtime/gap, không chọn prompt/ngưỡng bằng public; không thêm tính năng trước khi qua G3"
     ],
-    "evidence": [
-      "reports/github_publish.md",
-      "runs/editorial-review-20261105.json (local, ignored)"
+    "evidence": [],
+    "gate": "G3"
+  },
+  {
+    "id": "P4",
+    "title": "Dữ liệu và nghiệp vụ đầy đủ theo lỗi dev",
+    "phase": "P4",
+    "groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "G"
     ],
-    "limitations": [
-      "Chỉ hiệu đính tài liệu và metadata; không thay đổi code, dữ liệu hoặc luật chấm"
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 A5, A6, A7, B3, B4, C3, C4, E5, G5",
+    "source_items": [
+      "A5",
+      "A6",
+      "A7",
+      "B3",
+      "B4",
+      "C3",
+      "C4",
+      "E5",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P3"
+    ],
+    "acceptance": [
+      "View sạch bắt đầu từ data_start; số/ngày/đơn vị/ngữ cảnh và cờ tổng/ghi chú có test/lineage, không sửa raw; 38 status vẫn là giả thuyết tới khi có rulebook",
+      "Canonical/khóa namespace business/thực thể/coverage có evidence leave-group-out trong dev; chưa ánh xạ có cờ",
+      "NFC/khóa không dấu/viết tắt không ghi đè câu gốc; entity ambiguity → verifier/abstain; ngưỡng chọn calibration",
+      "Rulebook có cấu trúc đọc lúc chạy, điều khoản chưa hiểu → abstain; domain_lib mở rộng theo lỗi, mỗi hàm ≥2 nhóm",
+      "G4: precision đường tất định ≥95% trên phần trả lời (mục tiêu đề xuất), báo độ phủ theo họ và PA dev; chạy lại image"
+    ],
+    "evidence": [],
+    "gate": "G4",
+    "experiments": [
+      "X2"
     ]
+  },
+  {
+    "id": "P5",
+    "title": "Đo và chọn cải tiến đường LLM",
+    "phase": "P5",
+    "groups": [
+      "D",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 D3, D4, D5, D6, E5, G5",
+    "source_items": [
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "E5",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P4"
+    ],
+    "acceptance": [
+      "Bake-off ~300 câu dev phân tầng cùng pipeline; model eligibility/runtime được xác minh",
+      "Ablation thinking, sửa 0/1/2 lần, few-shot dev đã kiểm, linking/value retrieval, K=1/3/5 và plan-verify bounded",
+      "X13 oracle/rule/preview trên dữ liệu được phép; oracle không đi vào inference hoặc chọn bằng holdout",
+      "G5: kỹ thuật giữ lại có CI95% ΔPA dev >0 theo bootstrap cụm; trung tính chỉ giữ khi đơn giản hơn; ghi chi phí/runtime, chạy lại image"
+    ],
+    "evidence": [],
+    "gate": "G5",
+    "experiments": [
+      "X3",
+      "X4",
+      "X5",
+      "X6",
+      "X7",
+      "X8",
+      "X9",
+      "X13"
+    ]
+  },
+  {
+    "id": "P6",
+    "title": "Verifier, unanswerable và hiệu chỉnh độ tin cậy",
+    "phase": "P6",
+    "groups": [
+      "A",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 A7, E4, E5, E6, G5",
+    "source_items": [
+      "A7",
+      "E4",
+      "E5",
+      "E6",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P5"
+    ],
+    "acceptance": [
+      "Verifier/cross-check/coverage phân biệt 0, thiếu, unanswerable và abstain; quyết định fail-closed business hay cô lập file có test",
+      "Độ tin cậy từ đường/verifier/đồng thuận; ngưỡng theo đường chọn trên calibration và khóa trước P7",
+      "G6: reliability/risk-coverage diagram; PA calibration tăng so với không abstain; chạy lại image"
+    ],
+    "evidence": [],
+    "gate": "G6",
+    "experiments": [
+      "X11"
+    ]
+  },
+  {
+    "id": "P7",
+    "title": "Tổng quát hóa và một lần đánh giá holdout",
+    "phase": "P7",
+    "groups": [
+      "A",
+      "C",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 A8, C5, E5, E7, G5",
+    "source_items": [
+      "A8",
+      "C5",
+      "E5",
+      "E7",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P6"
+    ],
+    "acceptance": [
+      "Holdout mở đúng một lần qua evaluator; không dùng kết quả để chỉnh ngưỡng/hàm/prompt; ghi ledger access",
+      "Biến thể synthetic header/tên/sheet/đuôi/CSV và rulebook; lỗi nguồn abstain/log không sập run",
+      "G7: PA holdout trong CI calibration hoặc giải thích; không business lỗi nạp; so public gap, chạy lại image",
+      "Nếu cần tối ưu P8 sau khi mở holdout, giữ holdout cũ là audit đã dùng; khóa evaluation độc lập mới trước chọn hoặc nêu rõ không còn unseen test"
+    ],
+    "evidence": [],
+    "gate": "G7"
+  },
+  {
+    "id": "P8A",
+    "title": "Tối ưu prompt/playbook có điều kiện",
+    "phase": "P8a",
+    "groups": [
+      "D",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 D7, G5",
+    "source_items": [
+      "D7",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P7"
+    ],
+    "acceptance": [
+      "Chỉ mở khi P5 đã chững; GEPA/ACE trên dev, kiểm calibration; không học từ holdout/public",
+      "Giữ nếu ΔPA calibration >0 có ý nghĩa; hash prompt/playbook, chạy lại image; hoặc ghi quyết định bỏ có lý do"
+    ],
+    "evidence": [],
+    "optional": true,
+    "start_condition": "P5 chững và có thí nghiệm/cost/control được review",
+    "experiments": [
+      "X10"
+    ]
+  },
+  {
+    "id": "P8B",
+    "title": "SFT/RL có điều kiện trên Modal",
+    "phase": "P8b",
+    "groups": [
+      "F",
+      "E",
+      "G"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 F1, F2, F3, G5",
+    "source_items": [
+      "F1",
+      "F2",
+      "F3",
+      "G5"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P8A"
+    ],
+    "acceptance": [
+      "P5–P8a chững; lỗi còn lại chủ yếu do model, không do dữ liệu/rulebook; có business đánh giá chưa huấn luyện",
+      "Quỹ đạo dev đã kiểm có provenance; SFT/RL/control chỉ Modal, budget/account/quyền dữ liệu xác minh trước job",
+      "ΔPA calibration >0 có ý nghĩa; merge/quantization đo lại PA/tốc độ/tất định; hoặc giữ base và ghi lý do bỏ"
+    ],
+    "evidence": [],
+    "optional": true,
+    "start_condition": "Có phân tích lỗi và điều kiện F đã thỏa",
+    "experiment_note": "So sánh F2 riêng; X12 trong sổ thí nghiệm dành cho tất định, không phải SFT/RL"
+  },
+  {
+    "id": "P9",
+    "title": "Đóng băng và gói cuối",
+    "phase": "P9",
+    "groups": [
+      "G",
+      "E"
+    ],
+    "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
+    "source_sha256": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
+    "source_section": "§4; §5 G5, G6",
+    "source_items": [
+      "G5",
+      "G6"
+    ],
+    "status": "todo",
+    "depends_on": [
+      "P7",
+      "P8A",
+      "P8B"
+    ],
+    "acceptance": [
+      "P8A/P8B done hoặc skipped kèm quyết định/lý do; không chạy nhánh có điều kiện để qua gate",
+      "Hai lượt khớp, checksum/digest, runtime/offline và tài liệu phát hành; bản nộp là bản đã đánh giá",
+      "Xác minh lịch/quota và phạm vi thao tác gửi gói; không lấy ngày công hoặc deadline lịch sử làm lịch BTC mới"
+    ],
+    "evidence": []
   }
 ]

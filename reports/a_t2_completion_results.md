@@ -1,5 +1,7 @@
 # Hoàn thiện A-T2 — runtime format, header/data-start và descriptor
 
+> Bằng chứng module được giữ từ các phiên A-T1/A-T2 trước migration. Tham chiếu tuần, hash kế hoạch và handoff bên dưới là lịch sử; kế hoạch hiện hành là P0–P9 trong [state](../docs/project_state.md) và [backlog](../tasks/backlog.json).
+
 Ngày 05/11/2026. Người dùng giao hoàn thiện sau phản biện Claude; thay phạm
 vi chỉ engineering trước đó bằng kiểm chứng header CPU có giới hạn. Nguồn
 kế hoạch/giới hạn: [spec trước implementation](../docs/research/a_t2_completion.md),
@@ -133,7 +135,7 @@ final profile/audit phải được chạy lại, cache raw giữ nguyên hợp 
 
 A-T2 sở hữu format/profile/structure/descriptor/consumer contract. Theo yêu
 cầu hoàn thiện và phản biện, yêu cầu actual schema-in-prompt/PA được giữ rõ
-ở D-E-T2, thêm dependency A-T2. Không xóa milestone tích hợp hoặc dùng CPU
+ở P2 (trước đây D-E-T2), thêm dependency A-T2. Không xóa milestone tích hợp hoặc dùng CPU
 test thay cho model/scorer. A/B oracle/detector/preview và lựa chọn prompt
 representation chỉ làm khi D/E/model/split sẵn sàng.
 
@@ -150,15 +152,16 @@ Không mở cloud/model, scorer, tuning, Docker hoặc A-T3 cleaning trong phiê
 Không sửa data/kit manifest, không commit/push/upload; profile/nhãn/raw giữ local.
 
 A-T2 đã đóng ở phạm vi trên sau yêu cầu hoàn thiện của người dùng; actual
-model/prompt/PA milestone vẫn mở ở D-E-T2, không báo nó đã đạt. Source mới
+model/prompt/PA milestone vẫn mở ở P2 (trước đây D-E-T2), không báo nó đã đạt. Source mới
 không publish trong phiên implementation. Theo yêu cầu đồng bộ tiếp theo,
 đã push [source 790b1af](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/790b1af1ff48fca7f255206b12a89f02a31b973c)
 và kiểm [source CI pass](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/41997216193),
-144 tests trên Ubuntu. Chi tiết: [publication](github_publish.md).
+144 tests trên Ubuntu. Report publication lịch sử nằm trong
+[archive](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/blob/archive/timeline-20261103/reports/github_publish.md).
 
 Handoff cuối tại `runs/a-t2-completion-20261105/handoff_verification.json`:
 final proof/frozen label/rule hashes còn current, A-T2 done, CPU passed/current,
-không warning. D-E-T2 vẫn todo/blocked bởi các prerequisite còn thiếu. Kit
+không warning. P2 (trước đây D-E-T2) vẫn todo/blocked bởi các prerequisite còn thiếu. Kit
 train/public/thể lệ và cache cũ không đổi (public chỉ hash nhị phân); protected
 config/lock/contract manifests/Docker không đổi. 12 tài liệu/tracker UTF-8/
 NFC/JSON và 53 link local hợp lệ, diff/format pass. Nhãn/profile/raw tiếp tục

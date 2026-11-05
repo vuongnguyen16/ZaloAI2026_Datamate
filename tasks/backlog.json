@@ -65,7 +65,7 @@
     "title": "Khảo sát schema và loader CSV/XLSX/SQLite → DuckDB giữ raw",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
     "source_section": "A/T1",
-    "status": "todo",
+    "status": "done",
     "depends_on": [
       "G-FOUNDATION",
       "A-INVENTORY"
@@ -75,8 +75,29 @@
       "Mọi business nạp được qua loader có lỗi có cấu trúc",
       "Giữ raw và có fingerprint/cache theo business"
     ],
-    "evidence": [],
-    "next_action": "Đọc timeline A/T1 và contract; khảo sát metadata được phép, ghi research/build spec cho loader nhỏ nhất trước triển khai"
+    "evidence": [
+      "docs/research/a_t1_raw_loader.md",
+      "docs/ingestion.md",
+      "reports/a_t1_loader_results.md",
+      "runs/a-t1-loader-acceptance-20261105T050128Z-j5zoovbj/handoff_verification.json (local, ignored): A-T1 done/A-T2 ready, CPU passed/current; kit hashes unchanged; UTF-8/NFC/JSON/local links/diff/format pass",
+      "runs/a-t1-loader-acceptance-20261105T050128Z-j5zoovbj/final_acceptance.json (local, ignored): final warm 3.67s/30 hits; independent all-value/type/position audit 339/339 units pass in 241.32s; raw/source unchanged, fingerprint matches current CPU gate",
+      "runs/a-t1-loader-acceptance-20261105T050128Z-j5zoovbj/acceptance.json (local, ignored): 30/30 business; 339 unit; 3997599 raw rows; cold 374.85s, warm 3.50s/30 hits; independent full value/type/position audit pass; 162 raw hashes unchanged",
+      "runs/cpu-check-20261105T051420112942Z-h48l958o/gate.json (local, ignored): exit 0; Ruff/format pass; 87 passed in 15.77s; source fingerprint current, unchanged during gate",
+      "docs/research/a_t1_train_survey.md",
+      "docs/research/a_t1_deep_survey.md",
+      "runs/a-t1-deep-survey-20261105/report.md, metrics.json, catalog.md (local, ignored): 339 đơn vị/3184 cột, context/keyed-unkeyed/join/coverage/conversion audit",
+      "runs/a-t1-deep-survey-20261105/verification.json (local, ignored): 38 kiểm tra pass; validator train pass; hash raw giữ nguyên",
+      "runs/cpu-check-20261105T035816552038Z-53d0njvs/gate.json (local, ignored): exit 0; 59 passed in 8.47s; source fingerprint không đổi",
+      "runs/a-t1-train-survey-20261105/report.md (local, ignored): khảo sát 30 business, 302 sheet XLSX/20 CSV/17 bảng SQLite; không parse gold, hash raw giữ nguyên",
+      "runs/a-t1-train-survey-20261105/verification.json (local, ignored): số dòng và file README đối chiếu không issue",
+      "runs/cpu-check-20261105T025942709843Z-6dd8b3eg/gate.json (local, ignored): exit 0; 59 passed in 8.87s; source nền không đổi"
+    ],
+    "limitations": [
+      "Raw loader giữ positional columns, header/totals/notes/duplicates/blank rows; profile/header mapping và cleaner production thuộc A-T2/T3/T4, chưa status mapping hoặc khóa split",
+      "SQLite view/virtual/generated columns và WAL/journal snapshot bị từ chối rõ; không tính formula; cache hash không phải chữ ký chống sửa manifest và DB cùng lúc",
+      "Toàn train đầu vào đã được khảo sát; cần ghi nhận mức truy cập này khi thiết kế holdout"
+    ],
+    "next_action": "A-T2: ghi spec profile bảng/cột/type/sample/null/min-max và header/encoding có provenance; dùng raw cache đã nghiệm thu, research hẹp cho ambiguity có quyết định cần thử; không tự tuning/model/cleaning"
   },
   {
     "id": "E-T1",
@@ -133,7 +154,7 @@
     "title": "Profile schema, encoding và header",
     "source": "Research/Timeline DataMate theo nhóm việc A–G.docx",
     "source_section": "A/T2",
-    "status": "todo",
+    "status": "in_progress",
     "depends_on": [
       "A-T1"
     ],
@@ -142,7 +163,24 @@
       "Encoding/header có ca tái hiện",
       "Baseline dùng được schema profile"
     ],
-    "evidence": []
+    "evidence": [
+      "docs/research/a_t2_engineering.md",
+      "docs/profiling.md",
+      "reports/a_t2_engineering_results.md",
+      "runs/a-t2-engineering-20261105/handoff_verification.json (local, ignored): engineering done/research deferred, CPU passed/current/no warnings; kit and ingest code unchanged; protected config/UTF-8/NFC/JSON/links/diff/format pass",
+      "runs/a-t2-engineering-20261105/acceptance.json (local, ignored): 30/30 business; 339 units/3184 columns/3997599 raw rows/33628129 present cells; 2 full scans 151.99s and 152.62s; all 60 profile/schema hashes identical; SQL independent audit pass in 153.29s; raw/cache/source unchanged",
+      "runs/a-t2-engineering-20261105/audit/verification.json (local, ignored): full counts/types/length/lexical and numeric extrema/sample-coordinate/schema audit; gold not parsed",
+      "runs/cpu-check-20261105T062508275441Z-5p01bmls/gate.json (local, ignored): exit 0; 115 passed in 27.51s; Ruff/format pass; source unchanged during gate"
+    ],
+    "scope_decision": "Người dùng ngày 05/11/2026 chỉ giao engineering; hoãn research tự dò encoding/header và chiến lược biểu diễn cho LLM",
+    "engineering_status": "done",
+    "research_status": "deferred_by_user",
+    "limitations": [
+      "CSV/XLSX header unresolved nếu chưa có annotation tường minh; annotation không phải xác nhận header đúng",
+      "Codec/delimiter là cấu hình loader, không phải detection; chưa TCVN3/VNI/mojibake hoặc chuyển mã",
+      "Profile chỉ kiểu vật lý/raw, không semantic type, normalized money/date, fill/dedup/join hoặc prompt/model validation"
+    ],
+    "next_action": "Phần engineering đã nghiệm thu. Giữ research tự dò encoding/header/table-region và prompt representation ở trạng thái hoãn theo người dùng; chưa nghiệm thu prompt baseline thật, không tự mở A-T3/T4 hoặc research"
   },
   {
     "id": "C-T2",

@@ -70,6 +70,16 @@ class ProbeConfig(BaseModel):
             raise ValueError("estimated cost exceeds authorized budget")
         return self
 
+    def engine_memory_fraction(self, total_device_bytes: int) -> float:
+        if (
+            type(total_device_bytes) is not int
+            or total_device_bytes < self.memory_budget_bytes
+        ):
+            raise ValueError("device memory below declared probe budget")
+        # The hard acceptance ceiling stays30GiB; measured CUDA context overhead
+        # sits outside the engine's allocation target, so reserve1GiB for it.
+        return (self.memory_budget_bytes - 1024**3) / total_device_bytes
+
 
 class ModelCandidate(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)

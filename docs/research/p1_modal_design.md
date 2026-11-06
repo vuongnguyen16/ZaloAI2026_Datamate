@@ -253,3 +253,24 @@ Function GPU dùng deadline monotonic chung tính cả hash/load/round/cleanup v
 chừa90s trả kết quả. Mỗi lượt phải có sample NVML và peak Torch allocated/
 reserved hợp lệ; bất kỳ peak nào vượt30GiB đều fail, aggregate không che lượt
 thiếu evidence. Diagnostic được lọc credential và query URL trước lưu.
+
+## Phép thử Qwen3 đầu và sửa conformance — 06/11/2026
+
+Run `runs/p1-probe-20261106T073938Z-fcc48667/` thực sự chạy hai engine trên
+RTX-PRO-6000 sm_120, Python3.11.18/vLLM0.11.1/torch2.9.0+cu128/CUDA12.8.
+Mỗi lượt50record,47record qua Submission, normalized outputs trùng. Ba record
+sai: table answer là array; unanswerable và abstain có answer chuỗi.
+Schema cũ chỉ anyOf các dạng answer mà không gắn discriminator type; đó là
+lỗi conformance của decoder schema, không đổi expected hoặc nới scorer.
+
+Peak NVML cả hai lượt30.822265625GiB; Torch reserved30.076171875GiB.
+vLLM target30GiB chưa tính đủ overhead đo được. Quyết định trước thử lại:
+engine target29GiB, reserve1GiB trong tổng30GiB; giữ BF16/context2048, không
+tăng trần hay đổi quant/model. KV log trước sửa còn2.12GiB cho max2048token,
+nên giảm1GiB vẫn có headroom KV theo phép đo; fit thật phải đo lại.
+
+Decoder chuyển sang union các object có type const và answer tương ứng với
+Submission, đặc biệt table object và abstain/unanswerable null/absent.
+Regression dùng validator JSON Schema CPU tái hiện cả ba giá trị sai, không
+đọc gold. Thử mới phải đạt50/50 từng lượt, hai engine mới và mọi peak<=30GiB;
+run fail ban đầu được giữ nguyên. Đây không phải chọn/tuning bằng BTC.

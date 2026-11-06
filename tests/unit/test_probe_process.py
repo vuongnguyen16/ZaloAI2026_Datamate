@@ -58,3 +58,23 @@ def test_gpu_worker_request_rejects_answers_and_outside_model_paths():
         validate_request(request | {"cases": build_cases()})
     with pytest.raises(ValueError):
         validate_request(request | {"model_dir": "/tmp/another-model"})
+
+
+def test_decoder_schema_rejects_observed_cross_type_answers():
+    from jsonschema import Draft202012Validator
+
+    from infra.p1_runtime.generate import output_schema
+
+    validator = Draft202012Validator(output_schema())
+    for record in (
+        {"id": "fixture", "type": "table", "answer": ["mã", "số"]},
+        {"id": "fixture", "type": "unanswerable", "answer": ""},
+        {"id": "fixture", "type": "abstain", "answer": "abstain"},
+    ):
+        assert not validator.is_valid(record)
+    for record in (
+        {"id": "fixture", "type": "table", "answer": {"columns": ["x"], "rows": [[1]]}},
+        {"id": "fixture", "type": "unanswerable"},
+        {"id": "fixture", "type": "abstain"},
+    ):
+        assert validator.is_valid(record)

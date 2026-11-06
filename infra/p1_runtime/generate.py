@@ -42,38 +42,35 @@ def output_schema() -> dict:
         "required": ["columns", "rows"],
         "additionalProperties": False,
     }
-    return {
-        "type": "object",
-        "properties": {
-            "id": {"type": "string"},
-            "type": {
-                "type": "string",
-                "enum": [
-                    "number",
-                    "percent",
-                    "string",
-                    "date",
-                    "boolean",
-                    "list",
-                    "table",
-                    "unanswerable",
-                    "abstain",
-                ],
-            },
-            "answer": {
-                "anyOf": [
-                    {"type": "number"},
-                    {"type": "string"},
-                    {"type": "boolean"},
-                    {"type": "array", "items": scalar},
-                    table,
-                    {"type": "null"},
-                ]
-            },
-        },
-        "required": ["id", "type"],
-        "additionalProperties": False,
+    answers = {
+        "number": {"type": "number"},
+        "percent": {"type": "number"},
+        "string": {"type": "string"},
+        "date": {"type": "string", "pattern": r"^\d{4}-\d{2}(-\d{2})?$"},
+        "boolean": {"type": "boolean"},
+        "list": {"type": "array", "items": scalar},
+        "table": table,
+        "unanswerable": {"type": "null"},
+        "abstain": {"type": "null"},
     }
+    variants = []
+    for kind, answer in answers.items():
+        required = ["id", "type"] + (
+            [] if kind in ("abstain", "unanswerable") else ["answer"]
+        )
+        variants.append(
+            {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "string"},
+                    "type": {"type": "string", "const": kind},
+                    "answer": answer,
+                },
+                "required": required,
+                "additionalProperties": False,
+            }
+        )
+    return {"type": "object", "anyOf": variants}
 
 
 def generate(request: dict, destination: Path) -> None:
@@ -136,8 +133,9 @@ def generate(request: dict, destination: Path) -> None:
         max_num_batched_tokens=config.max_model_len,
         enforce_eager=True,
         enable_prefix_caching=False,
-        gpu_memory_utilization=config.memory_budget_bytes
-        / runtime["total_device_bytes"],
+        gpu_memory_utilization=config.engine_memory_fraction(
+            runtime["total_device_bytes"]
+        ),
     )
     sampling = SamplingParams(
         temperature=0,

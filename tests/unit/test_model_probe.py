@@ -168,6 +168,12 @@ def test_explicit_profile_is_required():
         )
 
 
+def test_engine_target_reserves_cuda_overhead_without_raising_total_budget():
+    settings = api().ProbeConfig(**configuration())
+    assert settings.engine_memory_fraction(96 * 1024**3) == 29 / 96
+    assert settings.memory_budget_bytes == 30 * 1024**3
+
+
 def test_snapshot_hash_and_missing_file_fail_closed(tmp_path):
     module = api()
     files = {"config.json": hashlib.sha256(b"{}").hexdigest()}

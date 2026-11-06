@@ -119,3 +119,15 @@ upstream loader/profile/split trong trust hiện có; không tuyên bố OS isol
 hay chống thay đồng thời toàn bộ provenance. Đổi lại có thêm thời gian/dung
 lượng CPU và nhiều trường hợp abstain; lỗi mapping, upstream hoặc can thiệp
 thù địch vẫn là rủi ro ngoài bằng chứng hiện tại.
+
+## Decision record
+
+- Ruling: honor explicit request for two source/synthetic review rounds instead of skill's usual no re-review — binding mistakes affect many questions; no BTC kit/gold passed to reviewers — cost if wrong: extra review time.
+- Ruling: arithmetic diagnostic gap regraded to decision safety — added one-informative-row counterexample; require10 genuinely discriminating arithmetic rows rather than10 total rows to select differing scales, report equivalent grammars — cost if wrong: conservative unresolved money formats.
+- Ruling: stale legacy cache rebuilt under current code instead of weakening identity guard; LF/CRLF variants excluded, exact storedhash matches790b1af — cost if wrong: CPU time/disk, no unsafe cache reuse.
+- Final: Ruling: real coverage/packet/RSS/taxonomy excluded from source review — parent audited18dev and author-checked1candidate, only one cluster; no taxonomy-to-answered inference or independently approved oracle — cost if wrong: author mapping errors remain until business approval.
+- Final: Ruling: human approval/PA/G2/production/Modal/billing excluded — leave them pending, no predict hookup/model job; upstream loader/profile/split implementations retain their existing trust/tests, not recertified — cost if wrong: untested integration/upstream defects may surface later.
+- Final: Ruling: physical memory and hostile filesystem races excluded — estimated ledger guards and before/after verification only, not OS isolation — cost if wrong: process can exceed estimate or adversarial changes can evade checks.
+- Final: Ruling: coordinated replacement of all provenance excluded — no independent signature root; rely on pinned split/current source and local artifact chain — cost if wrong: coordinated tampering could counterfeit evidence.
+
+Deferred minors: none. Task2 targeted verification:32passed23,26s after final fixes.

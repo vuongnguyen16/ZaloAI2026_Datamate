@@ -29,7 +29,8 @@ peak process142,84MiB; chưa dựng ledger business lớn nhất toàn dev hoặ
 minh6giờ. Hai lượt review source/synthetic độc lập;7Important và1điểm số học
 được nâng mức đều đã sửa bằng regression RED→GREEN, không minor hoãn.
 CPU cuối509passed/2skipped154,59s; Ruff lint/format pass, source không đổi.
-`runs/cpu-check-20261106T200626300303Z-p8p_2mc9/gate.json`; đã đọc gate.json và ba log. CI nhánh kiểm riêng.
+`runs/cpu-check-20261106T200626300303Z-p8p_2mc9/gate.json`; đã đọc gate.json và ba log. Đã push nhánh và mở [PR#6](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/6);
+CI exact-head và quyết định merge theo PR, chưa merge. Workspace giữ nguyên.
 
 Bước kế tiếp vẫn P2c CPU: giải thích nguồn/header-detail/bảng phụ và nhãn lạ
 bằng nghĩa nguồn để có binding được duyệt ở thêm cụm, rồi adapter short intent

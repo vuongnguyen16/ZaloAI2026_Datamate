@@ -14,6 +14,7 @@ import duckdb
 from datamate.artifacts import manifest, new_run, write_json
 from datamate.config import load_config
 from datamate.contracts import FakeResponse, Question, Submission, json_object
+from datamate.serialization import submission_bytes
 
 
 def read_questions(path: Path, limit: int | None = None) -> list[Question]:
@@ -56,12 +57,9 @@ class FakeModelAdapter:
 def write_results(
     run_dir: Path, predictions: list[Submission], events: list[dict]
 ) -> None:
-    lines = "".join(
-        json.dumps(p.output(), ensure_ascii=False, allow_nan=False) + "\n"
-        for p in predictions
-    )
-    (run_dir / "submission.jsonl").write_text(lines, encoding="utf-8")
-    (run_dir / "predictions.jsonl").write_text(lines, encoding="utf-8")
+    lines = b"".join(submission_bytes(p) for p in predictions)
+    (run_dir / "submission.jsonl").write_bytes(lines)
+    (run_dir / "predictions.jsonl").write_bytes(lines)
     (run_dir / "events.jsonl").write_text(
         "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in events),
         encoding="utf-8",

@@ -61,3 +61,29 @@ tạo trên Windows; chưa truy cập dashboard, chưa có actual bill. Không b
 ước tính GPU10phút thành chi phí thực toàn job, không ghi0USD hoặc chạy thêm
 GPU để hiệu chỉnh. Fresh account/budget và runtime evidence vẫn là điều kiện
 của probe tiếp theo.
+
+## Review độc lập và sửa lỗi
+
+Reviewer chỉ đọc source/spec/synthetic, không dữ liệu BTC.2Important đã tái
+hiện và sửa: header che status/entity mâu thuẫn; bearer credential sót trong
+snapshot checkpoint/exception.2điểm được reviewer xếp Minor đã được tác giả
+nâng thành Important vì có thể trả số sai: chuỗi `"false"` bật policy; ngày
+`2026-W45` bị gán thứ Hai dù binding yêu cầu ngày lịch. Cả4nhóm có12regression
+RED→GREEN.60test liên quan pass sau sửa, không gửi lại review vòng hai.
+
+Không còn minor hoãn trong increment này. Các phần reviewer không đánh giá
+vẫn được ghi là pending: binding/reader/hash file thật và completeness; nguồn
+rulebook do tác giả đối chiếu; CPU do tác giả chạy/đọc log; model/PA/G2/precision,
+GPU/short-prompt/throughput/billing; peak RAM với input tối đa. Rows/bytes là
+application guard, không phải hard physical-memory cap.
+
+
+## Gate cuối
+
+477passed/2skipped105,95s, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T183602599624Z-drtv7dh3/gate.json`, JSON/ba log đã đọc.
+Fingerprint `adc4c0af6fc8e75ebeef65795167cc3e01cdfc4caad83141e5304468023e6804`.
+Các12regression review đã FAIL trước sửa,60test liên quan PASS sau sửa.
+Đây là CPU-only; GPU/PA không được check.py kiểm. Xem [API và preconditions](../docs/domain_lib.md).
+Canonical alias/row-role/completeness của business thật vẫn cần verifier;
+unique string matching không chứng minh đã gom đủ mọi cách viết của thực thể.

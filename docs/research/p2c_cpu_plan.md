@@ -29,30 +29,30 @@ metrics; tách khỏi model và scoped gold. Không tự suy binding thật.
 modal_context_probe.py; tests/unit/test_context_probe_diagnostics.py.
 **Interfaces:** `verify_context_snapshot(candidate,target,checkpoint)`;
 Intent.filter_texts items<=256; checkpoint phase warming_up/ready.
-- [ ] RED tests:257char filter rejected; warmup raises leaves init duration;
+- [x] RED tests:257char filter rejected; warmup raises leaves init duration;
   failed snapshot writes bounded redacted stderr; image includes helper.
-- [ ] Minimal fixes, report clarifies sample/non-causal/time limitations.
-- [ ] Run targeted tests; Expected all pass; commit.
+- [x] Minimal fixes, report clarifies sample/non-causal/time limitations.
+- [x] Run targeted tests; Expected all pass; commit.
 
 ### Task 2: Resolver kỳ
 **Files:** domain_lib/model.py, periods.py, __init__.py;
 tests/unit/test_domain_periods.py.
 **Interfaces:** `Period(start,end)`, `DomainAbstain(code)`,
 `resolve_period(text,as_of)`, `previous_period(text,as_of)`.
-- [ ] RED boundary fixtures:leap/year/quarter/month clamp/week Mon/N inclusive;
+- [x] RED boundary fixtures:leap/year/quarter/month clamp/week Mon/N inclusive;
   malformed/multiple/unknown/Tet abstain; this-month comparison versus full explicit month.
-- [ ] Implement strict full-match, CPU only, deterministic and bounded.
-- [ ] Run resolver tests; Expected pass; commit.
+- [x] Implement strict full-match, CPU only, deterministic and bounded.
+- [x] Run resolver tests; Expected pass; commit.
 
 ### Task 3: Adapter, exact filters và metrics
 **Files:** domain_lib/orders.py, metrics.py;
 tests/unit/test_domain_orders.py, tests/integration/test_domain_metrics.py.
 **Interfaces:** RawRow/Binding/BoundSource/Ledger/Filter; `adapt_sources(sources)`;
 `revenue_total(ledger,period,filters=())`, `order_count(...)`.
-- [ ] RED tests review focus1–4; no-filter and exact-filter answers, boundary0,
+- [x] RED tests review focus1–4; no-filter and exact-filter answers, boundary0,
   no data !=0, role/status/date conflicts, no mutation, row cap.
-- [ ] Implement explicit binding/validation, group/dedupe/lineage and Decimal sum;
+- [x] Implement explicit binding/validation, group/dedupe/lineage and Decimal sum;
   no CSV inference or receipts join. Unsupported source remains abstain.
-- [ ] Run all domain tests and full CPU gate; Expected pass/current.
-- [ ] One fresh independent source/synthetic review, fix Important by RED→GREEN;
+- [x] Run all domain tests and full CPU gate; Expected pass/current.
+- [x] One fresh independent source/synthetic review, fix Important by RED→GREEN;
   record limits, update state/backlog and commit. Probe/full dev remain next bounded action.

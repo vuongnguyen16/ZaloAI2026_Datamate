@@ -116,3 +116,17 @@ def test_entity_binding_records_order_and_line_scope_explicitly():
         "P",
         "Q",
     ]
+
+
+@pytest.mark.parametrize("bad", ["false", "true", 0, 1, None])
+def test_binding_switches_are_strict_booleans(bad):
+    with pytest.raises(DomainAbstain):
+        source([row()], carry_order_fields=bad)
+    with pytest.raises(DomainAbstain):
+        EntityBinding("product", blank_is_absent=bad)
+
+
+@pytest.mark.parametrize("bad", ["2026-W45", "2026-W45-1", "20261102"])
+def test_calendar_date_binding_does_not_invent_day_from_week_or_guess_format(bad):
+    with pytest.raises(DomainAbstain):
+        adapt_sources([source([row(day=bad)])])

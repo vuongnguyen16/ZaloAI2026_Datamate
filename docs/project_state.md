@@ -12,13 +12,16 @@ vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime C
 
 Increment hiện hành `work/p2c-cpu-domain`, từ main6ac467e (PR3/4 đã merge).
 [CPU P2c](../reports/p2c_cpu_results.md) đã có ledger theo binding explicit,
-resolver kỳ và revenue_total/order_count;48test liên quan synthetic pass.
+resolver kỳ và revenue_total/order_count;60test liên quan synthetic pass.
 Ba minor P2b đã sửa bằng regression. Chưa binding/reader business thật được
 nghiệm thu, chưa nối predict/model/PA; G2/per-cluster acceptance chưa đạt.
 [Thiết kế](research/p2c_cpu_design.md) bổ sung cảnh báo throughput, tách
 business analysis/short intent và mốc trước đo; chưa probe runtime mới hoặc
 chạy full1895dev qua model. Billing thực chưa đọc được do CUA lỗi khởi tạo.
-CPU toàn bộ/review mới đang kiểm; record6ac trước increment là lịch sử.
+CPU cuối477passed/2skipped105,95s, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T183602599624Z-drtv7dh3/gate.json`, đã đọc JSON/ba log.
+Review độc lập4nhóm lỗi đã sửa bằng12regression RED→GREEN; không minor hoãn.
+Record6ac trước increment là lịch sử; CI nhánh mới kiểm riêng sau push.
 P2b cũ4096 chạy24/24JSON/peak29,833GiB trên4prompt lặp;8192+prefill8192 thiếuKV.
 Không suy tỷ lệ quá dài toàn dev hoặc quy mọi độ chậm cho KV; chưa6giờ/PA/G2.
 Tiêu chí từng hàm precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời giữ nguyên.

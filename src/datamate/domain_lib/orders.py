@@ -28,7 +28,11 @@ class EntityBinding:
     blank_is_absent: bool = False
 
     def __post_init__(self):
-        if self.scope not in {"line", "order"} or not (self.code or self.label):
+        if (
+            self.scope not in {"line", "order"}
+            or not (self.code or self.label)
+            or type(self.blank_is_absent) is not bool
+        ):
             raise DomainAbstain("invalid_entity_binding")
 
 
@@ -51,6 +55,7 @@ class Binding:
             or not self.order_id
             or self.date_format not in {"%Y-%m-%d", "%d/%m/%Y"}
             or self.number_format not in {"plain", "vi"}
+            or type(self.carry_order_fields) is not bool
         ):
             raise DomainAbstain("unsupported_binding")
         if self.role == "events" and not self.status:
@@ -168,6 +173,13 @@ def _cell(cells, column):
 def _date(value, binding):
     if value is None:
         return None
+    shape = (
+        r"\d{4}-\d{2}-\d{2}"
+        if binding.date_format == "%Y-%m-%d"
+        else r"\d{1,2}/\d{1,2}/\d{4}"
+    )
+    if re.fullmatch(shape, value) is None:
+        raise DomainAbstain("invalid_order_date")
     try:
         return (
             date.fromisoformat(value)
@@ -365,11 +377,22 @@ def adapt_sources(
             and any(r["date"] is None or r["status"] is None for r in records)
         ) or any(r["date"] is not None and r["date"] != placed for r in records):
             raise DomainAbstain("conflicting_or_missing_order_date")
+        if any(r["status"] is not None and r["status"] != status for r in records):
+            raise DomainAbstain("conflicting_order_status")
         if events[qid]:
             status = "returned" if "returned" in events[qid] else "cancelled"
         order_entities = {}
         for dim, scope in dimensions.items():
             if scope == "order":
+                known = [
+                    r["entities"][dim]
+                    for r in records
+                    if dim in r["entities"]
+                    and (
+                        r["entities"][dim].code is not None or r["entities"][dim].absent
+                    )
+                ]
+                _entity(known)
                 selected = [
                     r["entities"][dim] for r in headers if dim in r["entities"]
                 ] or [r["entities"][dim] for r in records if dim in r["entities"]]

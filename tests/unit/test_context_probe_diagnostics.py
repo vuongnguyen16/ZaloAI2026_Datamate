@@ -119,3 +119,23 @@ def test_snapshot_failure_checkpoint_preserves_bounded_sanitized_stderr(
     assert value["status"] == "snapshot_verification_failed"
     assert "secret-value" not in path.read_text("utf-8")
     assert 0 < len(value["diagnostic"]) <= 4096
+
+
+def test_bearer_value_is_not_leaked_by_snapshot_checkpoint_or_exception(
+    tmp_path, monkeypatch
+):
+    from infra.context_probe_process import verify_context_snapshot
+
+    def fail(*args, **kwargs):
+        raise subprocess.CalledProcessError(
+            1, args[0], stderr=b"Authorization: Bearer synthetic-secret-value\n"
+        )
+
+    monkeypatch.setattr(subprocess, "run", fail)
+    checkpoint = tmp_path / "snapshot.json"
+    with pytest.raises(ValueError) as caught:
+        verify_context_snapshot(
+            {"files": {"synthetic": "0" * 64}}, tmp_path, checkpoint
+        )
+    assert "synthetic-secret-value" not in str(caught.value)
+    assert "synthetic-secret-value" not in checkpoint.read_text("utf-8")

@@ -181,3 +181,24 @@ def test_explicit_number_and_date_formats_are_not_guessed():
     other = adapt_sources([bind([r("A", "1,234")])])
     with pytest.raises(DomainAbstain):
         revenue_total(other, NOV)
+
+
+@pytest.mark.parametrize("status", ["return", "cancel"])
+def test_header_cannot_hide_conflicting_nonempty_line_status(status):
+    headers = bind([r("A")], role="headers", unit="synthetic_headers")
+    lines = bind([r("A", status=status)])
+    with pytest.raises(DomainAbstain):
+        adapt_sources([headers, lines])
+
+
+def test_header_cannot_hide_conflicting_nonempty_order_entity():
+    entities = {"customer": EntityBinding("customer", None, "order")}
+    headers = bind(
+        [r("A", customer="C")],
+        role="headers",
+        unit="synthetic_headers",
+        entities=entities,
+    )
+    lines = bind([r("A", customer="D")], entities=entities)
+    with pytest.raises(DomainAbstain):
+        adapt_sources([headers, lines])

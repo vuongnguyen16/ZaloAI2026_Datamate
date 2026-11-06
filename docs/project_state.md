@@ -10,20 +10,18 @@ vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime C
 405passed/2skipped, Ruff/format pass và source không đổi ở record lịch sử
 `runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`.
 
-Increment hiện hành trên `work/p2c-dev-surveys`: khảo sát CPU và phạm vi P2c
-đã ghi ở [note](research/p2c_domain_scope.md);405 câu text/40gold dev chọn trước,
-ngoài dev decode0. [Prompt/cache](research/p2_intent_prompt_cache.md) đã phác.
-[P2b thực](../reports/p2b_context_probe_results.md): BF16/TP1 context4096 chạy
-24/24JSON,peak29,833GiB, khoảng0,10–0,11request/s trên4prompt lặp;
-8192 với prefill8192 thất bại KV. Offline/read-only/hash weights/cleanup pass.
-Không claim8k bất khả thi hoặc6giờ đạt; không PA/semantic accuracy/G2.
-Source7396c84 đã review độc lập, không lỗi chặn;3minor ghi trong report.
-Domain_lib chưa triển khai. Bước tiếp theo: P2c hai hàm + calendar/filter/tests
-và dev evaluation, context4096 bảo thủ; không chạy thêm GPU tự động.
-Precision từng hàm>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời, thiếu mẫu không đạt.
-CPU cuối417passed/2skipped77,22s, Ruff/format pass, source không đổi;
-`runs/cpu-check-20261106T174519857830Z-x32dseth/gate.json`, đã đọc JSON/ba log.
-Gate/QA sau cập nhật tracker ghi ở cuối report; CI remote kiểm riêng sau push.
+Increment hiện hành `work/p2c-cpu-domain`, từ main6ac467e (PR3/4 đã merge).
+[CPU P2c](../reports/p2c_cpu_results.md) đã có ledger theo binding explicit,
+resolver kỳ và revenue_total/order_count;48test liên quan synthetic pass.
+Ba minor P2b đã sửa bằng regression. Chưa binding/reader business thật được
+nghiệm thu, chưa nối predict/model/PA; G2/per-cluster acceptance chưa đạt.
+[Thiết kế](research/p2c_cpu_design.md) bổ sung cảnh báo throughput, tách
+business analysis/short intent và mốc trước đo; chưa probe runtime mới hoặc
+chạy full1895dev qua model. Billing thực chưa đọc được do CUA lỗi khởi tạo.
+CPU toàn bộ/review mới đang kiểm; record6ac trước increment là lịch sử.
+P2b cũ4096 chạy24/24JSON/peak29,833GiB trên4prompt lặp;8192+prefill8192 thiếuKV.
+Không suy tỷ lệ quá dài toàn dev hoặc quy mọi độ chậm cho KV; chưa6giờ/PA/G2.
+Tiêu chí từng hàm precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời giữ nguyên.
 
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),

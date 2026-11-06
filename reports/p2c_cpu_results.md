@@ -87,3 +87,13 @@ Các12regression review đã FAIL trước sửa,60test liên quan PASS sau sử
 Đây là CPU-only; GPU/PA không được check.py kiểm. Xem [API và preconditions](../docs/domain_lib.md).
 Canonical alias/row-role/completeness của business thật vẫn cần verifier;
 unique string matching không chứng minh đã gom đủ mọi cách viết của thực thể.
+
+Kiểm chéo heuristic cũ có authorize dev context, hash taxonomy/câu hỏi/script
+khớp:42/154câu none_seen cũng có average signal, còn112ứng viên chưa thấy cả
+filter lẫn average. Không đọc gold mới, không biến112thành coverage. Chi tiết
+chỉ local `runs/p2c-cpu-surveys-20261107/filter_average_cross-local.json`.
+
+CI đầu của892408a dừng ở formatter khối Python trong tài liệu API mới thêm
+sau gate local, chưa chạy pytest. Đã format và chạy full gate lại:477passed/
+2skipped93,78s, Ruff/format pass, source không đổi; đã đọc JSON/ba log tại
+`runs/cpu-check-20261106T184430642230Z-9tk6d_is/gate.json`.

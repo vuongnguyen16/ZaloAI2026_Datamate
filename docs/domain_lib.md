@@ -20,13 +20,24 @@ from datamate.domain_lib.periods import resolve_period
 from datamate.domain_lib.metrics import revenue_total, order_count
 
 binding = Binding(
-    role="lines", order_id="order", placed_at="placed", status="state",
-    amount="net_line", status_values={"done": "completed"},
+    role="lines",
+    order_id="order",
+    placed_at="placed",
+    status="state",
+    amount="net_line",
+    status_values={"done": "completed"},
 )
-rows = [RawRow(1, {
-    "order": "synthetic_A", "placed": "2026-11-01",
-    "state": "done", "net_line": "100",
-})]
+rows = [
+    RawRow(
+        1,
+        {
+            "order": "synthetic_A",
+            "placed": "2026-11-01",
+            "state": "done",
+            "net_line": "100",
+        },
+    )
+]
 ledger = adapt_sources([BoundSource("synthetic_export", "a" * 64, binding, rows)])
 period = resolve_period("tháng này", date(2026, 11, 7))
 assert revenue_total(ledger, period) == 100

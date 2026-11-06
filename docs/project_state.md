@@ -1,18 +1,30 @@
 # Trạng thái DataMate
 
-Cập nhật 06/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
+Cập nhật 07/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
 hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
-**P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
-Increment hiện hành: [sửa cô lập runtime](../reports/p2a_runtime_isolation_results.md)
-trên work/p2a-runtime-isolation; bỏ ngưỡng3lỗi và bỏ qua mục output ngoài runner.
-CPU runtime follow-up405passed/2skipped, Ruff/format pass, source không đổi;
-`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`, đã đọc JSON/ba log.
-Khảo sát CPU/P2c scope bắt đầu sau khi PR runtime được chốt, không làm song song.
-Đã chốt tiêu chí nội bộ từng hàm: precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời;
-thiếu mẫu báo chưa đạt. G2 giữ nguyên. Chưa khảo sát gold40 hoặc chạy P2b mới.
+**P0/G0 và P1/G1 đã hoàn tất; P2 chưa qua G2.** Runtime PR#3 đã merge
+vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime CPU
+405passed/2skipped, Ruff/format pass và source không đổi ở record lịch sử
+`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`.
+
+Increment hiện hành trên `work/p2c-dev-surveys`: khảo sát CPU và phạm vi P2c
+đã ghi ở [note](research/p2c_domain_scope.md);405 câu text/40gold dev chọn trước,
+ngoài dev decode0. [Prompt/cache](research/p2_intent_prompt_cache.md) đã phác.
+[P2b thực](../reports/p2b_context_probe_results.md): BF16/TP1 context4096 chạy
+24/24JSON,peak29,833GiB, khoảng0,10–0,11request/s trên4prompt lặp;
+8192 với prefill8192 thất bại KV. Offline/read-only/hash weights/cleanup pass.
+Không claim8k bất khả thi hoặc6giờ đạt; không PA/semantic accuracy/G2.
+Source7396c84 đã review độc lập, không lỗi chặn;3minor ghi trong report.
+Domain_lib chưa triển khai. Bước tiếp theo: P2c hai hàm + calendar/filter/tests
+và dev evaluation, context4096 bảo thủ; không chạy thêm GPU tự động.
+Precision từng hàm>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời, thiếu mẫu không đạt.
+CPU cuối417passed/2skipped77,22s, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T174519857830Z-x32dseth/gate.json`, đã đọc JSON/ba log.
+Gate/QA sau cập nhật tracker ghi ở cuối report; CI remote kiểm riêng sau push.
+
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),
 [bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.

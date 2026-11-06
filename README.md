@@ -88,8 +88,9 @@ hỗ trợ hardlink dùng exclusive `xb`, ghi `non_atomic_exclusive`: chết khi
 có thể để lại final dở. Công cụ dev vẫn fail-closed theo thiết kế.
 Bằng chứng CPU hiện hành nằm ở state/context;
 [thiết kế sửa review P2a](docs/research/p2a_review_fixes.md).
-Primary/fallback cùng publication lock; output đang có writer hoặc thư mục lạ
-bị từ chối. Emergency routing giới hạn1MiB/dòng; vượt giới hạn báo
+Primary/fallback cùng publication lock; output đang có writer vẫn bị từ chối.
+Mục ngoài runner được giữ nguyên, bỏ qua nội dung và ghi tên vào diagnostics.
+Timeout/lỗi từng câu không tắt backend theo số lần lặp. Emergency routing giới hạn1MiB/dòng; vượt giới hạn báo
 `coverage_complete=false`, `valid=false`, không tuyên bố đã xuất đủ ID.
 
 ## Modal, dữ liệu và đóng gói

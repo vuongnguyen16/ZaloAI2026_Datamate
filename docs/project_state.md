@@ -6,6 +6,11 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 tracker duy nhất state và tasks/backlog.json.
 
 **P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
+Increment hiện hành: [sửa cô lập runtime](../reports/p2a_runtime_isolation_results.md)
+trên work/p2a-runtime-isolation; bỏ ngưỡng3lỗi và bỏ qua mục output ngoài runner.
+Khảo sát CPU/P2c scope bắt đầu sau khi PR runtime được chốt, không làm song song.
+Đã chốt tiêu chí nội bộ từng hàm: precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời;
+thiếu mẫu báo chưa đạt. G2 giữ nguyên. Chưa khảo sát gold40 hoặc chạy P2b mới.
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),
 [bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.

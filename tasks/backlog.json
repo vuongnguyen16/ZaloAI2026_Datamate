@@ -401,7 +401,10 @@
       "reports/p2a_results.md",
       "docs/research/p2a_review_fixes.md",
       "docs/research/p2a_review_fixes_plan.md",
-      "reports/p2a_review_fixes_results.md"
+      "reports/p2a_review_fixes_results.md",
+      "docs/research/p2a_runtime_isolation.md",
+      "docs/research/p2a_runtime_isolation_plan.md",
+      "reports/p2a_runtime_isolation_results.md"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -410,7 +413,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "P2a PR1 review1-6 implemented; current verification/CI and merge evidence in reports/p2a_review_fixes_results.md; P2b/P2c and G2 pending",
+    "decision_status": "P2a runtime isolation follow-up implemented, proof in reports/p2a_runtime_isolation_results.md; next sequential CPU surveys then P2c scope/prompt/cache/P2b; G2 pending",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",

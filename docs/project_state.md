@@ -8,6 +8,9 @@ tracker duy nhất state và tasks/backlog.json.
 **P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
 P2a CPU safety và bảng chéo đã hoàn tất: [bằng chứng](../reports/p2a_results.md),
 [thiết kế](research/p2a_safety_design.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
+Đã push `work/p2a-safety` và mở [PR#1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1)
+vào `main` theo yêu cầu người dùng; chưa merge. Code được xuất bản tại `e327c52`,
+nhánh/workspace được giữ để nhận review. CI GitHub kiểm riêng với CPU local dưới đây.
 CPU hiện hành369passed/1skipped, Ruff/format pass, source không đổi;
 `runs/cpu-check-20261106T140338585948Z-ltr1oldz/gate.json`, đã đọc JSON/ba log;
 context P2 passed/current, dependency ready, không planning error/warning.

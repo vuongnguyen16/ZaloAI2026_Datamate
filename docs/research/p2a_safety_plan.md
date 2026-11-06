@@ -32,45 +32,45 @@ DuckDB worker fail to abstain. Cross-table reads only the pinned P0 dev artifact
 
 **Files:** contracts.py, new serialization.py, legacy runner.py writer, tests/unit/test_serialization.py.
 **Interfaces:** `submission_bytes(Submission|dict)->bytes`, `format_submission(id,type,answer,reason=None)->Submission`.
-- [ ] Write round-trip9type/Decimal1.0000000000000001/large-int/percent/negative-zero/reject tests; run and observe RED.
-- [ ] Implement bounded Decimal-compatible Submission and exact serializer; validate exact final line via scorer parse/validate, no score/gold IO.
-- [ ] Run new tests plus existing contract/scorer tests; expected all pass. Commit.
+- [x] Write round-trip9type/Decimal1.0000000000000001/large-int/percent/negative-zero/reject tests; run and observe RED.
+- [x] Implement bounded Decimal-compatible Submission and exact serializer; validate exact final line via scorer parse/validate, no score/gold IO.
+- [x] Run new tests plus existing contract/scorer tests; expected all pass. Commit.
 
 ### Task 2: Immutable publication and checkpoint segments
 
 **Files:** new prediction_store.py, tests/unit/test_prediction_store.py.
 **Interfaces:** `publish(path,data)->dict`, `RunStore(output,identity)` context with `append(record)`, `recover()->dict`, no-clobber finalization.
-- [ ] Tests for existing same/different, injected race, unsupported hardlink, torn/full corrupt lines, same/conflicting duplicate and writer lock; observe RED.
-- [ ] Implement file fsync/link publication, platform capability, immutable manifest/segments, OS lock and bounded recovery.
-- [ ] Run store tests; expected all pass, old bytes unchanged. Commit.
+- [x] Tests for existing same/different, injected race, unsupported hardlink, torn/full corrupt lines, same/conflicting duplicate and writer lock; observe RED.
+- [x] Implement file fsync/link publication, platform capability, immutable manifest/segments, OS lock and bounded recovery.
+- [x] Run store tests; expected all pass, old bytes unchanged. Commit.
 
 ### Task 3: Deadline and isolated trusted DuckDB worker
 
 **Files:** new bounded_execution.py, tests/unit/test_bounded_execution.py.
 **Interfaces:** `Deadline(started,budget,reserve)`, `run_duckdb(database,sql,parameters,timeout_seconds)->dict`.
-- [ ] Tests actual query/Decimal result, external-access rejection, bounded output, timeout interrupt/cleanup and forced terminate; observe RED.
-- [ ] Implement spawn worker with interrupt control thread, read-only/external-disabled/2threads/256MB and parent join/terminate/kill.
-- [ ] Run worker tests; expected pass and no live child. Commit.
+- [x] Tests actual query/Decimal result, external-access rejection, bounded output, timeout interrupt/cleanup and forced terminate; observe RED.
+- [x] Implement spawn worker with interrupt control thread, read-only/external-disabled/2threads/256MB and parent join/terminate/kill.
+- [x] Run worker tests; expected pass and no live child. Commit.
 
 ### Task 4: Tolerant prediction coordinator and CLI
 
 **Files:** new prediction.py, cli.py, configs/predict.yaml, predict.sh, tests/integration/test_prediction.py.
 **Interfaces:** `read_prediction_questions(path)->(questions,rejected,errors)`, `run_predict(input,output,config,backend=None,started=None)->dict`; backend callable returns per-question result, default safe_abstain.
-- [ ] Tests mixed invalid/duplicate input, unchanged raw/gold sentinel, startup/backend failure, expired deadline, resume/mismatch/final conflict, CLI and real kill/resume; observe RED.
-- [ ] Implement input inventory/identity, bounded batches, checkpoint every ID, exact one-line output/log and diagnostics; CLI starts clock before loading and explicitly labels no_model.
-- [ ] Run integration/store/worker/numeric tests; expected pass; stub unchanged. Commit.
+- [x] Tests mixed invalid/duplicate input, unchanged raw/gold sentinel, startup/backend failure, expired deadline, resume/mismatch/final conflict, CLI and real kill/resume; observe RED.
+- [x] Implement input inventory/identity, bounded batches, checkpoint every ID, exact one-line output/log and diagnostics; CLI starts clock before loading and explicitly labels no_model.
+- [x] Run integration/store/worker/numeric tests; expected pass; stub unchanged. Commit.
 
 ### Task 5: Authorized taxonomy cross-table and real aggregate
 
 **Files:** new taxonomy_cross.py, cli.py, tests/integration/test_taxonomy_cross.py.
 **Interfaces:** `cross_table(records)->dict`, `run_taxonomy_cross(split,manifest_sha256,output,proof=None)->dict`; supported CLI uses committed P0 proof only.
-- [ ] Tests hand-derived Cartesian counts, duplicate/out-of-scope IDs, proof/hash/source mismatch and no gold open; observe RED.
-- [ ] Implement pinned-before-decode artifact reader and dev authorization, no arbitrary CLI artifact path. Produce local aggregate/cell report, no record IDs/answers.
-- [ ] Run synthetic tests then real pinned dev artifact cross; inspect only aggregate summary, record path/hash, no sealed decode. Commit.
+- [x] Tests hand-derived Cartesian counts, duplicate/out-of-scope IDs, proof/hash/source mismatch and no gold open; observe RED.
+- [x] Implement pinned-before-decode artifact reader and dev authorization, no arbitrary CLI artifact path. Produce local aggregate/cell report, no record IDs/answers.
+- [x] Run synthetic tests then real pinned dev artifact cross; inspect only aggregate summary, record path/hash, no sealed decode. Commit.
 
 ### Task 6: Whole-branch review and handoff
 
 **Files:** report/state/backlog, run artifacts ignored.
-- [ ] Dispatch fresh source-only reviewer for this increment; fix Important/Critical with RED→GREEN.
-- [ ] Run `uv run --locked python scripts/check.py`, read gate/three logs and contextP2 current; timeline current.
-- [ ] Record real commands, platform limitations, local taxonomy provenance and pending P2b/c/G2; commit, no inferred push/merge.
+- [x] Dispatch fresh source-only reviewer for this increment; fix Important/Critical with RED→GREEN.
+- [x] Run `uv run --locked python scripts/check.py`, read gate/three logs and contextP2 current; timeline current.
+- [x] Record real commands, platform limitations, local taxonomy provenance and pending P2b/c/G2; commit, no inferred push/merge.

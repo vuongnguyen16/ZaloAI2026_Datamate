@@ -6,6 +6,12 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 tracker duy nhất state và tasks/backlog.json.
 
 **P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
+P2a CPU safety và bảng chéo đã hoàn tất: [bằng chứng](../reports/p2a_results.md),
+[thiết kế](research/p2a_safety_design.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
+CPU hiện hành369passed/1skipped, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T135742184879Z-u_1t7kow/gate.json`, đã đọc JSON/ba log.
+Review độc lập6Important đã sửa bằng regression;1minor README tools còn lại.
+Taxonomy cross local:1895unique/199cells/2589memberships, không mở lại gold.
 Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;
 primary Qwen3-14B,14,768,307,200 parameters. Chưa B0/PA BTC hoặc pipeline
 predict thật/Docker/public submission. [Kết quả P1](../reports/p1_results.md).

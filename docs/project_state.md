@@ -1,12 +1,13 @@
 # Trạng thái DataMate
 
-Cập nhật 05/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
+Cập nhật 06/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
 hash `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
 **P0/G0 đã hoàn tất.** Split/scorer/taxonomy/gate đều done;
-P1 ready, chưa model/Modal/Docker/public submission. P1 phải xác minh
+P1 đang in_progress: đã sửa format và chuẩn bị thiết kế model probe chờ duyệt;
+chưa có model thật/G1/Docker/public submission. P1 phải xác minh
 model/license/cutoff/tổng ≤15B, runtime sm_120, account vuonghungnguyen07,
 budget ≤30 USD và phạm vi dữ liệu trước job. Không tự mở job để chốt P0.
 
@@ -249,3 +250,29 @@ Ruff lint/format pass, source không đổi trong gate. Đã đọc gate.json v�
 Bản ghi này mô tả kiểm tra local trước push; CI GitHub kiểm riêng sau push.
 Các câu chưa commit/push ở phần trước là lịch sử các phiên triển khai.
 P0/G0 done, P1 todo/ready, P2 blocked; không có model/Modal/PA/B0 mới.
+
+## Khởi động P1 — 06/11/2026
+
+Đã fast-forward tới `7371bf6` từ GitHub, tái hiện và sửa local lỗi format ở
+loader.py/model.py; AST thực thi không đổi. P1 là task in_progress duy nhất;
+các task done/acceptance trước giữ nguyên, P2 chưa ready.
+[Kết quả và handoff](../reports/p1_kickoff_results.md),
+[thiết kế chờ duyệt](research/p1_modal_design.md).
+
+Đã xác minh profile/workspace/user Modal `vuonghungnguyen07` bằng lệnh chỉ đọc
+với profile tường minh; budget cấu hình 30 USD/thí nghiệm. Billing/usage còn
+chưa xác minh, không mở job. Đã nghiên cứu eligibility/revision/history weights
+hai model dưới15B và runtime sm_120 từ nguồn chính thức. Design tách staging
+CPU/Volume read-only/inference offline, chỉ50 câu synthetic hai lượt/process
+mới; builder check độc lập không còn câu hỏi quan trọng sau chỉnh thiết kế.
+
+CPU mới: **238 passed in 71.13s**, Ruff lint/format pass, exit0, source không
+đổi trong gate; `runs/cpu-check-20261106T063559581002Z-usdkdlqq/gate.json`.
+Đã đọc JSON/ba log, context P1 passed/current, dependency ready, không warning
+hoặc planning error; timeline current. Chưa commit/push các thay đổi phiên này;
+CI remote `7371bf6` vẫn là run format fail, không dùng green run cũ để kết luận.
+
+Đã gửi câu hỏi duyệt design theo skill brainstorming; chờ phản hồi trước
+adapter/plan implementation và cloud model job. Không tải weights, tạo Volume,
+đọc kit/gold hoặc chạy model/PA/B0. Sau duyệt dùng writing-plans đúng design,
+thực hiện inline nếu người dùng chọn, rồi TDD/CPU/Modal evidence riêng.

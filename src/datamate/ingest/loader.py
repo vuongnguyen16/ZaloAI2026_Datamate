@@ -64,7 +64,7 @@ def disjoint(a: Path, b: Path) -> bool:
     Returns:
         bool: ``True`` nếu tách biệt, ``False`` nếu trùng hoặc lồng nhau.
     """
-    
+
     return not (a == b or a.is_relative_to(b) or b.is_relative_to(a))
 
 
@@ -651,8 +651,9 @@ def run_ingest(
         )
     map_hash = None
     if format_map is not None:
-        
-        mapping = Path(format_map).resolve(strict=True)         # Kiểm tra xem file có thật sự tồn tại không
+        mapping = Path(format_map).resolve(
+            strict=True
+        )  # Kiểm tra xem file có thật sự tồn tại không
         if (
             not disjoint(mapping, source)
             or not disjoint(mapping, cache)

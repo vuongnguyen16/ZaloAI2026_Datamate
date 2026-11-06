@@ -328,7 +328,7 @@
       "D1",
       "G2"
     ],
-    "status": "todo",
+    "status": "in_progress",
     "depends_on": [
       "P0-GATE"
     ],
@@ -338,7 +338,10 @@
       "G1: ≥1 model thật chạy trên proxy với giới hạn ~30 GB; JSON hợp lệ ≥99%/50 câu được phép; 2 lượt cùng kết quả",
       "Khóa vLLM/PyTorch/CUDA, weights/image/volume và probe offline; mọi model thật chỉ Modal"
     ],
-    "evidence": [],
+    "evidence": [
+      "docs/research/p1_modal_design.md",
+      "reports/p1_kickoff_results.md"
+    ],
     "gate": "G1",
     "experiments": [
       "X3",

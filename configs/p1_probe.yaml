@@ -1,0 +1,12 @@
+profile: vuonghungnguyen07
+workspace: vuonghungnguyen07
+budget_usd: 30.0
+estimated_cost_usd: 10.0
+gpu: RTX-PRO-6000
+memory_budget_bytes: 32212254720
+seed: 0
+max_model_len: 2048
+max_tokens: 256
+gpu_timeout_seconds: 1200
+startup_timeout_seconds: 1200
+staging_timeout_seconds: 3600

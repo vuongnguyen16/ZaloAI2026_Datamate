@@ -13,10 +13,10 @@ class IngestError(ValueError):
     * 1. Lỗi gì? (``code``)
     * 2. Thế nào? (``message``)
     * 3. Ở đâu? (``location``)
-    
+
     Quy định: trên phiếu không được chép nội dung dữ liệu gốc
     (giá trị trong ô), để bảo mật dữ liệu.
-    
+
     Cách dùng:
         Báo lỗi (ném phiếu lên)::
 
@@ -54,19 +54,20 @@ class IngestError(ValueError):
         return {"code": self.code, "message": str(self), **self.location}
 
 
-@dataclass(frozen=True)      
+@dataclass(frozen=True)
 class CsvFormat:
     """
-    CsvFormat là tờ ghi chú cách đọc riêng cho đúng một file CSV, 
-    gồm: file nào (business, đường dẫn, mã niêm phong) và đọc thế nào (bảng mã, ký tự ngăn cách). 
-    Mã niêm phong đảm bảo ghi chú chỉ áp dụng khi file chưa bị thay đổi.       
+    CsvFormat là tờ ghi chú cách đọc riêng cho đúng một file CSV,
+    gồm: file nào (business, đường dẫn, mã niêm phong) và đọc thế nào (bảng mã, ký tự ngăn cách).
+    Mã niêm phong đảm bảo ghi chú chỉ áp dụng khi file chưa bị thay đổi.
     """
+
     business_id: str
     source_file: str
     source_sha256: str
-    encoding: str = "auto"          # Mặc định tự đoán (có thể sai)
-    delimiter: str = "auto"         # Mặc định tự đoán (có thể sai)
-    
+    encoding: str = "auto"  # Mặc định tự đoán (có thể sai)
+    delimiter: str = "auto"  # Mặc định tự đoán (có thể sai)
+
     def __post_init__(self):
         """Kiểm tra tính hợp lệ của các thuộc tính. Nếu không hợp lệ, ném IngestError."""
         if (

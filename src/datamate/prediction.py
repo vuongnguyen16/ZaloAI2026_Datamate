@@ -7,7 +7,7 @@ from pathlib import Path
 
 from datamate.bounded_execution import Deadline, run_bounded
 from datamate.contracts import Question
-from datamate.ingest.loader import disjoint
+from datamate.json_routing import project_id
 from datamate.prediction_store import (
     RunStore,
     publish,
@@ -15,7 +15,8 @@ from datamate.prediction_store import (
     regular_bytes,
     safe_path,
 )
-from datamate.scoped_data import project_id
+from datamate.runtime_paths import disjoint
+from datamate.runtime_paths import output_layout as _output_layout
 from datamate.scoring import parse_object
 from datamate.serialization import exact_json, format_submission, submission_bytes
 
@@ -114,24 +115,6 @@ def _inventory(root):
                 digest.update(block)
         result[str(path.relative_to(root)).replace("\\", "/")] = digest.hexdigest()
     return result
-
-
-def _output_layout(output):
-    if output.exists():
-        for path in output.iterdir():
-            safe_path(path)
-            if path.name == "logs" and path.is_dir():
-                continue
-            if path.name == "submission.jsonl" and path.is_file():
-                continue
-            if (
-                path.name.startswith(".submission.jsonl.")
-                and path.name.endswith(".pending")
-                and path.is_file()
-            ):
-                continue
-            raise ValueError("foreign nonempty output directory")
-    return output / "logs" / ".state"
 
 
 def _question_logs(

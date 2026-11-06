@@ -37,7 +37,23 @@ Targeted36passed/1skipped trong36.97s. Skip mới là directory symlink do quy�
 Windows; Linux CI phải chạy ca này thật. Test giới hạn10001IDs ghi final và
 SQLite thật, dùng sink synthetic cho file log lặp lại; physical per-ID logs
 được kiểm ở fixture nhỏ và CLI kill/resume2000IDs. Không dùng sink cho dữ liệu BTC.
-Fresh independent review/full CPU/CI còn pending; không dùng gate cũ để tuyên bố pass.
+Targeted là bằng chứng bước đầu; gate cuối sau fix review ghi dưới đây.
+
+Review source/synthetic độc lập phát hiện thêm3Important: fallback vượt live
+writer lock, vượt foreign-dir admission, import CLI/dependency sớm chưa được
+catch. Đã thêm shared publication lock/guard, minimal emergency imports và
+regression subprocess cho cả3. Case limit từng bị xếp Minor được nâng Important
+vì valid=true che coverage thiếu; nay counter/coverage_complete/valid phản ánh đúng.
+Các regression mới có6fail trước fix, thêm import Pydantic cũng fail trước;
+sau fix8case pass. Không re-review vòng2; tác giả kiểm regression và toàn suite.
+
+CPU cuối `uv run --locked python scripts/check.py`:394passed/2skipped trong69.51s,
+Ruff/format pass, exit0, source không đổi. Đã đọc gate và3log tại
+`runs/cpu-check-20261106T150301669878Z-gu4dqicp/gate.json`, fingerprint
+`52f8c5682b3025075784065e8434f55ff9dfd6d4f4207c259e10d387cd368d8b`.
+Hai skip là symlink fixtures do quyền Windows; CI Linux phải chạy thật.
+CI exact-head và trạng thái merge xem [PR1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1);
+chỉ merge khi run tương ứng success, giữ expected_head_sha để không merge nhầm head.
 
 ## Giới hạn giữ rõ
 

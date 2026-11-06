@@ -4,9 +4,8 @@ import json
 from decimal import Decimal
 
 from datamate.contracts import Submission
+from datamate.json_routing import MAX_RECORD_BYTES
 from datamate.scoring import number, parse_object, percent, validate_entry
-
-MAX_RECORD_BYTES = 4 * 1024 * 1024
 
 
 def exact_json(value, depth=0) -> str:

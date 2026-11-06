@@ -6,16 +6,16 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 tracker duy nhất state và tasks/backlog.json.
 
 **P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
-P2a đã có bản đầu; hiện sửa review PR1 mục1–6:
+P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),
 [bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
 Đã push `work/p2a-safety` và mở [PR#1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1)
-vào `main` theo yêu cầu người dùng; hiện draft trong khi sửa, chưa merge.
-Người dùng đã cho phép gate/CI xanh rồi merge, không cần hỏi lại tích hợp.
-CPU369passed/1skipped dưới đây là lịch sử trước sửa review; gate mới còn pending.
-`runs/cpu-check-20261106T140338585948Z-ltr1oldz/gate.json`, đã đọc JSON/ba log;
-Record cũ không chứng minh source sửa review pass. Review ban đầu6Important đã
-sửa; phản hồi Linux mới đang được regression/verify. README đã sửa riêng ởf33bf08.
+vào `main` theo yêu cầu người dùng. Trạng thái tích hợp hiện hành xem PR1;
+người dùng đã cho phép gate/CI xanh rồi merge, không cần hỏi lại tích hợp.
+CPU cuối394passed/2skipped, Ruff/format pass, source không đổi, đã đọc JSON/ba log:
+`runs/cpu-check-20261106T150301669878Z-gu4dqicp/gate.json`.
+Review độc lập bổ sung3Important đã sửa bằng regression; coverage-limit false pass
+cũng đã sửa. README sửa riêng ởf33bf08. Chưa model/PA/G2 hoặc public submission.
 Taxonomy cross local:1895unique/199cells/2589memberships, không mở lại gold.
 Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;
 primary Qwen3-14B,14,768,307,200 parameters. Chưa B0/PA BTC hoặc pipeline

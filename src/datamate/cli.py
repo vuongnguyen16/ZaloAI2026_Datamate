@@ -4,19 +4,6 @@ import sys
 from pathlib import Path
 
 from datamate import APPLICATION_STARTED
-from datamate.evaluation import run_eval
-from datamate.ingest import IngestError, LoaderOptions
-from datamate.ingest.loader import run_ingest
-from datamate.profile import ProfileOptions, run_profile
-from datamate.runner import run_smoke, run_stub
-from datamate.splits import (
-    authorize_access,
-    freeze_split,
-    log_public_submission,
-    open_split,
-)
-from datamate.taxonomy import run_taxonomy
-from datamate.validation import inspect_input, inspect_logs, inspect_submission
 
 
 def main() -> int:
@@ -136,6 +123,23 @@ def main() -> int:
     cross.add_argument("--manifest-sha256", required=True)
     cross.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    ingest_errors = ()
+    if args.command != "predict":
+        from datamate.evaluation import run_eval
+        from datamate.ingest import IngestError, LoaderOptions
+        from datamate.ingest.loader import run_ingest
+        from datamate.profile import ProfileOptions, run_profile
+        from datamate.runner import run_smoke, run_stub
+        from datamate.splits import (
+            authorize_access,
+            freeze_split,
+            log_public_submission,
+            open_split,
+        )
+        from datamate.taxonomy import run_taxonomy
+        from datamate.validation import inspect_input, inspect_logs, inspect_submission
+
+        ingest_errors = (IngestError,)
     try:
         if args.command == "predict":
             from datamate.prediction_failsafe import submission_predict
@@ -246,7 +250,7 @@ def main() -> int:
             output = run_smoke(args.config)
         else:
             output = run_stub(args.input, args.output)
-    except IngestError as exc:
+    except ingest_errors as exc:
         print(
             json.dumps(
                 {"valid": False, "errors": [exc.record()]}, ensure_ascii=False, indent=2

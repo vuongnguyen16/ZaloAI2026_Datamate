@@ -38,3 +38,20 @@ Phép thử: output/logs có trước và q1 timeout nhưng q2–q4 vẫn trả 
 
 Taxonomy: chỉ đọc cross aggregate dev đã pin SHA trước JSON, user cho phép
 dán top20 ô vào hội thoại. Không publish cells/raw records lên GitHub.
+
+## Khép lỗi từ review độc lập
+
+Toàn bộ primary và fallback cùng giữ OS publication lock tại logs/.publication.lock,
+có reentrancy trong cùng thread; RunStore runtime cũng tham gia lock này.
+Busy writer hoặc foreign output bị từ chối, không dùng fallback để vượt quyền sở hữu.
+Mismatch identity chỉ được fallback khi đã có lock riêng, không đọc dữ liệu CP cũ.
+Đây là giới hạn cần thiết của yêu cầu catch-all: không biến lỗi guard thành quyền ghi.
+
+CLI chỉ import dependency non-predict sau khi chọn command. Emergency path chỉ
+dùng stdlib và helper parse/validate thuần; không cần profile/ingest/DuckDB/Pydantic.
+project_id được tách cơ học ra json_routing và re-export từ scoped_data, không đổi
+policy hoặc logic authorize/decode. Numeric serializer dùng cùng budget constant.
+
+Routing emergency bounded1MiB/dòng. Dòng vượt budget có counter riêng,
+coverage_complete=false/valid=false, không bị báo như malformed và không che thiếu ID.
+Giữ final phần ID đọc được, không tuyên bố đã đáp ứng coverage đầy đủ cho input đó.

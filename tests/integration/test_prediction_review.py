@@ -213,3 +213,103 @@ def test_actual_cli_config_error_uses_failsafe(tmp_path):
     assert child.returncode == 0, child.stderr
     assert len(results(output)) == 3
     assert inspect_logs(root, output)["valid"]
+
+
+@pytest.mark.parametrize("changed_config", [False, True])
+def test_failsafe_cannot_steal_publication_from_active_writer(tmp_path, changed_config):
+    import json
+    import subprocess
+    import sys
+
+    from datamate.prediction_store import RunStore
+
+    root = inputs(tmp_path)
+    output = tmp_path / "out"
+    run_predict(root, output)
+    final = output / "submission.jsonl"
+    final.unlink()
+    state = output / "logs/.state"
+    identity = json.loads((state / "identity.json").read_text("utf-8"))
+    command = [
+        sys.executable,
+        "-m",
+        "datamate.cli",
+        "predict",
+        "--input",
+        str(root),
+        "--output",
+        str(output),
+    ]
+    if changed_config:
+        config = tmp_path / "different.yaml"
+        config.write_text("budget_seconds: 100\nreserve_seconds: 1\n")
+        command += ["--config", str(config)]
+    with RunStore(state, identity):
+        child = subprocess.run(command, capture_output=True, timeout=20)
+        assert child.returncode != 0
+        assert not final.exists(), "fallback stole the healthy writer's final path"
+
+
+def test_submission_failsafe_retains_foreign_output_admission_guard(tmp_path):
+    from datamate.prediction_failsafe import submission_predict
+
+    root = inputs(tmp_path)
+    output = tmp_path / "foreign"
+    output.mkdir()
+    (output / "user.txt").write_bytes(b"preserve")
+    outcome = submission_predict(root, output)
+    assert not outcome["valid"]
+    assert not (output / "submission.jsonl").exists()
+    assert (output / "user.txt").read_bytes() == b"preserve"
+
+
+@pytest.mark.parametrize(
+    "blocked", ["datamate.profile", "datamate.prediction", "duckdb", "pydantic"]
+)
+def test_cli_startup_import_failure_cannot_bypass_emergency_boundary(tmp_path, blocked):
+    import subprocess
+    import sys
+
+    root = inputs(tmp_path)
+    output = tmp_path / "out"
+    launcher = tmp_path / "blocked_import.py"
+    launcher.write_text(
+        """import builtins
+import sys
+original = builtins.__import__
+blocked = sys.argv[1]
+def guard(name, *args, **kwargs):
+    if name == blocked or name.startswith(blocked + "."):
+        raise ImportError("synthetic blocked import")
+    return original(name, *args, **kwargs)
+builtins.__import__ = guard
+from datamate.cli import main
+sys.argv = ["datamate", "predict", "--input", sys.argv[2], "--output", sys.argv[3]]
+raise SystemExit(main())
+""",
+        encoding="utf-8",
+    )
+    child = subprocess.run(
+        [sys.executable, str(launcher), blocked, str(root), str(output)],
+        capture_output=True,
+        timeout=20,
+    )
+    assert child.returncode == 0, child.stderr
+    assert len(results(output)) == 3
+
+
+def test_failsafe_reports_routing_limit_as_incomplete_coverage(tmp_path, monkeypatch):
+    import json
+
+    import datamate.prediction_failsafe as module
+
+    root = inputs(tmp_path, 1)
+    with (root / "questions.jsonl").open("a") as handle:
+        handle.write(json.dumps({"id": "large", "question": "x" * 1024}) + "\n")
+    monkeypatch.setattr(module, "MAX_ROUTING_LINE", 512)
+    config = tmp_path / "broken.yaml"
+    config.write_text("[broken")
+    outcome = module.submission_predict(root, tmp_path / "out", config_path=config)
+    assert not outcome["valid"]
+    assert outcome["coverage_complete"] is False
+    assert outcome["routing_limit_lines"] == 1

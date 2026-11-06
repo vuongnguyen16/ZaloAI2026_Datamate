@@ -7,9 +7,8 @@ import shutil
 import uuid
 from pathlib import Path
 
-from datamate.ingest.loader import is_link
-from datamate.scoring import parse_object
-from datamate.serialization import MAX_RECORD_BYTES, exact_json, submission_bytes
+from datamate.json_routing import MAX_RECORD_BYTES
+from datamate.runtime_paths import is_link, publication_lock, safe_path
 
 MAX_STORE_BYTES = 512 * 1024 * 1024
 MAX_JOURNAL_RECORDS = 100000
@@ -32,14 +31,6 @@ def journal_lines(paths):
                 if total > MAX_STORE_BYTES:
                     raise ValueError("checkpoint store exceeds byte budget")
                 yield path, index, line
-
-
-def safe_path(path: Path) -> Path:
-    path = Path(os.path.abspath(path))
-    for part in (path, *path.parents):
-        if is_link(part):
-            raise ValueError("linked/reparse path refused")
-    return path
 
 
 def sync_directory(path: Path) -> str:
@@ -159,8 +150,22 @@ class RunStore:
         self.segment = None
         self.bytes_written = 0
         self.allow_exclusive_fallback = allow_exclusive_fallback
+        self.publication_scope = None
 
     def __enter__(self):
+        if self.output.name == ".state" and self.output.parent.name == "logs":
+            scope = publication_lock(self.output.parent.parent)
+            scope.__enter__()
+            self.publication_scope = scope
+        try:
+            return self._enter_store()
+        except BaseException:
+            self.__exit__(None, None, None)
+            raise
+
+    def _enter_store(self):
+        from datamate.serialization import exact_json
+
         self.output.mkdir(parents=True, exist_ok=True)
         manifest = self.output / "identity.json"
         expected = (exact_json(self.identity) + "\n").encode("utf-8")
@@ -238,8 +243,13 @@ class RunStore:
             # Closing releases the OS lock even after an interrupted process.
             self.lock.close()
             self.lock = None
+        if self.publication_scope is not None:
+            scope, self.publication_scope = self.publication_scope, None
+            scope.__exit__(None, None, None)
 
     def append(self, record: dict):
+        from datamate.serialization import submission_bytes
+
         raw = submission_bytes(record)
         if self.bytes_written + len(raw) > MAX_STORE_BYTES:
             raise ValueError("checkpoint store exceeds byte budget")
@@ -249,6 +259,9 @@ class RunStore:
         self.bytes_written += len(raw)
 
     def recover(self) -> dict:
+        from datamate.scoring import parse_object
+        from datamate.serialization import submission_bytes
+
         results = {}
         self.errors = []
         paths = sorted(self.output.glob("segment-*.jsonl"))

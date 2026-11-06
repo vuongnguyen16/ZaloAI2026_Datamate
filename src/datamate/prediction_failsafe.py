@@ -1,23 +1,55 @@
 """Submission-only last resort. No business tables, answers or old checkpoints."""
 
+import json
 import sqlite3
 import uuid
 from contextlib import closing
 from pathlib import Path
 
-from datamate.ingest.loader import disjoint, is_link
+from datamate.json_routing import project_id
 from datamate.prediction_store import publish, publish_chunks, safe_path
-from datamate.scoped_data import project_id
-from datamate.serialization import exact_json, submission_bytes
+from datamate.runtime_paths import (
+    OutputBusyError,
+    disjoint,
+    is_link,
+    output_layout,
+    publication_lock,
+)
+from datamate.scoring import parse_object, validate_entry
 
 MAX_ROUTING_LINE = 1024 * 1024
 
 
-def run_failsafe(input_dir, output, primary_error):
+def _line(value):
+    return (
+        json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+        + "\n"
+    ).encode("utf-8")
+
+
+def _submission_line(record):
+    raw = _line(record)
+    validate_entry(parse_object(raw))
+    return raw
+
+
+def _admit(input_dir, output):
     source = Path(input_dir).resolve(strict=True)
     output = safe_path(output)
     if not disjoint(source, output):
         raise ValueError("failsafe output must be disjoint from input")
+    output_layout(output)
+    return source, output
+
+
+def run_failsafe(input_dir, output, primary_error):
+    _, output = _admit(input_dir, output)
+    with publication_lock(output):
+        return _run_failsafe(input_dir, output, primary_error)
+
+
+def _run_failsafe(input_dir, output, primary_error):
+    source, output = _admit(input_dir, output)
     final = safe_path(output / "submission.jsonl")
     if final.exists():
         raise FileExistsError("existing submission preserved")
@@ -28,7 +60,7 @@ def run_failsafe(input_dir, output, primary_error):
     # State is new per attempt and never reads an identity-mismatched checkpoint.
     scratch = safe_path(output / "logs" / f"failsafe-{uuid.uuid4().hex}")
     scratch.mkdir(parents=True, exist_ok=False)
-    count = errors = 0
+    count = errors = routing_limits = 0
     with closing(sqlite3.connect(scratch / "ids.sqlite")) as database:
         database.execute("PRAGMA cache_size=-2048")
         database.execute("PRAGMA temp_store=FILE")
@@ -40,7 +72,7 @@ def run_failsafe(input_dir, output, primary_error):
                 if len(line) > MAX_ROUTING_LINE:
                     while line and not line.endswith(b"\n"):
                         line = handle.readline(MAX_ROUTING_LINE + 1)
-                    errors += 1
+                    routing_limits += 1
                     continue
                 try:
                     line = line.removeprefix(b"\xef\xbb\xbf") if index == 1 else line
@@ -60,7 +92,7 @@ def run_failsafe(input_dir, output, primary_error):
                 yield {"id": qid, "type": "abstain", "reason": "runtime_fallback"}
 
         publication = publish_chunks(
-            final, (submission_bytes(r) for r in rows()), allow_exclusive_fallback=True
+            final, (_submission_line(r) for r in rows()), allow_exclusive_fallback=True
         )
         logs = safe_path(output / "logs" / f"submission-{publication['sha256']}")
         logs.mkdir(parents=True, exist_ok=True)
@@ -78,27 +110,47 @@ def run_failsafe(input_dir, output, primary_error):
             }
             publish(
                 logs / f"{index:06d}.json",
-                (exact_json(event) + "\n").encode("utf-8"),
+                _line(event),
                 allow_exclusive_fallback=True,
             )
     outcome = {
-        "valid": count > 0,
+        "valid": count > 0 and routing_limits == 0,
         "mode": "failsafe_all_abstain",
         "question_ids": count,
         "malformed_lines": errors,
+        "routing_limit_lines": routing_limits,
+        "coverage_complete": routing_limits == 0,
         "primary_error": primary_error,
         "publication": publication,
         "gold_content_read": False,
     }
     publish(
         scratch / "diagnostics.json",
-        (exact_json(outcome) + "\n").encode("utf-8"),
+        _line(outcome),
         allow_exclusive_fallback=True,
     )
     return outcome
 
 
 def submission_predict(input_dir, output, *, config_path=None, started=None):
+    try:
+        _, output = _admit(input_dir, output)
+        with publication_lock(output):
+            return _submission_predict_locked(
+                input_dir, output, config_path=config_path, started=started
+            )
+    except OutputBusyError:
+        return {"valid": False, "mode": "output_busy", "gold_content_read": False}
+    except Exception as exc:
+        return {
+            "valid": False,
+            "mode": "output_refused",
+            "error": type(exc).__name__,
+            "gold_content_read": False,
+        }
+
+
+def _submission_predict_locked(input_dir, output, *, config_path=None, started=None):
     try:
         import yaml
 

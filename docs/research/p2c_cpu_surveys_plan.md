@@ -12,16 +12,16 @@ Không đọc calibration/holdout gold. Script và mọi record BTC giữ local 
 `.tmp/`/`runs/`. Chỉ đưa kết luận, định nghĩa và locator nguồn vào tài liệu.
 Phương án đọc toàn bộ gold dev bị loại: chỉ cần tối đa40 record đã chọn trước.
 
-- [ ] Xác minh taxonomy/hash/split; phân loại 405 câu bằng nội dung câu hỏi:
+- [x] Xác minh taxonomy/hash/split; phân loại 405 câu bằng nội dung câu hỏi:
   dấu hiệu lọc, một/nhiều kỳ, độ hạt. Có bucket mơ hồ; không gọi heuristic
   là eligibility hoặc độ phủ. Không dùng gold để phân loại câu hỏi.
-- [ ] Chọn tối đa10 câu/cụm, phân tầng dạng kỳ và hai họ number/percent;
+- [x] Chọn tối đa10 câu/cụm, phân tầng dạng kỳ và hai họ number/percent;
   khóa danh sách trước khi đọc gold. Authorize dev gold rồi chỉ route/decode
   tập con đó bằng scoped reader, ghi audit và kiểm nguồn không đổi.
   Báo dạng số/độ lớn tổng hợp; không suy quy tắc từ mẫu nhỏ.
-- [ ] Checklist rulebook: ngày, trạng thái, grain, trả hàng, chiết khấu,
+- [x] Checklist rulebook: ngày, trạng thái, grain, trả hàng, chiết khấu,
   VAT/phí ship, as_of_date, kỳ so sánh, làm tròn, mẫu số và dữ liệu thiếu.
-- [ ] Viết `p2c_domain_scope.md`: hai hàm chính, percent tùy chọn; unknown
+- [x] Viết `p2c_domain_scope.md`: hai hàm chính, percent tùy chọn; unknown
   filter abstain, không lọc bỏ im lặng; precision>=90% trên>=2cụm, mỗi cụm
   >=15 câu đã trả lời; chưa đủ mẫu không đạt. Không thay G2 toàn dev.
 

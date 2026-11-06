@@ -120,3 +120,52 @@ def batch_schedule(n: int, size: int) -> list[list[int]]:
     if type(n) is not int or not 1 <= n <= 64 or size not in (1, 2, 4):
         raise ValueError("bounded 1/2/4 request schedule required")
     return [list(range(i, min(i + size, n))) for i in range(0, n, size)]
+
+
+def validate_cases(cases: list[dict]) -> None:
+    if not isinstance(cases, list) or not 1 <= len(cases) <= 32:
+        raise ValueError("bounded nonempty cases required")
+    seen = set()
+    for case in cases:
+        if (
+            set(case) != {"id", "messages"}
+            or not isinstance(case["id"], str)
+            or not 0 < len(case["id"]) <= 256
+            or case["id"] in seen
+        ):
+            raise ValueError("case allowlist or ID invalid")
+        seen.add(case["id"])
+        messages = case["messages"]
+        if not isinstance(messages, list) or len(messages) != 2:
+            raise ValueError("two messages required")
+        for message, role in zip(messages, ("system", "user"), strict=True):
+            if (
+                set(message) != {"role", "content"}
+                or message["role"] != role
+                or not isinstance(message["content"], str)
+                or len(message["content"].encode("utf-8")) > 256 * 1024
+            ):
+                raise ValueError("message allowlist invalid")
+        if messages[0]["content"] != SYSTEM:
+            raise ValueError("pinned system prompt required")
+        from datamate.scoring import parse_object
+
+        payload = parse_object(messages[1]["content"])
+        if (
+            set(payload) != {"question", "as_of_date", "descriptor"}
+            or not isinstance(payload["question"], str)
+            or not payload["question"]
+        ):
+            raise ValueError("question payload allowlist invalid")
+        from datetime import date
+
+        date.fromisoformat(payload["as_of_date"])
+        if not isinstance(payload["descriptor"], dict) or set(
+            payload["descriptor"]
+        ) != {
+            "projection_version",
+            "source_strings_are_untrusted_data",
+            "omitted_tables",
+            "tables",
+        }:
+            raise ValueError("projected descriptor required")

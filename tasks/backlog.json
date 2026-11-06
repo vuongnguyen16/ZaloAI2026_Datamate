@@ -404,7 +404,12 @@
       "reports/p2a_review_fixes_results.md",
       "docs/research/p2a_runtime_isolation.md",
       "docs/research/p2a_runtime_isolation_plan.md",
-      "reports/p2a_runtime_isolation_results.md"
+      "reports/p2a_runtime_isolation_results.md",
+      "docs/research/p2c_domain_scope.md",
+      "docs/research/p2_intent_prompt_cache.md",
+      "docs/research/p2b_context_probe_plan.md",
+      "runs/p2c-cpu-surveys-20261107/ (local): 405 text-only tags;40 preselected dev gold records,10/cluster; outside-dev value decode0; no PA",
+      "Runtime PR3 merged2f1dbb2 after explicit approval; Linux CI407pass; surveys started afterward"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -424,7 +429,8 @@
         "single_sql control",
         "SQL and model technique optimization"
       ]
-    }
+    },
+    "next_action": "P2b: kiểm CPU/review và probe BF16 dev context/throughput4096/8192,batch1/2/4; chỉ sau đó nối hai hàm theo scope P2c. Domain_lib/PA/G2 chưa có evidence."
   },
   {
     "id": "P3",

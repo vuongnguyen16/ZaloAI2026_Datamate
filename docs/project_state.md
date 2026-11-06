@@ -1,18 +1,25 @@
 # Trạng thái DataMate
 
-Cập nhật 06/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
+Cập nhật 07/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
 hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
-**P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
-Increment hiện hành: [sửa cô lập runtime](../reports/p2a_runtime_isolation_results.md)
-trên work/p2a-runtime-isolation; bỏ ngưỡng3lỗi và bỏ qua mục output ngoài runner.
-CPU runtime follow-up405passed/2skipped, Ruff/format pass, source không đổi;
-`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`, đã đọc JSON/ba log.
-Khảo sát CPU/P2c scope bắt đầu sau khi PR runtime được chốt, không làm song song.
-Đã chốt tiêu chí nội bộ từng hàm: precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời;
-thiếu mẫu báo chưa đạt. G2 giữ nguyên. Chưa khảo sát gold40 hoặc chạy P2b mới.
+**P0/G0 và P1/G1 đã hoàn tất; P2 chưa qua G2.** Runtime PR#3 đã merge
+vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime CPU
+405passed/2skipped, Ruff/format pass và source không đổi ở record lịch sử
+`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`.
+
+Increment hiện hành trên `work/p2c-dev-surveys`: đã khảo sát CPU theo
+[phạm vi P2c](research/p2c_domain_scope.md),405 câu text và40 gold dev chọn
+trước (10/cụm); ngoài dev decode0. Taxonomy có cả câu trung bình trong ô405,
+không coi count là coverage. Đã chốt precision>=90% ở>=2cụm, mỗi cụm>=15 câu
+đã trả lời; chưa đủ mẫu không đạt. G2 giữ nguyên. Prompt/cache có
+[dự thảo](research/p2_intent_prompt_cache.md); P2b đang chuẩn bị CPU/review,
+chưa có context/throughput dev thật hoặc PA. Payload16 câu + descriptor A-T2
+thực, chỉ dev/không gold, giữ local. Người dùng xác nhận credit>=30USD ngày07/11;
+account đúng workspace và không app đang chạy khi kiểm trước probe.
+
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),
 [bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.

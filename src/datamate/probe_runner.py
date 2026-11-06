@@ -1,11 +1,17 @@
 """Evidence-first orchestration; transport is constructed after CPU preflight."""
 
 import json
+import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
 from datamate.artifacts import new_run, sha256, write_json
-from datamate.model_probe import ModelCandidate, ProbeConfig, preflight
+from datamate.model_probe import (
+    ModelCandidate,
+    ProbeConfig,
+    preflight,
+    sanitize_diagnostic,
+)
 from datamate.probe_fixtures import build_cases, inference_cases
 from datamate.probe_results import evaluate_probe
 
@@ -96,6 +102,8 @@ def execute_probe(
                 "status": "failed",
                 "g1_passed": False,
                 "error_type": type(exc).__name__,
+                "message": sanitize_diagnostic(str(exc))[:4000],
+                "traceback": sanitize_diagnostic(traceback.format_exc())[-16000:],
                 "pa": "not_evaluated",
                 "automatic_retries": 0,
             },

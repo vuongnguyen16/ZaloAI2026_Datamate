@@ -1,26 +1,20 @@
 """P1 cloud transport. No SDK import or resource creation at module import."""
 
 import json
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dict:
-    import modal
-
-    runtime = json.loads((ROOT / "configs/p1_runtime.json").read_text("utf-8"))
+def build_images(image_api, runtime):
     base = runtime["base_image"]
     if not base.startswith("nvidia/cuda@sha256:") or len(base.rsplit(":", 1)[-1]) != 64:
         raise ValueError("immutable CUDA image digest required")
-    app = modal.App("datamate-p1-model-probe")
-    volume = modal.Volume.from_name(
-        "datamate-p1-model-weights-v1", create_if_missing=True
-    )
-    common = modal.Image.debian_slim(python_version="3.11.18").pip_install("uv==0.13.6")
-    gpu = modal.Image.from_registry(base, add_python="3.11.18").pip_install(
-        "uv==0.13.6"
-    )
+    full_python = runtime["python"]
+    series = ".".join(full_python.split(".")[:2])
+    common = image_api.debian_slim(python_version=full_python).pip_install("uv==0.13.6")
+    gpu = image_api.from_registry(base, add_python=series).pip_install("uv==0.13.6")
 
     def prepare(image, group):
         for name in ("pyproject.toml", "uv.lock"):
@@ -32,14 +26,19 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
                 ROOT / "src/datamate" / name, f"/opt/p1/src/datamate/{name}", copy=True
             )
         return image.env(
-            {"PYTHONPATH": "/opt/p1/src", "UV_PYTHON_DOWNLOADS": "never"}
+            {
+                "PYTHONPATH": "/opt/p1/src",
+                "UV_PYTHON_DOWNLOADS": "never",
+                "UV_PYTHON_INSTALL_DIR": "/opt/p1/python",
+            }
         ).run_commands(
-            f"cd /opt/p1/runtime && uv sync --locked --only-group {group} --no-install-project --python 3.11"
+            f"UV_PYTHON_DOWNLOADS=automatic uv python install {full_python}",
+            f"cd /opt/p1/runtime && uv sync --locked --only-group {group} --no-install-project --python {full_python}",
         )
 
     common, gpu = prepare(common, "staging"), prepare(gpu, "gpu")
     gpu = gpu.add_local_file(
-        ROOT / "infra/probe_process.py", "/opt/p1/probe_process.py", copy=True
+        ROOT / "infra/probe_process.py", "/opt/p1/src/infra/probe_process.py", copy=True
     )
     gpu = gpu.add_local_file(
         ROOT / "infra/p1_runtime/generate.py", "/opt/p1/generate.py", copy=True
@@ -53,6 +52,34 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
             "HF_HUB_DISABLE_TELEMETRY": "1",
         }
     )
+    return common, gpu
+
+
+def failure_event(app, phase, error):
+    from datamate.model_probe import sanitize_diagnostic
+
+    return {
+        "phase": f"{phase}_failed",
+        "app_id": app.app_id,
+        "error_type": type(error).__name__,
+        "message": sanitize_diagnostic(str(error))[:4000],
+    }
+
+
+def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dict:
+    import modal
+
+    runtime = json.loads((ROOT / "configs/p1_runtime.json").read_text("utf-8"))
+    base = runtime["base_image"]
+    app = modal.App("datamate-p1-model-probe")
+    volume = modal.Volume.from_name(
+        "datamate-p1-model-weights-v1", create_if_missing=True
+    )
+    evidence_volume = modal.Volume.from_name(
+        "datamate-p1-probe-evidence-v1", create_if_missing=True
+    )
+    evidence_key = uuid.uuid4().hex
+    common, gpu = build_images(modal.Image, runtime)
 
     @app.function(
         image=common,
@@ -127,7 +154,10 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
     @app.function(
         image=gpu,
         gpu=config["gpu"],
-        volumes={"/weights": volume.with_mount_options(read_only=True)},
+        volumes={
+            "/weights": volume.with_mount_options(read_only=True),
+            "/evidence": evidence_volume,
+        },
         cpu=8,
         memory=65536,
         max_containers=1,
@@ -141,17 +171,25 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
         include_source=False,
         serialized=True,
     )
-    def probe(candidate, payload):
+    def probe(candidate, payload, evidence_key):
         import os
         import subprocess
-        import sys
         import tempfile
+        import time
         import urllib.error
         import urllib.request
         import uuid
 
-        sys.path.insert(0, "/opt/p1")
-        from probe_process import run_child
+        from infra.probe_process import (
+            checkpoint_round,
+            read_checkpoint,
+            remaining_timeout,
+            run_child,
+        )
+
+        started = time.monotonic()
+        evidence_path = Path("/evidence") / evidence_key
+        evidence_path.mkdir(parents=True, exist_ok=True)
 
         target = (
             Path("/weights")
@@ -169,7 +207,12 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
                 json.dumps(candidate["files"]),
             ],
             check=True,
-            timeout=300,
+            timeout=min(
+                300,
+                remaining_timeout(
+                    started, config["gpu_timeout_seconds"], remaining_rounds=1
+                ),
+            ),
         )
         try:
             urllib.request.urlopen("https://example.com", timeout=3).close()
@@ -221,7 +264,9 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
         for number in (1, 2):
             folder = directory / f"round-{number}"
             folder.mkdir()
-            output = folder / "output.json"
+            persistent = evidence_path / f"round-{number}"
+            persistent.mkdir()
+            output = persistent / "output.json"
             metrics = run_child(
                 [
                     "/opt/p1/runtime/.venv/bin/python",
@@ -232,20 +277,19 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
                     str(output),
                 ],
                 folder,
-                timeout=(config["gpu_timeout_seconds"] - 60) / 2,
+                timeout=remaining_timeout(
+                    started, config["gpu_timeout_seconds"], remaining_rounds=3 - number
+                ),
                 sample_memory=sample,
             )
-            result = (
-                json.loads(output.read_text("utf-8"))
-                if output.is_file()
-                else {"records": []}
-            )
+            result = read_checkpoint(output)
             result.update(metrics)
             for log in ("stdout", "stderr"):
                 result[log] = (folder / f"{log}.log").read_text(
                     "utf-8", errors="replace"
                 )[-200000:]
             rounds.append(result)
+            checkpoint_round(persistent, result, evidence_volume.commit)
             if not metrics["cleaned_up"] or metrics["exit_code"]:
                 break
         capability = (
@@ -266,33 +310,52 @@ def run_cloud(config: dict, model: dict, cases: list[dict], record_event) -> dic
             "memory_method": "sampled total-device nvidia-smi MiB at approximately50ms+command latency; not a physical partition",
             "worker_uid": os.getuid(),
         }
-        return {"rounds": rounds, "telemetry": telemetry}
+        return {
+            "rounds": rounds,
+            "telemetry": telemetry,
+            "evidence_volume": "datamate-p1-probe-evidence-v1",
+            "evidence_key": evidence_key,
+        }
 
-    with modal.enable_output(), app.run():
-        record_event(
-            {
-                "phase": "app_started",
-                "app_id": app.app_id,
-                "base_image": base,
-                "staging_image_id": common.object_id,
-                "gpu_image_id": gpu.object_id,
-            }
-        )
-        staged = stage.remote(model)
-        record_event(
-            {
-                "phase": "staging_complete",
-                "app_id": app.app_id,
-                "cached": staged["cached"],
-            }
-        )
-        result = probe.remote(model, cases)
-        result.update(
-            staging=staged,
-            app_id=app.app_id,
-            base_image=base,
-            staging_image_id=common.object_id,
-            gpu_image_id=gpu.object_id,
-            billing_usd="not_yet_available; inspect Modal dashboard",
-        )
-        return result
+    record_event(
+        {
+            "phase": "prepared",
+            "evidence_volume": "datamate-p1-probe-evidence-v1",
+            "evidence_key": evidence_key,
+        }
+    )
+    phase = "startup"
+    try:
+        with modal.enable_output(), app.run():
+            record_event(
+                {
+                    "phase": "app_started",
+                    "app_id": app.app_id,
+                    "base_image": base,
+                    "staging_image_id": common.object_id,
+                    "gpu_image_id": gpu.object_id,
+                }
+            )
+            phase = "staging"
+            staged = stage.remote(model)
+            record_event(
+                {
+                    "phase": "staging_complete",
+                    "app_id": app.app_id,
+                    "cached": staged["cached"],
+                }
+            )
+            phase = "inference"
+            result = probe.remote(model, cases, evidence_key)
+            result.update(
+                staging=staged,
+                app_id=app.app_id,
+                base_image=base,
+                staging_image_id=common.object_id,
+                gpu_image_id=gpu.object_id,
+                billing_usd="not_yet_available; inspect Modal dashboard",
+            )
+            return result
+    except Exception as exc:
+        record_event(failure_event(app, phase, exc))
+        raise

@@ -51,3 +51,38 @@ def test_cli_refuses_missing_explicit_profile_before_live_account(
 
     with pytest.raises(ValueError, match="profile"):
         main(arguments(tmp_path), account_reader=forbidden)
+
+
+def test_live_account_rejects_active_app_even_with_stopped_at_column(monkeypatch):
+    import subprocess
+
+    import scripts.p1_probe as cli
+
+    responses = iter(
+        [
+            subprocess.CompletedProcess(
+                [],
+                0,
+                "Workspace: vuonghungnguyen07 (ac-example)\nUser: vuonghungnguyen07 (us-example)\n",
+                "",
+            ),
+            subprocess.CompletedProcess(
+                [],
+                0,
+                json.dumps(
+                    [
+                        {
+                            "description": "datamate-p1-model-probe",
+                            "state": "ephemeral",
+                            "tasks": "1",
+                            "stopped_at": None,
+                        }
+                    ]
+                ),
+                "",
+            ),
+        ]
+    )
+    monkeypatch.setattr(cli.subprocess, "run", lambda *args, **kwargs: next(responses))
+    with pytest.raises(ValueError, match="existing P1"):
+        cli.live_account()

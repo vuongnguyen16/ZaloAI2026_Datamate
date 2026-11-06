@@ -36,6 +36,25 @@ def evaluate_probe(cases: list[dict], rounds: list[dict], telemetry: dict) -> di
             errors.append(f"round {index}: requires 50/50 valid unique outputs")
         if run.get("exit_code") != 0 or run.get("cleaned_up") is not True:
             errors.append(f"round {index}: engine failed or cleanup unproven")
+        peaks = [
+            run.get(key)
+            for key in (
+                "peak_memory_bytes",
+                "torch_peak_allocated_bytes",
+                "torch_peak_reserved_bytes",
+            )
+        ]
+        if (
+            type(run.get("memory_sample_count")) is not int
+            or run["memory_sample_count"] <= 0
+            or any(
+                type(value) not in (int, float)
+                or not math.isfinite(value)
+                or not 0 < value <= MEMORY_BYTES
+                for value in peaks
+            )
+        ):
+            errors.append(f"round {index}: memory evidence missing or exceeds budget")
         if not all(correct.values()):
             errors.append(f"round {index}: missing correct non-abstain answer type")
         normalized.append(outputs)

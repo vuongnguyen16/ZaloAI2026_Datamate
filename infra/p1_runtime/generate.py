@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 from datamate.model_probe import ProbeConfig
+from infra.probe_process import atomic_json
 
 
 def validate_request(request: dict) -> None:
@@ -87,6 +88,8 @@ def generate(request: dict, destination: Path) -> None:
         "VLLM_ENABLE_V1_MULTIPROCESSING": "0",
     }.items():
         os.environ[key] = value
+    import platform
+
     import torch
     import vllm
     from transformers import AutoTokenizer
@@ -97,6 +100,7 @@ def generate(request: dict, destination: Path) -> None:
         "vllm": vllm.__version__,
         "torch": torch.__version__,
         "cuda": torch.version.cuda,
+        "python": platform.python_version(),
         "device": torch.cuda.get_device_name(0),
         "device_capability": list(torch.cuda.get_device_capability(0)),
         "total_device_bytes": torch.cuda.get_device_properties(0).total_memory,
@@ -105,6 +109,7 @@ def generate(request: dict, destination: Path) -> None:
         runtime["vllm"] == "0.11.1"
         and runtime["torch"].split("+")[0] == "2.9.0"
         and runtime["cuda"] == "12.8"
+        and runtime["python"] == "3.11.18"
     )
     evidence = {
         "runtime": runtime,
@@ -112,7 +117,7 @@ def generate(request: dict, destination: Path) -> None:
         "records": [],
         "status": "loading",
     }
-    destination.write_text(json.dumps(evidence, ensure_ascii=False), encoding="utf-8")
+    atomic_json(destination, evidence)
     if not correct_pins or runtime["device_capability"] != [12, 0]:
         raise ValueError("actual runtime pins or sm_120 do not match")
     torch.cuda.reset_peak_memory_stats()
@@ -175,13 +180,9 @@ def generate(request: dict, destination: Path) -> None:
             torch_peak_reserved_bytes=torch.cuda.max_memory_reserved(),
             status="running",
         )
-        destination.write_text(
-            json.dumps(evidence, ensure_ascii=False, allow_nan=False), encoding="utf-8"
-        )
+        atomic_json(destination, evidence)
     evidence["status"] = "completed"
-    destination.write_text(
-        json.dumps(evidence, ensure_ascii=False, allow_nan=False), encoding="utf-8"
-    )
+    atomic_json(destination, evidence)
 
 
 def main():

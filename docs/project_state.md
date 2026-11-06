@@ -6,7 +6,7 @@ hash `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`;
 tracker duy nhất state và tasks/backlog.json.
 
 **P0/G0 đã hoàn tất.** Split/scorer/taxonomy/gate đều done;
-P1 đang in_progress: đã sửa format và chuẩn bị thiết kế model probe chờ duyệt;
+P1 đang in_progress: thiết kế đã duyệt, đang kiểm adapter/probe trước chạy cloud;
 chưa có model thật/G1/Docker/public submission. P1 phải xác minh
 model/license/cutoff/tổng ≤15B, runtime sm_120, account vuonghungnguyen07,
 budget ≤30 USD và phạm vi dữ liệu trước job. Không tự mở job để chốt P0.

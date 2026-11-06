@@ -233,3 +233,23 @@ trước retry/đổi config; không đổi expected hoặc giảm gate để pa
 
 Pin/source đầy đủ và ngày công bố phải được đối chiếu lần cuối trước manifest
 và staging; nguồn mô tả khả năng hỗ trợ không thay evidence chạy thật.
+
+## Quyết định thực thi sau review — 06/11/2026
+
+Người dùng đã duyệt thiết kế và triển khai trực tiếp; đã xác nhận credit/hạn
+mức khả dụng ít nhất30USD. Chỉ ghi là xác nhận người dùng, không là hard cap.
+
+Modal1.6.3 chỉ nhận `add_python=3.11` ở Image.from_registry; uv trong Image
+cài interpreter chính xác3.11.18 rồi sync cloud lock bằng interpreter đó.
+Worker phải báo đúng Python3.11.18 cùng tuple vLLM/torch/CUDA. Không cài local.
+
+Ngoài Volume weights read-only, có Volume evidence nhỏ chỉ chứa synthetic
+(`datamate-p1-probe-evidence-v1`): checkpoint atomic và commit mỗi lượt trước
+khi bắt đầu lượt sau. events local lưu UUID evidence và appID, kể cả lỗi khi
+vào app.run/build. Volume này có chi phí lưu trữ nhỏ tiếp diễn, không chứa BTC.
+Đây là lựa chọn thực thi để giữ kết quả khi disconnect/OOM, không mở thêm pha.
+
+Function GPU dùng deadline monotonic chung tính cả hash/load/round/cleanup và
+chừa90s trả kết quả. Mỗi lượt phải có sample NVML và peak Torch allocated/
+reserved hợp lệ; bất kỳ peak nào vượt30GiB đều fail, aggregate không che lượt
+thiếu evidence. Diagnostic được lọc credential và query URL trước lưu.

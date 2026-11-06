@@ -83,6 +83,8 @@ def test_transport_failure_is_preserved_without_retry(tmp_path):
     report = json.loads((run / "acceptance.json").read_text())
     assert report["g1_passed"] is False
     assert report["status"] == "failed"
+    assert "synthetic transport failed" in report["message"]
+    assert "RuntimeError" in report["traceback"]
     assert "synthetic-app" in (run / "events.jsonl").read_text()
     assert (run / "preflight.json").is_file()
     assert (run / "source.json").is_file()

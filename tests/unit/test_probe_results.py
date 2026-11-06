@@ -35,6 +35,10 @@ def rounds():
             "engine_started_at": float(pid),
             "exit_code": 0,
             "cleaned_up": True,
+            "torch_peak_allocated_bytes": 28 * 1024**3,
+            "torch_peak_reserved_bytes": 29 * 1024**3,
+            "peak_memory_bytes": 29 * 1024**3,
+            "memory_sample_count": 12,
             "records": [
                 {"id": c["id"], "text": json.dumps(c["expected"]), "token_ids": [1, 2]}
                 for c in cases()
@@ -169,3 +173,19 @@ def test_all_abstain_does_not_pass_as_model_evidence():
     report = evaluate(rs)
     assert report["valid_counts"] == [50, 50]
     assert report["g1_passed"] is False
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"torch_peak_allocated_bytes": 31 * 1024**3},
+        {"torch_peak_reserved_bytes": 32 * 1024**3},
+        {"peak_memory_bytes": 31 * 1024**3},
+        {"memory_sample_count": 0},
+        {"torch_peak_reserved_bytes": None},
+    ],
+)
+def test_aggregate_cannot_hide_overbudget_or_missing_round_memory(change):
+    rs = rounds()
+    rs[1].update(change)
+    assert evaluate(rs)["g1_passed"] is False

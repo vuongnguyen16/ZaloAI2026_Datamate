@@ -84,6 +84,12 @@ không tái dùng engine/prefix cache. Weights stage online trên CPU rồi hash
 GPU chỉ đọc Volume, block_network và local-files-only. Volume giữ weights cho
 P2 và tiếp tục có chi phí storage; không tự xóa như cleanup.
 
+Sau review, thêm Volume evidence synthetic riêng với UUID được ghi trong
+events local. Weights vẫn read-only; checkpoint round được commit trước khi
+chạy round kế tiếp. Khi mất kết nối, kiểm app và evidence UUID trước khi tính
+chạy lại. SDK chọn Python series3.11, cloud uv cài worker interpreter3.11.18;
+không cài interpreter/GPU dependency khác vào môi trường local.
+
 Mỗi run tạo `runs/p1-probe-.../`: preflight/config/model/source hash,
 synthetic fixture local, events/app ID, raw_result và acceptance. Expected của
 fixture không vào inference payload. Timeout/failure được ghi, không repair

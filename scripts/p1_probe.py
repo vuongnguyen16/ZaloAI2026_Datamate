@@ -47,9 +47,17 @@ def live_account() -> dict:
     if not isinstance(entries, list):
         raise ValueError("Unexpected Modal app inventory; no job launched")
     for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError("Unexpected Modal app row; no job launched")
+        row = {
+            re.sub(r"[^a-z]", "", key.lower()): value for key, value in entry.items()
+        }
+        description = row.get("description", "")
+        state = row.get("state")
         if (
-            "datamate-p1-model-probe" in str(entry)
-            and "stopped" not in str(entry).lower()
+            isinstance(description, str)
+            and "datamate-p1-model-probe" in description
+            and state != "stopped"
         ):
             raise ValueError(
                 "An existing P1 app requires inspection before another launch"

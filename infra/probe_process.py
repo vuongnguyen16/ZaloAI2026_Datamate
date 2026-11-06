@@ -1,10 +1,51 @@
 """Bounded subprocess supervision, usable without any GPU or cloud imports."""
 
+import base64
+import json
 import os
 import signal
 import subprocess
 import time
 from pathlib import Path
+
+
+def remaining_timeout(
+    started: float, total: float, *, remaining_rounds: int, now: float | None = None
+) -> float:
+    available = total - ((time.monotonic() if now is None else now) - started) - 90
+    if available <= 0 or remaining_rounds < 1:
+        raise TimeoutError("probe deadline reserve reached")
+    return available / remaining_rounds
+
+
+def atomic_json(path: Path, value: dict) -> None:
+    encoded = json.dumps(value, ensure_ascii=False, allow_nan=False)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(encoded, encoding="utf-8")
+    os.replace(temporary, path)
+
+
+def read_checkpoint(path: Path) -> dict:
+    if not path.is_file():
+        return {"records": [], "checkpoint_error": "missing"}
+    raw = path.read_bytes()
+    try:
+        result = json.loads(raw.decode("utf-8"))
+        if not isinstance(result, dict):
+            raise ValueError("checkpoint must be object")
+        return result
+    except (ValueError, UnicodeError):
+        return {
+            "records": [],
+            "checkpoint_error": "unreadable",
+            "checkpoint_raw_base64": base64.b64encode(raw).decode("ascii"),
+        }
+
+
+def checkpoint_round(directory: Path, result: dict, commit) -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    atomic_json(directory / "round.json", result)
+    commit()
 
 
 def run_child(
@@ -13,6 +54,7 @@ def run_child(
     directory.mkdir(parents=True, exist_ok=True)
     peak, samples, timed_out = 0, 0, False
     started = time.time()
+    monotonic_started = time.monotonic()
     kwargs = {"start_new_session": True} if os.name != "nt" else {}
     with (
         (directory / "stdout.log").open("wb") as out,
@@ -27,7 +69,7 @@ def run_child(
                     samples += 1
                 if child.poll() is not None:
                     break
-                if time.time() - started >= timeout:
+                if time.monotonic() - monotonic_started >= timeout:
                     timed_out = True
                     break
                 time.sleep(0.05)

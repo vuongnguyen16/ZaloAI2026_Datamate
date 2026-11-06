@@ -1,12 +1,45 @@
 {
-  "status": "eligible_p1_candidates_not_executed",
-  "inference_models": [],
-  "total_parameters": null,
-  "eligibility_verified": false,
+  "status": "selected_after_p1_g1_pipeline_pending_p2",
+  "inference_models": [
+    {
+      "role": "primary",
+      "repository": "Qwen/Qwen3-14B",
+      "full_commit_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+      "public_release_date": "2025-04-29",
+      "license_and_source": {
+        "id": "Apache-2.0",
+        "source": "https://huggingface.co/Qwen/Qwen3-14B/blob/40c069824f4251a91eefaf281ebe4c544efd3e18/LICENSE"
+      },
+      "total_parameters_including_all_moe_experts": 14768307200,
+      "artifact_hashes": {
+        "LICENSE": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+        "config.json": "e73c3664ca09b10a673fef0c22e8a6b456201d49bd4713c9691f775720e8857a",
+        "generation_config.json": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+        "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+        "model-00001-of-00008.safetensors": "e942bdbdf08857d16a8fef7d1dae9fceabeb4e84def6043485fe2f6f085dab0e",
+        "model-00002-of-00008.safetensors": "f7c9c6eee628f5ad831d2d1d292e120505e5fcadeb38f88b4d3c4cb86306ccf9",
+        "model-00003-of-00008.safetensors": "dfb8c5df9404b41ad6ae74e8b6b367135f017b4467b884cf71b17c71954f18a9",
+        "model-00004-of-00008.safetensors": "eab286fec759e3e59ab228621aefa0fef14ed56039e06f959e67257d5af7604d",
+        "model-00005-of-00008.safetensors": "97f0dc2992e59da95c466eff6f4fd0c8335843bbc36ed5c913a6f5150748c0e6",
+        "model-00006-of-00008.safetensors": "9e8e76a013cd5e253865b792991e0b410f869b136b3c500079b531b09198e99e",
+        "model-00007-of-00008.safetensors": "0aee70ee6e91dc00d818804fb47f124d13ee4ad5b4a64553e09dbf9391cd5750",
+        "model-00008-of-00008.safetensors": "0d6b92296e326d39bbbaeb32c3ec454ac606da843d4c8ffa8edf010b62b8c9e0",
+        "model.safetensors.index.json": "62d7ad35757bae5e7baa452cb1483178b7daa50e869e923226b8da10871f7ebc",
+        "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+        "tokenizer_config.json": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+        "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      },
+      "tokenizer_and_chat_template_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+      "runtime_evidence_reference": "#/p1_evidence/runs/0",
+      "selection_basis": "First eligible candidate passing G1, as designed; not a quality ranking."
+    }
+  ],
+  "total_parameters": 14768307200,
+  "eligibility_verified": true,
   "fake_adapter_is_model": false,
   "execution_policy": "all_real_models_on_modal",
   "policy_reference": "manifests/competition_contract.json#/model_policy",
-  "next_review": "D/G: full revision, release date, license, aggregate parameters including auxiliary/MoE",
+  "next_review": "P2 hybrid integration and PA dev; P5 controlled model comparison; current predict remains stub.",
   "required_fields_per_real_model": [
     "role",
     "repository",
@@ -79,5 +112,92 @@
       ]
     }
   ],
-  "candidate_scope": "Candidates are tested sequentially; inference_models remains empty until selection. HF metadata hashes, not local weight-byte verification."
+  "candidate_scope": "Candidates are tested sequentially; inference_models remains empty until selection. HF metadata hashes, not local weight-byte verification.",
+  "p1_evidence": {
+    "kind": "source_and_artifact_provenance_only",
+    "scope": "Synthetic runtime/format, not B0 or BTC PA; task status lives in state/backlog.",
+    "runs": [
+      {
+        "repository": "Qwen/Qwen3-14B",
+        "full_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+        "run_directory": "runs/p1-probe-20261106T080821Z-b4015cd9",
+        "app_id": "ap-8MzBpOmzpUkOd4o5pzlfw9",
+        "acceptance_sha256": "43517c053030fbef95278906cef5ef35776f23444b14e9d2ca87a115691c69af",
+        "raw_result_sha256": "213d9878bcb91df04338ffd1733c85484e747c9be34baa12d8070e72452bd6e1",
+        "source_manifest_sha256": "491c8add78b91c1c59f9c434acf3bf4e8fb0b38ee917a7a3cca530e6c38dbb6a",
+        "model_input_sha256": "90a7ff891030c6400e75dbfcf3d0b983a2fddff41f4cebfbe49ebb3efff293c3",
+        "config_sha256": "17f6e10ad8d41582cee7d1a725d0aa75f80132b1c326ef2b3e5d6d8844135c3f",
+        "valid_counts": [
+          50,
+          50
+        ],
+        "normalized_equal": true,
+        "raw_text_equal_count": 50,
+        "token_ids_equal_count": 50,
+        "peak_memory_bytes": 32003588096,
+        "runtime": {
+          "vllm": "0.11.1",
+          "torch": "2.9.0+cu128",
+          "cuda": "12.8",
+          "python": "3.11.18",
+          "device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+          "device_capability": [
+            12,
+            0
+          ],
+          "total_device_bytes": 102016548864
+        },
+        "gpu_image_id": "im-8Y8ahw0jVUMLObcthywDGH",
+        "staging_image_id": "im-SACdI7rW75lILsmFu7NgUI",
+        "evidence_volume": "datamate-p1-probe-evidence-v1",
+        "evidence_key": "3ddc658879df4f0a83c83a70396b4cab",
+        "call_wall_seconds_upper_estimate": 177.651837,
+        "call_compute_cost_upper_estimate_usd": 0.19344153227255997,
+        "cost_scope": "Wall interval includes startup/network/stop; rate includes GPU+8CPU+64GiB, excludes builds/staging/storage; not an invoice."
+      },
+      {
+        "repository": "Qwen/Qwen2.5-Coder-14B-Instruct",
+        "full_revision": "aedcc2d42b622764e023cf882b6652e646b95671",
+        "run_directory": "runs/p1-probe-20261106T081654Z-53376f43",
+        "app_id": "ap-JrcosZOQwP51IliWGSAUoM",
+        "acceptance_sha256": "bbfbf634cc4a05315a5833ff72e396ddf65bab4056505220bd80b2f02b8bff22",
+        "raw_result_sha256": "4ba6db5757550213363a4862fe63a1c07bf665ad0c371667792a6f07ec6c6d04",
+        "source_manifest_sha256": "491c8add78b91c1c59f9c434acf3bf4e8fb0b38ee917a7a3cca530e6c38dbb6a",
+        "model_input_sha256": "9e94dbf2474d240b19f23606486dadfba8e9a59a773b0893f2894da42a2e29c4",
+        "config_sha256": "17f6e10ad8d41582cee7d1a725d0aa75f80132b1c326ef2b3e5d6d8844135c3f",
+        "valid_counts": [
+          50,
+          50
+        ],
+        "normalized_equal": true,
+        "raw_text_equal_count": 50,
+        "token_ids_equal_count": 50,
+        "peak_memory_bytes": 31932284928,
+        "runtime": {
+          "vllm": "0.11.1",
+          "torch": "2.9.0+cu128",
+          "cuda": "12.8",
+          "python": "3.11.18",
+          "device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+          "device_capability": [
+            12,
+            0
+          ],
+          "total_device_bytes": 102016548864
+        },
+        "gpu_image_id": "im-8Y8ahw0jVUMLObcthywDGH",
+        "staging_image_id": "im-SACdI7rW75lILsmFu7NgUI",
+        "evidence_volume": "datamate-p1-probe-evidence-v1",
+        "evidence_key": "ddfef754941a43af86b9690b64676c47",
+        "call_wall_seconds_upper_estimate": 570.585842,
+        "call_compute_cost_upper_estimate_usd": 0.62129951163696,
+        "cost_scope": "Wall interval includes startup/network/stop; rate includes GPU+8CPU+64GiB, excludes builds/staging/storage; not an invoice."
+      }
+    ],
+    "failed_run_directories": [
+      "runs/p1-probe-20261106T073327Z-5dc4f6c9",
+      "runs/p1-probe-20261106T073938Z-fcc48667"
+    ],
+    "registration_note": "Candidate input and all recorded source hashes verified against current tree before this post-run registration. Only registration bookkeeping now changes models.json."
+  }
 }

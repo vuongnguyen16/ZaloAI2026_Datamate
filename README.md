@@ -8,7 +8,10 @@ không còn là bảy luồng song song theo tuần. Ước lượng trong DOCX 
 **P0/G0 đã hoàn tất:** split/access khóa, scorer 9 type,
 run_eval/bootstrap và taxonomy dev đã có. [Kết quả](reports/p0_results.md),
 [cách đánh giá](docs/evaluation.md). Calibration/holdout gold giữ kín;
-chưa có model thật hoặc B0. Sau G0, bước tiếp theo là P1 trên Modal.
+**P1/G1 đã hoàn tất:** hai model thật trên Modal sm_120, JSON50/50 mỗi lượt,
+hai lượt trùng; peak<30GiB, weights read-only và inference offline.
+[Kết quả P1](reports/p1_results.md). Chưa có B0/PA dữ liệu BTC;
+bước tiếp theo là P2 hybrid pipeline.
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên
@@ -19,7 +22,7 @@ $env:UV_CACHE_DIR = "$PWD\.uv-cache"
 $env:UV_PYTHON_INSTALL_DIR = "$PWD\.uv-python"
 uv sync --locked
 uv run --locked python scripts/timeline.py check
-uv run --locked python scripts/harness.py context --task P1
+uv run --locked python scripts/harness.py context --task P2
 uv run --locked python scripts/check.py
 ```
 
@@ -45,8 +48,9 @@ thiết kế, plan, TDD, debug và review; bootstrap qua AGENTS.md. Dùng chung 
 |---|---|
 | A-T1 loader CSV/XLSX/SQLite → DuckDB, cache raw | [Hướng dẫn](docs/ingestion.md), [nghiệm thu](reports/a_t1_loader_results.md); 30 business/339 unit, bảo toàn raw |
 | A-T2 format/profile/header/data_start/descriptor | [Profile](docs/profiling.md), [format](docs/runtime_format.md), [nghiệm thu](reports/a_t2_completion_results.md); 311 auto/11 unresolved/17 schema; actual prompt/PA còn ở P2 |
-| P0 đánh giá | [Scorer/scoped reader/bootstrap/taxonomy](docs/evaluation.md); [split khóa](docs/split_policy.md); chưa model/B0 |
-| Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử, chưa GPU/model |
+| P0 đánh giá | [Scorer/scoped reader/bootstrap/taxonomy](docs/evaluation.md); [split khóa](docs/split_policy.md); chưa B0/PA BTC |
+| P1 model/runtime | [Qwen3-14B và Coder-14B trên Modal](reports/p1_results.md); structured JSON, hai process mới, sm_120 và offline pass; chưa B0/PA |
+| Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử; GPU/model xem P1 |
 
 Kiến trúc mục tiêu: domain_lib dựng từ dev, model nhỏ chọn/gọi hàm,
 SQL/Python dự phòng và abstain/verifier/formatter từ P2. single_sql là đối chứng.

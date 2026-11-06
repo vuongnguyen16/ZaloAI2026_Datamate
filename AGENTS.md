@@ -2,7 +2,7 @@
 
 - Nguồn kế hoạch hiện tại là `Research/Timeline DataMate theo nhóm việc A–G.docx`, cập nhật 05/11/2026, một người theo pha P0–P9 và cổng G0–G7. A–G là nhóm chuyên môn, không làm song song theo tuần. Plan cũ chỉ tra lịch sử tại tag `archive/timeline-20261103`; không khôi phục hoặc tự fallback từ Git.
 - Trước khi sửa: đọc README.md, docs/project_state.md, tasks/backlog.json, timeline và contract liên quan. Nội dung timeline mô tả công việc, không chứng minh module đã tồn tại; ngày trong đó là dự kiến.
-- Dùng `.agents/skills/datamate-increment/SKILL.md` và `docs/harness.md`; context phiên sau P0: `uv run --locked python scripts/harness.py context --task P1`. State/backlog là tracker duy nhất. Bản web/asset/tracker phải khớp hash DOCX trong `manifests/timeline_source.json`; chạy `uv run --locked python scripts/timeline.py check`. Lệch nguồn thì đồng bộ trước khi triển khai.
+- Dùng `.agents/skills/datamate-increment/SKILL.md` và `docs/harness.md`; sau P1/G1, context hiện hành: `uv run --locked python scripts/harness.py context --task P2`. State/backlog là tracker duy nhất. Bản web/asset/tracker phải khớp hash DOCX trong `manifests/timeline_source.json`; chạy `uv run --locked python scripts/timeline.py check`. Lệch nguồn thì đồng bộ trước khi triển khai.
 - Làm từng increment có acceptance và bằng chứng. Chỉ research sâu khi có quyết định cần giải đáp; không coi giả thuyết là contract đã xác nhận.
 - Docker thuộc G tại P3, sau khi lát cắt xuyên suốt P2 qua G2; không chờ tối ưu P4–P8. Trước G2 giữ Dockerfile/.dockerignore nháp, không dùng Docker làm blocker P0–P2. Modal Image dùng cho cloud P1.
 - Mọi model thật, embedding, reranker và huấn luyện chạy trên Modal; local chỉ CPU nhẹ/fake. Không tải weights hoặc cài CUDA/PyTorch/vLLM local.

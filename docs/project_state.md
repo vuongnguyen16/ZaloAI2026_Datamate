@@ -5,11 +5,12 @@ hash `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
-**P0/G0 đã hoàn tất.** Split/scorer/taxonomy/gate đều done;
-P1 đang in_progress: thiết kế đã duyệt, đang kiểm adapter/probe trước chạy cloud;
-chưa có model thật/G1/Docker/public submission. P1 phải xác minh
-model/license/cutoff/tổng ≤15B, runtime sm_120, account vuonghungnguyen07,
-budget ≤30 USD và phạm vi dữ liệu trước job. Không tự mở job để chốt P0.
+**P0/G0 và P1/G1 đã hoàn tất.** P2 todo/ready, chưa mở task active.
+Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;
+primary Qwen3-14B,14,768,307,200 parameters. Chưa B0/PA BTC hoặc pipeline
+predict thật/Docker/public submission. [Kết quả P1](../reports/p1_results.md).
+Mỗi job tiếp theo vẫn phải xác minh account/budget/phạm vi dữ liệu;
+P1 chỉ dùng synthetic, quyền gửi dữ liệu BTC cloud chưa được mở từ P1.
 
 ## P0 hiện hành
 
@@ -276,3 +277,40 @@ CI remote `7371bf6` vẫn là run format fail, không dùng green run cũ để 
 adapter/plan implementation và cloud model job. Không tải weights, tạo Volume,
 đọc kit/gold hoặc chạy model/PA/B0. Sau duyệt dùng writing-plans đúng design,
 thực hiện inline nếu người dùng chọn, rồi TDD/CPU/Modal evidence riêng.
+
+## P1/G1 hoàn tất — 06/11/2026
+
+Đã triển khai theo design người dùng duyệt, chỉ dùng synthetic; thử thật hai
+model tuần tự trên Modal RTX-PRO-6000 sm_120. Qwen3-14B và
+Qwen2.5-Coder-14B-Instruct đều50/50 JSON hợp lệ ở từng lượt; normalized/raw
+text/token IDs trùng50/50 giữa hai engine OS process mới, exit0/cleanup pass.
+Peak NVML lần lượt29.8057/29.7393GiB, mọi peak Torch/NVML<=30GiB, weights
+read-only, outbound bị chặn và snapshot hash khớp.
+
+Runtime Python3.11.18/vLLM0.11.1/torch2.9.0+cu128/CUDA12.8, OCI digest và
+cloud uv.lock ghim; không torch/vLLM/weights local. Primary cho P2 là Qwen3,
+14,768,307,200 parameters; chỉ một inference model, không cộng hai candidate.
+Chọn theo thứ tự smoke đã thiết kế, không claim model tốt nhất hoặc PA/B0.
+Hai lỗi boolean synthetic Qwen3 còn được báo; JSON validity không là accuracy.
+
+[Báo cáo](../reports/p1_results.md),
+[provenance/hash/app IDs](../manifests/models.json) tại p1_evidence.
+Pass runs local/ignored: `runs/p1-probe-20261106T080821Z-b4015cd9/` và
+`runs/p1-probe-20261106T081654Z-53376f43/`. Đã kiểm source/candidate/hash
+trước khi đăng ký selection và provenance. Hai run fail cũ giữ nguyên;
+không đổi expected, giảm gate hoặc tăng memory trần để pass.
+
+Credit đủ do người dùng xác nhận, account live đúng trước job, trần30USD;
+invoice thực chưa đọc nên không ghi0USD. Apps đã completed; live check không
+có app P1 xung đột. Volume weights/evidence giữ để P2 tái dùng và có storage
+theo quota/pricing workspace, không tự xóa. Không data/gold/BTC upload hoặc
+real-gold evaluation. Quyền gửi dữ liệu BTC cloud ở P2 cần xác minh riêng.
+
+P1 done, P2 todo/ready theo dependency; chưa mở P2, Docker vẫn P3 sau G2.
+Phiên tiếp: `uv run --locked python scripts/harness.py context --task P2`.
+CPU final: **314 passed, 1 skipped in 35.97s**, Ruff lint/format pass, exit0,
+source không đổi; đã đọc JSON/ba log tại
+`runs/cpu-check-20261106T085823004284Z-ub9a2irz/gate.json`.
+Context P2: dependency ready, CPU passed/current, không active task, warning
+hoặc planning error; timeline check current. Nhánh local `work/p1-modal-probe`
+đã chốt code/config/docs; P1 chưa push/merge, chờ lựa chọn tích hợp cuối.

@@ -9,7 +9,7 @@ Quyết định đồng bộ/giữ foundation: `docs/research/timeline_sync.md`.
 
 ```powershell
 uv run --locked python scripts/timeline.py check
-uv run --locked python scripts/harness.py context --task P1
+uv run --locked python scripts/harness.py context --task P2
 uv run --locked python scripts/check.py
 ```
 
@@ -37,7 +37,7 @@ hash/mapping lịch sử, không phải tracker thứ hai.
 | Cổng | Yêu cầu | Trạng thái |
 |---|---|---|
 | CPU | Ruff lint/format + pytest; log, command/exit code, code/test/config/lock hash | `scripts/check.py` hiện có; JSON/log dưới `runs/cpu-check-.../` |
-| Modal model | Xác minh account/budget, app/run ID, model revision, hardware/config và lời gọi model thật | D/G chưa có model; smoke CPU lịch sử không thay model gate |
+| Modal model | Xác minh account/budget, app/run ID, model revision, hardware/config và lời gọi model thật | P1/G1 đã có hai model thật sm_120/offline/synthetic; xem reports/p1_results.md; chưa PA/B0 |
 | Evaluation | Project scorer từ nguồn E, scoped reader, split/control/config/log/bootstrap | P0/G0 đã có; model/PA baseline hybrid P2 còn todo |
 
 CPU gate không gọi cloud và luôn để GPU/model/PA chưa kiểm chứng. Marker `gpu`

@@ -6,6 +6,8 @@
 !/infra/
 
 # Fixtures, documents, credentials and generated files are not code context.
+*.toml
+*.lock
 *.json
 *.jsonl
 *.csv

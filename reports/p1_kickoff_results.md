@@ -1,5 +1,8 @@
 # Khởi động P1 — 06/11/2026
 
+Đây là báo cáo kickoff lịch sử. P1/G1 sau đó đã hoàn tất;
+trạng thái và nghiệm thu cuối ở [kết quả P1](p1_results.md), state/backlog.
+
 **P1 in_progress, G1 chưa đạt.** Đã sửa format, kiểm nền CPU và chuẩn bị
 [thiết kế model probe](../docs/research/p1_modal_design.md) chờ người dùng duyệt.
 Chưa có model adapter mới, chưa mở job GPU, chưa tạo Volume/tải weights.

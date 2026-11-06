@@ -344,7 +344,8 @@ P6 kiểm cấu hình cuối/ngưỡng; P7 holdout một lần. Split/access/sco
 
 Đây là đóng quyết định giấy tờ, P2/P5 vẫn todo; không có task active, code P2,
 probe model mới, upload dev hoặc PA mới. G2/G5 chưa pass. Nhánh local
-`work/p2-policy`; chưa push/merge. Bằng chứng CPU/QA cuối:
+`work/p2-policy` tại thời điểm chốt giấy tờ; xuất bản sau đó ghi ở phần dưới.
+Bằng chứng CPU/QA cuối:
 CPU mới: **314 passed, 1 skipped in43.55s**, Ruff lint/format pass, exit0,
 source không đổi; đã đọc gate.json/ba log tại
 `runs/cpu-check-20261106T113002356608Z-kn2e1qpb/gate.json`.
@@ -352,3 +353,17 @@ DOCX render16trang đã kiểm toàn bộ ảnh, không lỗi clipping/mất d�
 current137đoạn/20bảng/149hàng/1sơ đồ. Review độc lập phát hiện1Important
 (B4/P4 dùng calibration quá sớm) đã sửa thành dev tạm/P6 hiệu chỉnh;
 [báo cáo](../reports/p2_policy_results.md). Không có job cloud trong phiên này.
+
+## Xuất bản quyết định P2 lên GitHub — 06/11/2026
+
+Theo yêu cầu trực tiếp của người dùng, đã fast-forward `main` từc8d0aa4
+tới[800e4d6](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/800e4d65b225df2431ac23d84d9a6d66eae74798)
+và push thành công; SHA remote đã đối chiếu. Nội dung gồm DOCX/web/sơ đồ,
+quyền dev trên Modal, G2 thu gọn và contract G5 đã chốt.
+
+[GitHub CPU gate của800e4d6](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42211822444)
+success, **315 passed in15.16s** trên Ubuntu, Ruff lint/format pass; đã đọc
+job steps và log. Gate local phía trên vẫn passed/current. Bản ghi này bổ
+sung bằng chứng xuất bản cho commit đó; CI của commit tài liệu tiếp theo
+được kiểm riêng. Kit/gold/membership/runs/credentials và scratch QA không
+được publish. P2/P5 vẫn todo; chưa runtime P2, probe dev hoặc PA mới.

@@ -56,4 +56,10 @@ Các phần reviewer không kết luận: QA hình ảnh và CPU đã được t
 như trên; runtime G2/G5, dữ liệu/artifact thật và live quyền/budget để đúng
 pha, không lấy giấy tờ thay bằng chứng. Không có job cloud trong phiên này.
 
-Nhánh local `work/p2-policy`; không push/merge hoặc gửi dữ liệu ra ngoài.
+Người dùng sau đó yêu cầu đưa lên GitHub. Đã fast-forward `main` và push
+[800e4d6](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/commit/800e4d65b225df2431ac23d84d9a6d66eae74798),
+SHA remote khớp. [CI của commit policy](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42211822444)
+success, **315 passed in15.16s** trên Ubuntu, Ruff pass; đã đọc steps/log.
+Đây là bằng chứng cho800e4d6; commit bổ sung bản ghi này kiểm CI riêng.
+Chỉ code/config/tài liệu phù hợp được xuất bản, không dữ liệu BTC/gold/runs
+hoặc scratch QA. Không có job model mới hoặc thay trạng thái P2/P5.

@@ -3,6 +3,7 @@ import json
 import sys
 from pathlib import Path
 
+from datamate import APPLICATION_STARTED
 from datamate.evaluation import run_eval
 from datamate.ingest import IngestError, LoaderOptions
 from datamate.ingest.loader import run_ingest
@@ -32,6 +33,12 @@ def main() -> int:
     )
     stub.add_argument("--input", type=Path, required=True)
     stub.add_argument("--output", type=Path, required=True)
+    predict = commands.add_parser(
+        "predict", help="Resumable CPU safety output; no model"
+    )
+    predict.add_argument("--input", type=Path, required=True)
+    predict.add_argument("--output", type=Path, required=True)
+    predict.add_argument("--config", type=Path)
     audit = commands.add_parser(
         "validate-input", help="Split contract checks; never reads gold"
     )
@@ -124,7 +131,20 @@ def main() -> int:
     taxonomy.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
-        if args.command == "run-eval":
+        if args.command == "predict":
+            import yaml
+
+            from datamate.prediction import run_predict
+
+            config = None
+            if args.config:
+                config = yaml.safe_load(args.config.read_text("utf-8"))
+                if not isinstance(config, dict):
+                    raise ValueError("prediction config must be a mapping")
+            output = run_predict(
+                args.input, args.output, config, started=APPLICATION_STARTED
+            )
+        elif args.command == "run-eval":
             output = run_eval(
                 args.split,
                 args.manifest_sha256,
@@ -236,3 +256,7 @@ def main() -> int:
         else output
     )
     return 0 if not isinstance(output, dict) or output["valid"] else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

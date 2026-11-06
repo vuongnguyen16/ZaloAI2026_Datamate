@@ -1,0 +1,4 @@
+# P2a safety coordinator: no model, no SQL fallback, no gold access.
+budget_seconds: 21600
+reserve_seconds: 120
+per_question_seconds: 30

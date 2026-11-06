@@ -67,3 +67,22 @@ Không job Modal, model thật, Gold mới, PA, Docker hoặc public submission.
 PR tạm draft vì GitHub không cho author Request changes trên chính PR mình (API422).
 Người dùng yêu cầu sửa/gate/CI rồi merge; thực hiện theo exact-head CI và expected SHA.
 Taxonomy top20 chỉ xuất hội thoại theo yêu cầu, không commit/push cells hoặc records.
+
+## Tích hợp hoàn tất
+
+Đã merge [PR1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1) với
+expected head973329e vào main, commit `e17a14bf23cf8098891ec65ec40a9b00b3cf19e8`.
+Lượt đầu auto-review yêu cầu phê duyệt trực tiếp; sau câu xác nhận mới của chủ
+project đã thực hiện qua cùng merge API, không dùng workaround.
+Tree merge bằng tree của head đã test; local main fast-forward tới merge.
+
+[CI PR exact head](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42240188523)
+success,396passed/26.24s trên Linux, Ruff/format pass, đã đọc job steps/log.
+[CI merge](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42240636621)
+cũng success. Đây là CPU synthetic, không model/PA hoặc bằng chứng mount BTC thật.
+
+CPU local sau checkout/merge được chạy mới vì chuẩn hóa newline làm fingerprint
+khác trước checkout:394passed/2skipped/98.44s, Ruff/format pass, source không đổi,
+`runs/cpu-check-20261106T151229925071Z-25frn51n/gate.json`, fingerprint
+`819fa30091519b4e6841441b486fe105fb05dc8cc9fe002e41e59b132e2555c3`.
+Đã đọc gate/ba log; state/backlog vẫn chỉ P2 in_progress, P2b/P2c/G2 pending.

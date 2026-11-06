@@ -10,10 +10,12 @@ P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),
 [bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
 Đã push `work/p2a-safety` và mở [PR#1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1)
-vào `main` theo yêu cầu người dùng. Trạng thái tích hợp hiện hành xem PR1;
-người dùng đã cho phép gate/CI xanh rồi merge, không cần hỏi lại tích hợp.
-CPU cuối394passed/2skipped, Ruff/format pass, source không đổi, đã đọc JSON/ba log:
-`runs/cpu-check-20261106T150301669878Z-gu4dqicp/gate.json`.
+và merge vào `main` sau xác nhận trực tiếp của người dùng. Merge commit `e17a14b`,
+PR head `973329e`; local main đã đồng bộ, tree merge khớp head đã kiểm.
+[CI Linux PR](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/actions/runs/42240188523)
+396passed/26.24s, Ruff/format pass; đã đọc steps/log. CI merge cũng success.
+CPU sau merge394passed/2skipped/98.44s, Ruff/format pass, source không đổi;
+đã đọc JSON/ba log tại `runs/cpu-check-20261106T151229925071Z-25frn51n/gate.json`.
 Review độc lập bổ sung3Important đã sửa bằng regression; coverage-limit false pass
 cũng đã sửa. README sửa riêng ởf33bf08. Chưa model/PA/G2 hoặc public submission.
 Taxonomy cross local:1895unique/199cells/2589memberships, không mở lại gold.

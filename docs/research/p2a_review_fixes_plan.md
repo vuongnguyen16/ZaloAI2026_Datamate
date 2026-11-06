@@ -23,24 +23,24 @@ Files: prediction.py, prediction_store.py, new prediction_failsafe.py, cli.py;
 tests/integration/test_prediction.py, new test_prediction_review.py, store tests.
 Interfaces: run_predict remains strict; submission_predict/run_failsafe protect CLI;
 publish_chunks(..., allow_exclusive_fallback=False) enables explicit degraded mode.
-- [ ] Regression preexisting logs and q1 timeout/error followed by valid q2–q4; observe RED.
-- [ ] Move runtime state/logs and isolate transient failures; observe GREEN.
-- [ ] Regress config/import/identity/hardlink/input-budget failures and >10000 IDs,
+- [x] Regression preexisting logs and q1 timeout/error followed by valid q2–q4; observe RED.
+- [x] Move runtime state/logs and isolate transient failures; observe GREEN.
+- [x] Regress config/import/identity/hardlink/input-budget failures and >10000 IDs,
   same/different/racing finals; observe RED then implement strict+failsafe separation.
-- [ ] Regress recursive code hash and unsupported link xb mode/race/permission errors.
-- [ ] Run prediction/store suites; expected all pass. Commit runtime fixes.
+- [x] Regress recursive code hash and unsupported link xb mode/race/permission errors.
+- [x] Run prediction/store suites; expected all pass. Commit runtime fixes.
 
 ### Task 2: Documentation and tracker
 
 Files: README.md, state/backlog/report/design.
-- [ ] Separate README commit describing predict and its degraded mode honestly.
-- [ ] Record source, tested scope, remaining limits and current P2 status before gate.
-- [ ] Check timeline and UTF-8/links/diff; expected current/no issues. Commit.
+- [x] Separate README commit describing predict and its degraded mode honestly.
+- [x] Record source, tested scope, remaining limits and current P2 status before gate.
+- [x] Check timeline and UTF-8/links/diff; expected current/no issues. Commit.
 
 ### Task 3: Review, gate, CI and authorized merge
 
 Files: report/state; no raw/cells uploads.
-- [ ] One fresh source/synthetic-only reviewer for revised increment; material fixes TDD.
-- [ ] uv run --locked python scripts/check.py; read JSON/three logs; expected pass/current.
-- [ ] Push branch, ready PR, wait for exact-head CI success and inspect logs.
-- [ ] Merge PR with expected head, sync local main; keep evidence and report final.
+- [x] One fresh source/synthetic-only reviewer for revised increment; material fixes TDD.
+- [x] uv run --locked python scripts/check.py; read JSON/three logs; expected pass/current.
+- [x] Push branch, ready PR, wait for exact-head CI success and inspect logs.
+- [x] Merge PR with expected head, sync local main; keep evidence and report final.

@@ -103,7 +103,7 @@ def test_backend_failure_and_expired_startup_finalize_all(tmp_path):
     assert all(p["reason"] == "deadline" for p in results(expired))
 
 
-def test_existing_final_conflict_and_foreign_output(tmp_path):
+def test_existing_final_conflict_and_preserved_unmanaged_output(tmp_path):
     root = inputs(tmp_path)
     output = tmp_path / "out"
     run_predict(root, output)
@@ -114,8 +114,9 @@ def test_existing_final_conflict_and_foreign_output(tmp_path):
     foreign = tmp_path / "foreign"
     foreign.mkdir()
     (foreign / "user.txt").write_text("mine")
-    with pytest.raises(ValueError, match="foreign"):
-        run_predict(root, foreign)
+    # Updated admission: unrelated root files are preserved and ignored.
+    assert run_predict(root, foreign)["valid"]
+    assert (foreign / "user.txt").read_text() == "mine"
 
 
 def test_cli_and_real_process_kill_resume(tmp_path):

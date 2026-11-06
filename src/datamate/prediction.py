@@ -15,7 +15,7 @@ from datamate.prediction_store import (
     regular_bytes,
     safe_path,
 )
-from datamate.runtime_paths import disjoint
+from datamate.runtime_paths import disjoint, ignored_output_entries
 from datamate.runtime_paths import output_layout as _output_layout
 from datamate.scoring import parse_object
 from datamate.serialization import exact_json, format_submission, submission_bytes
@@ -172,6 +172,7 @@ def run_predict(
     if not disjoint(root, output):
         raise ValueError("input and output must be disjoint")
     state_dir = _output_layout(output)
+    ignored_entries = ignored_output_entries(output)
     inventory = _inventory(root)
     questions, rejected, errors = read_prediction_questions(root / "questions.jsonl")
     # Detect mutation during parsing; no checkpoint may be resumed under stale bytes.
@@ -199,7 +200,6 @@ def run_predict(
         if not set(records) <= set(ids):
             raise ValueError("checkpoint contains foreign question IDs")
         backend_failed = False
-        consecutive_errors = 0
         durations = {}
         retained = sum(len(submission_bytes(r)) for r in records.values())
         reserve_sizes = {
@@ -238,15 +238,12 @@ def run_predict(
                     result = {"status": "startup_error", "error": type(exc).__name__}
                 if result["status"] != "ok":
                     reason = "backend_" + result["status"]
-                    consecutive_errors += 1
                     backend_failed = (
                         result["status"] == "startup_error"
                         or result.get("error")
                         in {"worker_exited", "invalid_worker_result"}
-                        or consecutive_errors >= 3
                     )
                 else:
-                    consecutive_errors = 0
                     candidate = result["value"]
             if reason:
                 prediction = format_submission(qid, "abstain", reason=reason)
@@ -306,6 +303,7 @@ def run_predict(
                         "input_errors": errors,
                         "checkpoint_errors": store.errors,
                         "publication": publication,
+                        "ignored_output_entries": ignored_entries,
                     }
                 )
                 + "\n"

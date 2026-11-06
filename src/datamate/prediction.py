@@ -70,6 +70,18 @@ def _digest(value):
     return hashlib.sha256(exact_json(value).encode("utf-8")).hexdigest()
 
 
+def code_fingerprint(root=None):
+    root = Path(__file__).parent if root is None else Path(root)
+    return _digest(
+        {
+            p.relative_to(root).as_posix(): hashlib.sha256(
+                safe_path(p).read_bytes()
+            ).hexdigest()
+            for p in sorted(root.rglob("*.py"))
+        }
+    )
+
+
 def _inventory(root):
     # Only inference paths. In particular, never open answers.jsonl at split root.
     paths = [root / "questions.jsonl"]
@@ -104,7 +116,68 @@ def _inventory(root):
     return result
 
 
-def run_predict(input_dir: Path, output: Path, config=None, backend=None, started=None):
+def _output_layout(output):
+    if output.exists():
+        for path in output.iterdir():
+            safe_path(path)
+            if path.name == "logs" and path.is_dir():
+                continue
+            if path.name == "submission.jsonl" and path.is_file():
+                continue
+            if (
+                path.name.startswith(".submission.jsonl.")
+                and path.name.endswith(".pending")
+                and path.is_file()
+            ):
+                continue
+            raise ValueError("foreign nonempty output directory")
+    return output / "logs" / ".state"
+
+
+def _question_logs(
+    logs, ids, records, identity, durations, *, allow_exclusive_fallback=False
+):
+    logs.mkdir(parents=True, exist_ok=True)
+    identity_sha = _digest(identity)
+    for index, qid in enumerate(ids):
+        path = logs / f"{index:06d}.json"
+        if path.exists():
+            old = parse_object(regular_bytes(path))
+            if (
+                old.get("question_id") == qid
+                and old.get("identity_sha256") == identity_sha
+                and submission_bytes(old.get("answer", {}))
+                == submission_bytes(records[qid])
+            ):
+                continue
+        event = {
+            "question_id": qid,
+            "stage": "prediction_safety",
+            "status": "abstain" if records[qid]["type"] == "abstain" else "answered",
+            "answer": records[qid],
+            "reason": records[qid].get("reason"),
+            "duration_seconds": durations.get(qid, 0),
+            "timing_available": qid in durations,
+            "identity_sha256": identity_sha,
+            "backend": identity["model_revision"],
+            "evidence": "P2a CPU safety coordinator; no model inference. Replayed timing is unavailable when timing_available=false.",
+        }
+        publish(
+            path,
+            (exact_json(event) + "\n").encode("utf-8"),
+            allow_exclusive_fallback=allow_exclusive_fallback,
+        )
+
+
+def run_predict(
+    input_dir: Path,
+    output: Path,
+    config=None,
+    backend=None,
+    started=None,
+    *,
+    allow_exclusive_fallback=False,
+):
     started = time.monotonic() if started is None else started
     settings = {**DEFAULTS, **(config or {})}
     if set(settings) != set(DEFAULTS) or any(
@@ -115,6 +188,7 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
     root, output = safe_path(input_dir), safe_path(output)
     if not disjoint(root, output):
         raise ValueError("input and output must be disjoint")
+    state_dir = _output_layout(output)
     inventory = _inventory(root)
     questions, rejected, errors = read_prediction_questions(root / "questions.jsonl")
     # Detect mutation during parsing; no checkpoint may be resumed under stale bytes.
@@ -126,24 +200,24 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
     ):
         raise ValueError("questions changed during inventory")
     ids = sorted(set(questions) | set(rejected))
-    code = {
-        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
-        for p in sorted(Path(__file__).parent.glob("*.py"))
-    }
     identity = {
         "schema_version": 1,
         "input_sha256": _digest(inventory),
         "config_sha256": _digest(settings),
-        "code_sha256": _digest(code),
+        "code_sha256": code_fingerprint(),
         "model_revision": "no_model"
         if backend is None
         else f"synthetic:{backend.__module__}.{backend.__qualname__}",
     }
-    with RunStore(output, identity) as store:
+    with RunStore(
+        state_dir, identity, allow_exclusive_fallback=allow_exclusive_fallback
+    ) as store:
         records = store.recover()
         if not set(records) <= set(ids):
             raise ValueError("checkpoint contains foreign question IDs")
         backend_failed = False
+        consecutive_errors = 0
+        durations = {}
         retained = sum(len(submission_bytes(r)) for r in records.values())
         reserve_sizes = {
             qid: len(
@@ -160,6 +234,7 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
         for qid in ids:
             if qid in records:
                 continue
+            question_started = time.monotonic()
             reason = rejected.get(qid)
             candidate = None
             if reason is None and clock.work_remaining <= 0:
@@ -180,8 +255,15 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
                     result = {"status": "startup_error", "error": type(exc).__name__}
                 if result["status"] != "ok":
                     reason = "backend_" + result["status"]
-                    backend_failed = True
+                    consecutive_errors += 1
+                    backend_failed = (
+                        result["status"] == "startup_error"
+                        or result.get("error")
+                        in {"worker_exited", "invalid_worker_result"}
+                        or consecutive_errors >= 3
+                    )
                 else:
+                    consecutive_errors = 0
                     candidate = result["value"]
             if reason:
                 prediction = format_submission(qid, "abstain", reason=reason)
@@ -202,12 +284,22 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
                 prediction = format_submission(qid, "abstain", reason="output_budget")
                 backend_failed = True
             store.append(prediction.output())
+            durations[qid] = time.monotonic() - question_started
             records[qid] = prediction.output()
             retained += len(submission_bytes(prediction))
         publication = publish_chunks(
             output / "submission.jsonl",
             (submission_bytes(records[qid]) for qid in ids),
             MAX_OUTPUT_BYTES,
+            allow_exclusive_fallback=allow_exclusive_fallback,
+        )
+        _question_logs(
+            output / "logs" / f"submission-{publication['sha256']}",
+            ids,
+            records,
+            identity,
+            durations,
+            allow_exclusive_fallback=allow_exclusive_fallback,
         )
         logs = [
             {
@@ -219,15 +311,23 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
             for qid in ids
         ]
         publish(
-            output / "execution.jsonl",
+            state_dir / "execution.jsonl",
             b"".join((exact_json(e) + "\n").encode("utf-8") for e in logs),
+            allow_exclusive_fallback=allow_exclusive_fallback,
         )
         publish(
-            output / f"diagnostics-{uuid.uuid4().hex}.json",
+            state_dir / f"diagnostics-{uuid.uuid4().hex}.json",
             (
-                exact_json({"input_errors": errors, "checkpoint_errors": store.errors})
+                exact_json(
+                    {
+                        "input_errors": errors,
+                        "checkpoint_errors": store.errors,
+                        "publication": publication,
+                    }
+                )
                 + "\n"
             ).encode("utf-8"),
+            allow_exclusive_fallback=allow_exclusive_fallback,
         )
         summary = {
             "valid": True,
@@ -238,7 +338,11 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
             "gold_content_read": False,
             "identity": identity,
         }
-        publish(output / "run.json", (exact_json(summary) + "\n").encode("utf-8"))
+        publish(
+            state_dir / "run.json",
+            (exact_json(summary) + "\n").encode("utf-8"),
+            allow_exclusive_fallback=allow_exclusive_fallback,
+        )
         return {
             **summary,
             "publication": publication,

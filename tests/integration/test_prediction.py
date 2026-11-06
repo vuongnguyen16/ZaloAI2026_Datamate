@@ -46,7 +46,8 @@ def test_worker_start_failure_and_timeout_are_abstain(tmp_path):
     timed = tmp_path / "timed"
     run_predict(root, timed, {"per_question_seconds": 0.2}, backend=sleeping_backend)
     assert results(timed)[0]["reason"] == "backend_timeout"
-    assert results(timed)[-1]["reason"] == "backend_unavailable"
+    # A question-local timeout no longer poisons the remaining backend calls.
+    assert results(timed)[-1]["reason"] == "backend_timeout"
 
 
 def test_bad_line_and_duplicate_do_not_lose_remaining_ids(tmp_path):
@@ -137,7 +138,10 @@ def test_cli_and_real_process_kill_resume(tmp_path):
             deadline = time.monotonic() + 15
             checkpoint_seen = False
             while time.monotonic() < deadline and child.poll() is None:
-                if any(p.stat().st_size > 100 for p in output.glob("segment-*.jsonl")):
+                if any(
+                    p.stat().st_size > 100
+                    for p in (output / "logs/.state").glob("segment-*.jsonl")
+                ):
                     checkpoint_seen = True
                     child.kill()
                     break

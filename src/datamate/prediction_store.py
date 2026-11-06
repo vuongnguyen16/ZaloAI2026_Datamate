@@ -1,7 +1,9 @@
 """Single-writer, append-only prediction checkpoints and no-clobber publication."""
 
+import errno
 import hashlib
 import os
+import shutil
 import uuid
 from pathlib import Path
 
@@ -62,11 +64,15 @@ def regular_bytes(path: Path, limit=MAX_STORE_BYTES, *, single_link=False) -> by
     return result
 
 
-def publish(path: Path, data: bytes) -> dict:
-    return publish_chunks(path, (data,))
+def publish(path: Path, data: bytes, *, allow_exclusive_fallback=False) -> dict:
+    return publish_chunks(
+        path, (data,), allow_exclusive_fallback=allow_exclusive_fallback
+    )
 
 
-def publish_chunks(path: Path, chunks, max_bytes=None) -> dict:
+def publish_chunks(
+    path: Path, chunks, max_bytes=None, *, allow_exclusive_fallback=False
+) -> dict:
     """Link a fsynced sibling inode exclusively. A conflict retains our pending file."""
     path = safe_path(path)
     limit = MAX_STORE_BYTES if max_bytes is None else min(max_bytes, MAX_STORE_BYTES)
@@ -84,8 +90,27 @@ def publish_chunks(path: Path, chunks, max_bytes=None) -> dict:
             handle.write(chunk)
         handle.flush()
         os.fsync(handle.fileno())
+    mode = "atomic_hardlink"
     try:
-        os.link(pending, path)
+        try:
+            os.link(pending, path)
+        except FileExistsError:
+            raise
+        except OSError as exc:
+            if not allow_exclusive_fallback or exc.errno not in {
+                errno.EXDEV,
+                errno.ENOSYS,
+                errno.ENOTSUP,
+                errno.EOPNOTSUPP,
+            }:
+                raise
+            mode = "non_atomic_exclusive"
+            # O_EXCL refuses an existing/racing path, including a symlink.
+            # Never delete a partial final if this copy is interrupted.
+            with path.open("xb") as dest, pending.open("rb") as source:
+                shutil.copyfileobj(source, dest, 1024 * 1024)
+                dest.flush()
+                os.fsync(dest.fileno())
         status = "published"
     except FileExistsError:
         safe_path(path)
@@ -104,22 +129,36 @@ def publish_chunks(path: Path, chunks, max_bytes=None) -> dict:
         if read != size or existing.digest() != digest.digest():
             raise FileExistsError(f"output conflict; candidate preserved at {pending}")
         status = "reused"
+        mode = "existing_verified"
     pending.unlink()
+    try:
+        directory_sync = sync_directory(path.parent)
+    except OSError as exc:
+        if not allow_exclusive_fallback or exc.errno not in {
+            errno.EINVAL,
+            errno.ENOSYS,
+            errno.ENOTSUP,
+            errno.EOPNOTSUPP,
+        }:
+            raise
+        directory_sync = f"unavailable_filesystem_errno_{exc.errno}"
     return {
         "status": status,
+        "mode": mode,
         "sha256": digest.hexdigest(),
-        "directory_sync": sync_directory(path.parent),
+        "directory_sync": directory_sync,
     }
 
 
 class RunStore:
-    def __init__(self, output: Path, identity: dict):
+    def __init__(self, output: Path, identity: dict, *, allow_exclusive_fallback=False):
         self.output = safe_path(output)
         self.identity = identity
         self.errors = []
         self.lock = None
         self.segment = None
         self.bytes_written = 0
+        self.allow_exclusive_fallback = allow_exclusive_fallback
 
     def __enter__(self):
         self.output.mkdir(parents=True, exist_ok=True)
@@ -153,7 +192,10 @@ class RunStore:
                 if regular_bytes(marker, 1, single_link=True) != b"":
                     raise ValueError("foreign initialization marker")
             sync_directory(self.output)
-            publish(manifest, expected)
+            if self.allow_exclusive_fallback:
+                publish(manifest, expected, allow_exclusive_fallback=True)
+            else:
+                publish(manifest, expected)
         if regular_bytes(manifest, MAX_RECORD_BYTES) != expected:
             raise ValueError("checkpoint identity mismatch")
         lock_path = safe_path(self.output / ".writer.lock")

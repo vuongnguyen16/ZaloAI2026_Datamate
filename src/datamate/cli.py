@@ -138,17 +138,13 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.command == "predict":
-            import yaml
+            from datamate.prediction_failsafe import submission_predict
 
-            from datamate.prediction import run_predict
-
-            config = None
-            if args.config:
-                config = yaml.safe_load(args.config.read_text("utf-8"))
-                if not isinstance(config, dict):
-                    raise ValueError("prediction config must be a mapping")
-            output = run_predict(
-                args.input, args.output, config, started=APPLICATION_STARTED
+            output = submission_predict(
+                args.input,
+                args.output,
+                config_path=args.config,
+                started=APPLICATION_STARTED,
             )
         elif args.command == "taxonomy-cross":
             from datamate.taxonomy_cross import run_taxonomy_cross

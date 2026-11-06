@@ -38,6 +38,9 @@ config, code và model revision (no_model ở P2a). Manifest immutable, một
 writer lock hệ điều hành cho mỗi output; lock tự nhả khi process bị kill.
 Không xóa lock file để tránh race inode. Kết quả/metadata chỉ finalize khi
 không còn writer cũ; output lạ hoặc fingerprint khác bị từ chối trước ghi.
+Khởi tạo dùng marker rỗng mang SHA identity trước publish manifest rồi mới
+tạo lock; marker/pending đúng namespace cho phép resume nếu chết trước manifest.
+File lạ vẫn giữ nguyên và bị từ chối; không xóa pending cũ khi phục hồi.
 
 Chỉ dùng dòng checkpoint có newline và parse/shape/envelope hợp lệ. Tail
 chưa newline được ghi chẩn đoán và xử lý lại; không sửa/truncate segment.
@@ -63,6 +66,13 @@ fallback/CLI chạy SQL của model. Read-only DB, external access tắt, thread
 memory256MiB, bounded result. Parent yêu cầu interrupt qua control pipe tới
 thread giữ connection, rồi terminate/kill nếu không dừng. Mọi đường phải join
 và báo cleanup; timeout bao gồm startup. Không coi DuckDB setting là OS ACL.
+Worker trả exact JSON bytes, không pickle object kết quả; thread nhận/parse được
+supervisor tính trong timeout. Kill/join đóng đầu pipe khi receive dở.
+Output retained tối đa128MiB, reserve bytes cho abstain còn lại, finalize stream;
+journal tối đa512MiB/100000records/10000segments và đọc streaming có bounds.
+Default6giờ/reserve120giây/per-question30giây khớp configs/predict.yaml.
+Load/finalize có giới hạn dữ liệu; đây chưa phải OS hard real-time deadline
+trên storage treo. P3 phải đo headroom runtime thực trước đóng gói.
 
 ## Taxonomy dev
 

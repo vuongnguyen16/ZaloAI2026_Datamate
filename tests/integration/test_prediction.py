@@ -77,7 +77,7 @@ def test_resume_and_input_config_mismatch_preserve_final(tmp_path):
     assert run_predict(root, output)["publication"]["status"] == "reused"
     assert len(results(output)) == 3
     with pytest.raises(ValueError, match="identity"):
-        run_predict(root, output, {"budget_seconds": 100})
+        run_predict(root, output, {"budget_seconds": 100, "reserve_seconds": 1})
     (root / "questions.jsonl").write_text(json.dumps(question("new")) + "\n")
     with pytest.raises(ValueError, match="identity"):
         run_predict(root, output)
@@ -152,3 +152,58 @@ def test_cli_and_real_process_kill_resume(tmp_path):
     assert len(results(output)) == 2000
     assert len({p["id"] for p in results(output)}) == 2000
     assert json.loads(resumed.stdout)["backend"] == "no_model"
+
+
+def test_invalid_numeric_values_are_contained_and_known_ids_accounted(tmp_path):
+    root = inputs(tmp_path, 1)
+    with (root / "questions.jsonl").open("ab") as handle:
+        handle.write(b'{"id":"bad","question":1e9999999999999999999999999}\n')
+    run_predict(root, tmp_path / "mixed")
+    assert {p["id"] for p in results(tmp_path / "mixed")} == {"0", "bad"}
+    (root / "questions.jsonl").write_bytes(b'{"id":"bad","question":1e1001}\n')
+    run_predict(root, tmp_path / "only-bad")
+    assert results(tmp_path / "only-bad")[0]["type"] == "abstain"
+
+
+def test_rejected_ids_count_toward_limit_and_reordered_duplicates_deduplicate(tmp_path):
+    root = inputs(tmp_path, 1)
+    with (root / "questions.jsonl").open("a") as handle:
+        handle.write(json.dumps(dict(reversed(list(question("0").items())))) + "\n")
+    accepted, rejected, _ = read_prediction_questions(root / "questions.jsonl")
+    assert set(accepted) == {"0"} and not rejected
+    (root / "questions.jsonl").write_bytes(
+        b"".join(b'{"id":"bad%d","question":1e1001}\n' % i for i in range(10001))
+    )
+    with pytest.raises(ValueError, match="count"):
+        read_prediction_questions(root / "questions.jsonl")
+
+
+def large_backend(question):
+    return {"type": "string", "answer": "x" * 500}
+
+
+def test_aggregate_output_budget_abstains_and_streams_final(tmp_path, monkeypatch):
+    import datamate.prediction as module
+
+    root = inputs(tmp_path, 5)
+    monkeypatch.setattr(module, "MAX_OUTPUT_BYTES", 800, raising=False)
+    result = run_predict(root, tmp_path / "out", backend=large_backend)
+    assert result["valid"]
+    rows = results(tmp_path / "out")
+    assert len(rows) == 5 and any(p.get("reason") == "output_budget" for p in rows)
+    assert (tmp_path / "out/submission.jsonl").stat().st_size <= 800
+
+
+def test_effective_default_reserve_matches_shipped_six_hour_config():
+    from pathlib import Path
+
+    import yaml
+
+    from datamate.prediction import DEFAULTS
+
+    config = yaml.safe_load(
+        (Path(__file__).resolve().parents[2] / "configs/predict.yaml").read_text(
+            "utf-8"
+        )
+    )
+    assert DEFAULTS == config

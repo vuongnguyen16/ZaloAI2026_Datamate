@@ -8,18 +8,26 @@ from pathlib import Path
 from datamate.bounded_execution import Deadline, run_bounded
 from datamate.contracts import Question
 from datamate.ingest.loader import disjoint
-from datamate.prediction_store import RunStore, publish, regular_bytes, safe_path
+from datamate.prediction_store import (
+    RunStore,
+    publish,
+    publish_chunks,
+    regular_bytes,
+    safe_path,
+)
+from datamate.scoped_data import project_id
 from datamate.scoring import parse_object
 from datamate.serialization import exact_json, format_submission, submission_bytes
 
-DEFAULTS = {"budget_seconds": 21600, "reserve_seconds": 1, "per_question_seconds": 30}
+DEFAULTS = {"budget_seconds": 21600, "reserve_seconds": 120, "per_question_seconds": 30}
 MAX_INPUT_BYTES = 64 * 1024 * 1024
 MAX_LINE_BYTES = 1024 * 1024
+MAX_OUTPUT_BYTES = 128 * 1024 * 1024
 
 
 def read_prediction_questions(path: Path):
     raw = regular_bytes(path, MAX_INPUT_BYTES, single_link=True)
-    questions, rejected, errors, payloads = {}, {}, [], {}
+    questions, rejected, errors, payloads, seen = {}, {}, [], {}, set()
     for index, line in enumerate(raw.splitlines(), 1):
         if index > 100000:
             raise ValueError("question line count exceeds budget")
@@ -27,16 +35,16 @@ def read_prediction_questions(path: Path):
         try:
             if len(line) > MAX_LINE_BYTES:
                 raise ValueError("question line exceeds budget")
-            obj = parse_object(
-                line.removeprefix(b"\xef\xbb\xbf") if index == 1 else line
-            )
-            candidate = obj.get("id")
-            if isinstance(candidate, str) and candidate.strip():
-                candidate.encode("utf-8")
-                qid = candidate
-            if qid is None:
-                raise ValueError("unrouteable question ID")
-            canonical = exact_json(obj)
+            line = line.removeprefix(b"\xef\xbb\xbf") if index == 1 else line
+            candidate = project_id(line)
+            candidate.encode("utf-8")
+            qid = candidate
+            seen.add(qid)
+            if len(seen) > 10000:
+                raise ValueError("question ID count exceeds budget")
+            obj = parse_object(line.decode("utf-8"))
+            question = Question.model_validate(obj)
+            canonical = exact_json(question.model_dump())
             if qid in payloads:
                 if payloads[qid] != canonical:
                     questions.pop(qid, None)
@@ -44,17 +52,16 @@ def read_prediction_questions(path: Path):
                     errors.append({"kind": "input_conflict", "line": index})
                 continue
             payloads[qid] = canonical
-            if len(payloads) > 10000:
-                raise ValueError("question ID count exceeds budget")
-            questions[qid] = Question.model_validate(obj)
-        except (ValueError, TypeError, UnicodeError):
-            if len(payloads) > 10000:
+            if qid not in rejected:
+                questions[qid] = question
+        except (ValueError, TypeError, UnicodeError, ArithmeticError, RecursionError):
+            if len(seen) > 10000:
                 raise ValueError("question ID count exceeds budget")
             errors.append({"kind": "invalid_question", "line": index})
             if qid is not None:
                 questions.pop(qid, None)
                 rejected[qid] = "invalid_question"
-    if not payloads:
+    if not seen:
         raise ValueError("no routeable question IDs")
     return questions, rejected, errors
 
@@ -137,6 +144,19 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
         if not set(records) <= set(ids):
             raise ValueError("checkpoint contains foreign question IDs")
         backend_failed = False
+        retained = sum(len(submission_bytes(r)) for r in records.values())
+        reserve_sizes = {
+            qid: len(
+                submission_bytes(
+                    format_submission(qid, "abstain", reason="backend_unavailable")
+                )
+            )
+            for qid in ids
+            if qid not in records
+        }
+        reserve = sum(reserve_sizes.values())
+        if retained + reserve > MAX_OUTPUT_BYTES:
+            raise ValueError("recovered output exceeds byte budget")
         for qid in ids:
             if qid in records:
                 continue
@@ -174,10 +194,21 @@ def run_predict(input_dir: Path, output: Path, config=None, backend=None, starte
                 )
             else:
                 prediction = format_submission(qid, "abstain", reason="format_rejected")
+            reserve -= reserve_sizes[qid]
+            if (
+                retained + len(submission_bytes(prediction)) + reserve
+                > MAX_OUTPUT_BYTES
+            ):
+                prediction = format_submission(qid, "abstain", reason="output_budget")
+                backend_failed = True
             store.append(prediction.output())
             records[qid] = prediction.output()
-        final = b"".join(submission_bytes(records[qid]) for qid in ids)
-        publication = publish(output / "submission.jsonl", final)
+            retained += len(submission_bytes(prediction))
+        publication = publish_chunks(
+            output / "submission.jsonl",
+            (submission_bytes(records[qid]) for qid in ids),
+            MAX_OUTPUT_BYTES,
+        )
         logs = [
             {
                 "id": qid,

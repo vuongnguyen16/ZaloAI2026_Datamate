@@ -50,3 +50,20 @@ def test_timeout_interrupt_and_forced_terminate_leave_no_children(tmp_path):
     )
     assert result["status"] == "timeout"
     assert not ({p.pid for p in multiprocessing.active_children()} - before)
+
+
+class SlowDict(dict):
+    def __reduce__(self):
+        return time.sleep, (4,)
+
+
+def custom_result():
+    return SlowDict(answer=1)
+
+
+def test_worker_result_does_not_unpickle_custom_reducers():
+    started = time.monotonic()
+    result = run_bounded(custom_result, (), 2)
+    assert result["status"] == "ok"
+    assert result["value"] == {"answer": 1}
+    assert time.monotonic() - started < 3

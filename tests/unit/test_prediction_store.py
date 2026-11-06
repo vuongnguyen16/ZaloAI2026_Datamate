@@ -65,7 +65,9 @@ def test_corrupt_complete_line_and_exclusive_writer(tmp_path):
         with pytest.raises((OSError, ValueError)):
             with RunStore(tmp_path, {"x": 1}):
                 pass
-    (tmp_path / "segment-corrupt.jsonl").write_bytes(b"bad\n")
+    (tmp_path / "segment-corrupt.jsonl").write_bytes(
+        b'bad\n{"id":"bad","type":"number","answer":1e9999999999999999999999999}\n'
+    )
     with RunStore(tmp_path, {"x": 1}) as store:
         assert store.recover() == {}
         assert store.errors[0]["kind"] == "invalid_checkpoint"
@@ -83,4 +85,57 @@ def test_foreign_output_and_hardlinked_segment_rejected(tmp_path):
     os.link(next(clean.glob("segment-*.jsonl")), tmp_path / "alias")
     with pytest.raises(ValueError, match="linked"):
         with RunStore(clean, {}) as store:
+            store.recover()
+
+
+def test_interrupted_initial_publication_can_resume_without_adopting_foreign(
+    tmp_path, monkeypatch
+):
+    import datamate.prediction_store as module
+
+    original = module.publish
+    monkeypatch.setattr(
+        module, "publish", lambda *a: (_ for _ in ()).throw(OSError("interrupted"))
+    )
+    with pytest.raises(OSError):
+        with RunStore(tmp_path / "ours", {"x": 1}):
+            pass
+    monkeypatch.setattr(module, "publish", original)
+    with RunStore(tmp_path / "ours", {"x": 1}):
+        pass
+    other = tmp_path / "foreign"
+    other.mkdir()
+    (other / ".identity.json.fake.pending").write_bytes(b"foreign")
+    with pytest.raises(ValueError, match="foreign"):
+        with RunStore(other, {"x": 1}):
+            pass
+    assert (other / ".identity.json.fake.pending").read_bytes() == b"foreign"
+
+
+def test_total_append_and_streamed_publication_are_bounded(tmp_path, monkeypatch):
+    import datamate.prediction_store as module
+
+    with RunStore(tmp_path / "store", {}) as store:
+        store.append({"id": "a", "type": "string", "answer": "x" * 50})
+        monkeypatch.setattr(module, "MAX_STORE_BYTES", 140)
+        with pytest.raises(ValueError, match="budget"):
+            store.append({"id": "b", "type": "string", "answer": "x" * 50})
+    assert (
+        sum(p.stat().st_size for p in (tmp_path / "store").glob("segment-*.jsonl"))
+        <= 140
+    )
+    with pytest.raises(ValueError, match="budget"):
+        module.publish_chunks(tmp_path / "final", iter([b"a" * 100, b"b" * 100]))
+    assert not (tmp_path / "final").exists()
+
+
+def test_corrupt_journal_cannot_expand_to_unbounded_record_list(tmp_path, monkeypatch):
+    import datamate.prediction_store as module
+
+    with RunStore(tmp_path, {}):
+        pass
+    (tmp_path / "segment-corrupt.jsonl").write_bytes(b"bad\n" * 10)
+    monkeypatch.setattr(module, "MAX_JOURNAL_RECORDS", 5, raising=False)
+    with pytest.raises(ValueError, match="record budget"):
+        with RunStore(tmp_path, {}) as store:
             store.recover()

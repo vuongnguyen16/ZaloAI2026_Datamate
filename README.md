@@ -1,7 +1,7 @@
 # DataMate
 
 Lộ trình hiện hành: [Timeline một người theo giai đoạn](Research/Timeline_DataMate_A-G.md),
-nguồn [DOCX](<Research/Timeline DataMate theo nhóm việc A–G.docx>) cập nhật 05/11/2026.
+nguồn [DOCX](<Research/Timeline DataMate theo nhóm việc A–G.docx>) cập nhật 06/11/2026.
 Triển khai tuần tự P0–P9, mỗi pha có cổng kiểm chứng. A–G là nhóm chuyên môn,
 không còn là bảy luồng song song theo tuần. Ước lượng trong DOCX là ngày công.
 
@@ -11,7 +11,9 @@ run_eval/bootstrap và taxonomy dev đã có. [Kết quả](reports/p0_results.m
 **P1/G1 đã hoàn tất:** hai model thật trên Modal sm_120, JSON50/50 mỗi lượt,
 hai lượt trùng; peak<30GiB, weights read-only và inference offline.
 [Kết quả P1](reports/p1_results.md). Chưa có B0/PA dữ liệu BTC;
-bước tiếp theo là P2 hybrid pipeline.
+bước tiếp theo là P2 bảo thủ: lưới an toàn → probe context/throughput dev →
+vài họ nghiệp vụ → G2 ưu tiên độ đúng. SQL chuyển P4–P5.
+[Quyền dev trên Modal và cổng G2/G5 đã chốt](docs/research/p2_g2_g5_decisions.md).
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên
@@ -52,8 +54,9 @@ thiết kế, plan, TDD, debug và review; bootstrap qua AGENTS.md. Dùng chung 
 | P1 model/runtime | [Qwen3-14B và Coder-14B trên Modal](reports/p1_results.md); structured JSON, hai process mới, sm_120 và offline pass; chưa B0/PA |
 | Nền G/E | [Foundation](docs/foundation.md): uv/CLI/validator/fake/log/hash/CPU CI; Modal CPU synthetic lịch sử; GPU/model xem P1 |
 
-Kiến trúc mục tiêu: domain_lib dựng từ dev, model nhỏ chọn/gọi hàm,
-SQL/Python dự phòng và abstain/verifier/formatter từ P2. single_sql là đối chứng.
+Kiến trúc mục tiêu: domain_lib dựng từ dev, model nhỏ chọn/gọi hàm;
+P2 có abstain/verifier/formatter và log tối thiểu, chưa phủ thì abstain.
+SQL fallback tối thiểu ở P4, single_sql đối chứng và tối ưu đường LLM ở P5.
 Không tạo module rỗng hoặc coi kế hoạch là code đã chạy.
 
 ## Công cụ hiện có

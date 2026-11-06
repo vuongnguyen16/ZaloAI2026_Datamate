@@ -63,6 +63,13 @@ lần; cải tiến sau đó cần công bố giới hạn hoặc có đánh gi�
 
 Scope/acceptance phải rõ trong task. Ghi research note trước quyết định kiến
 trúc; với bug, cần tái hiện lỗi, xác định nguyên nhân và có regression có ý nghĩa.
+
+Quyết định06/11: G2 ưu tiên precision, không cổng coverage/đủ5họ; safety và
+probe context/throughput đi trước nghiệp vụ. SQL chuyển P4–P5. Phạm vi dev
+trên Modal đã xác nhận tại `docs/research/p2_g2_g5_decisions.md`.
+G5 dùng `configs/g5_decision_policy.json` trước thí nghiệm P5; bootstrap cũ
+vẫn tính hai khoảng mô tả và `internal_decision` không là cổng G5 mới.
+Giữ nguyên split/access/scorer P0; P5 không chọn từng kỹ thuật bằng calibration.
 Giữ các test về dữ liệu, ID, type và bảo toàn raw; không xóa để làm gate pass.
 Review contract/SQL/scorer/
 inference có xét leakage, failure paths và tài nguyên; ghi self/independent review.

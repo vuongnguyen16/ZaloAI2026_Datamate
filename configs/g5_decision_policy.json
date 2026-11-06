@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "status": "user_approved_before_p5",
+  "approved_date": "2026-11-06",
+  "label": "Quy tắc quyết định kỹ thuật, không phải ý nghĩa thống kê",
+  "scope": "P5 technique acceptance; documentation contract, P5 runtime integration pending",
+  "reference": "docs/research/p2_g2_g5_decisions.md",
+  "comparison": {
+    "control": "currently accepted configuration, frozen before each experiment",
+    "identical": ["fixed dev IDs", "model revision", "tokenizer revision", "seed", "scoring policy"],
+    "changes": "one declared technique or a declared simplification",
+    "model_bakeoff": "separate protocol required; changing model is not a same-model technique comparison"
+  },
+  "unit": {
+    "score": "correct=+1, wrong=-1, abstain=0",
+    "net_points": "sum(candidate_score - control_score) on identical IDs",
+    "delta_pa": "net_points / N",
+    "warning": "Net score points are not a count of changed questions; wrong-to-correct contributes +2."
+  },
+  "global_gate": {
+    "technique_min_delta_pa": "0.01",
+    "simplification_min_delta_pa": "-0.005",
+    "integer_rule": "net_points >= ceil(min_delta_pa * N), evaluated exactly",
+    "dev_1895_examples": {"technique_min_net_points": 19, "simplification_min_net_points": -9},
+    "simplification_requires": "documented removal or reduction of system complexity; not a new technique relabeled as simplification"
+  },
+  "cluster_gates": {
+    "membership": "frozen leakage components in the existing split lock; no repartition",
+    "dev_components": 4,
+    "nondecrease_tolerance_net_points": 1,
+    "minimum_components_within_nondecrease_tolerance": 3,
+    "nondecrease_rule": "at least 3 of 4 components have net_points >= -1",
+    "maximum_loss_rule": "for every component c: net_points_c >= -max(N_c / 100, 2)",
+    "equivalent_delta_pa_rule": "delta_pa_c >= -max(0.01, 2 / N_c)",
+    "exact_integer_rule": "allowed_loss_points_c = floor(max(N_c / 100, 2)); no binary-float rounding",
+    "applies_to": ["technique", "simplification"]
+  },
+  "runtime_gate": {
+    "required": true,
+    "rule": "candidate remains within the measured P3 runtime budget including load/IO and declared workload; reject if exceeded even when PA improves",
+    "p3_measurements": "pending P3; cannot claim this gate from P1 smoke latency"
+  },
+  "uncertainty": {
+    "business_bootstrap": "report only; correlated businesses do not establish independent sample size",
+    "leakage_component_bootstrap": "report only; four components are too few for the project's significance claim policy",
+    "replicates_minimum": 1000,
+    "label": "Mô tả, không phải cổng",
+    "significance_claim": false,
+    "legacy_bootstrap_internal_decision": "diagnostic only; must not decide G5 acceptance"
+  },
+  "selection_controls": {
+    "dev": "all per-technique development/comparison; repeated selection may still overfit dev",
+    "calibration": "P6 thresholds and final configuration check only; no per-technique P5 selection or per-question debugging",
+    "holdout": "one frozen evaluation at P7 under existing access/release policy",
+    "public": "format/crash/generalization only; not threshold/prompt/model selection"
+  },
+  "report": ["control/candidate hashes", "fixed ID/model/seed hashes", "global net points and delta PA", "per-component N/net points/delta PA and gates", "both descriptive intervals", "runtime versus P3 budget", "decision and simplification evidence"]
+}

@@ -95,3 +95,9 @@ synthetic fixture local, events/app ID, raw_result và acceptance. Expected củ
 fixture không vào inference payload. Timeout/failure được ghi, không repair
 JSON hoặc biến fake thành G1. Bộ nhớ là target vLLM30GiB và peak đo, không
 phải physical GPU partition. Bằng chứng synthetic này không phải PA/B0.
+
+Phạm vi P2 đã được chủ project xác nhận: dev/input/câu hỏi và artifact tối
+thiểu của dev trên Modal, không gold inference/calibration/holdout. Xem
+`docs/research/p2_g2_g5_decisions.md`; account/budget/data manifest vẫn kiểm
+trước job. P1 CLI ở trên vẫn chỉ50fixture synthetic; probe P2 là integration
+riêng, không thay fixture/expected P1 bằng câu BTC hoặc claim G1 cho workload mới.

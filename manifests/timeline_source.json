@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "files": {
-    "Research/Timeline DataMate theo nhóm việc A–G.docx": "b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219",
-    "Research/Timeline_DataMate_A-G.md": "40f567fc47bfafdfc8332939f86dce60f37234b34b4744d51bc918a355945e52",
-    "Research/timeline_assets/277e6aadb74d9262f6e4716774b5a3ff3a62eba0.png": "c0b70d81293974ef5782fb6f8ced96f32a75ad9421257c226365a15d85215324"
+    "Research/Timeline DataMate theo nhóm việc A–G.docx": "499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28",
+    "Research/Timeline_DataMate_A-G.md": "7bd60a1f4930f3bbbec14ee88d9f111ab89e1a5ca8f3b710296c1e46b617e985",
+    "Research/timeline_assets/277e6aadb74d9262f6e4716774b5a3ff3a62eba0.png": "97e44666c063f472d6dad61442d2467b94ae2addd17394f893b18d59580416ff"
   },
   "superseded_archive": "https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/archive/timeline-20261103",
   "superseded_commit": "bd0061593698df76c05745c7ef1df3d31b1331f3",
@@ -61,5 +61,10 @@
       "P3",
       "P9"
     ]
+  },
+  "latest_amendment": {
+    "date": "2026-11-06",
+    "decision": "docs/research/p2_g2_g5_decisions.md",
+    "scope": "dev on Modal; safety/context first; reduced G2; technical G5 thresholds approved by user"
   }
 }

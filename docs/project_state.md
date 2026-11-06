@@ -1,7 +1,7 @@
 # Trạng thái DataMate
 
 Cập nhật 06/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
-hash `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`;
+hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
@@ -9,8 +9,10 @@ tracker duy nhất state và tasks/backlog.json.
 Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;
 primary Qwen3-14B,14,768,307,200 parameters. Chưa B0/PA BTC hoặc pipeline
 predict thật/Docker/public submission. [Kết quả P1](../reports/p1_results.md).
-Mỗi job tiếp theo vẫn phải xác minh account/budget/phạm vi dữ liệu;
-P1 chỉ dùng synthetic, quyền gửi dữ liệu BTC cloud chưa được mở từ P1.
+Mỗi job tiếp theo vẫn kiểm account/budget/phạm vi dữ liệu. P1 chỉ dùng synthetic;
+quyền P2 nay đã xác nhận: chỉ input/câu hỏi/artifact tối thiểu dev trên Modal,
+không gold calibration/holdout hoặc gold inference. G2 thu gọn và G5 kỹ thuật
+đã chốt trong [quyết định06/11](research/p2_g2_g5_decisions.md).
 
 ## P0 hiện hành
 
@@ -304,7 +306,7 @@ Credit đủ do người dùng xác nhận, account live đúng trước job, tr
 invoice thực chưa đọc nên không ghi0USD. Apps đã completed; live check không
 có app P1 xung đột. Volume weights/evidence giữ để P2 tái dùng và có storage
 theo quota/pricing workspace, không tự xóa. Không data/gold/BTC upload hoặc
-real-gold evaluation. Quyền gửi dữ liệu BTC cloud ở P2 cần xác minh riêng.
+real-gold evaluation. Phạm vi quyền P2 được cụ thể hóa ở quyết định06/11 bên dưới.
 
 P1 done, P2 todo/ready theo dependency; chưa mở P2, Docker vẫn P3 sau G2.
 Phiên tiếp: `uv run --locked python scripts/harness.py context --task P2`.
@@ -316,3 +318,37 @@ hoặc planning error; timeline check current. Theo lựa chọn của người 
 `main` local đã fast-forward từ7371bf6 tới3f03996 ngày06/11/2026;
 nhánh `work/p1-modal-probe` được dọn sau khi gate pass. Workspace được giữ.
 P1 chưa push lên GitHub; P2 vẫn todo/ready, chưa mở triển khai.
+
+## Quyền dev và quyết định G2 G5 — 06/11/2026
+
+Đã ghi quyền chủ project xác nhận: input/câu hỏi và artifact tối thiểu dev
+trên Modal, gồm prompt/descriptor cho probe; không gold inference hoặc gold
+calibration/holdout lên cloud. Gold dev chấm local qua scoped evaluator.
+Không suy quyền API ngoài Modal/GitHub. Trước job vẫn kiểm account/budget.
+
+DOCX/web/asset/backlog đã đổi G2: giấy tờ → safety/checkpoint/hash/resume và
+deadline → probe BF16 context/throughput dev → vài họ nghiệp vụ → PA dev/G2
+→ P3. G2 cần mọi ID hợp lệ có output, PA toàn dev>0, sai trên phần trả lời≤10%;
+báo coverage, không cổng độ phủ/đủ5họ. SQL tối thiểu P4, single_sql đối chứng
+P5; log tối thiểu và descriptor thật trong prompt vẫn ở P2.
+
+G5 đã chốt theo xác nhận mới nhất, thay lựa chọn giữ dự thảo trước đó:
+[policy](../configs/g5_decision_policy.json),
+[quyết định và phép kiểm](research/p2_g2_g5_decisions.md).
+Kỹ thuật mới deltaPA≥+0,01; đơn giản hóa có bằng chứng≥−0,005. Cả hai nhánh
+cần≥3/4cụm có điểm ròng≥−1 và mọi cụm có điểm ròng≥−max(0,01*N_c,2),
+trong budget runtime đo tại P3. Với1895câu:≥19điểm ròng hoặc giảm tối đa9điểm.
+CI business/cụm chỉ mô tả, không cổng/significance; so cùng ID/model/seed
+với cấu hình đang được chấp nhận. P5 không chọn từng kỹ thuật trên calibration;
+P6 kiểm cấu hình cuối/ngưỡng; P7 holdout một lần. Split/access/scorer P0 giữ nguyên.
+
+Đây là đóng quyết định giấy tờ, P2/P5 vẫn todo; không có task active, code P2,
+probe model mới, upload dev hoặc PA mới. G2/G5 chưa pass. Nhánh local
+`work/p2-policy`; chưa push/merge. Bằng chứng CPU/QA cuối:
+CPU mới: **314 passed, 1 skipped in43.55s**, Ruff lint/format pass, exit0,
+source không đổi; đã đọc gate.json/ba log tại
+`runs/cpu-check-20261106T113002356608Z-kn2e1qpb/gate.json`.
+DOCX render16trang đã kiểm toàn bộ ảnh, không lỗi clipping/mất dấu; timeline
+current137đoạn/20bảng/149hàng/1sơ đồ. Review độc lập phát hiện1Important
+(B4/P4 dùng calibration quá sớm) đã sửa thành dev tạm/P6 hiệu chỉnh;
+[báo cáo](../reports/p2_policy_results.md). Không có job cloud trong phiên này.

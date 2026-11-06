@@ -49,6 +49,21 @@ Bootstrap control dùng cùng ID, ≥1000 lượt ghép cặp theo business và 
 theo leakage component, seed 20261105, CI95 percentile. Dưới 10 cụm độc lập
 thì project không cho claim significance; đây là quy tắc bảo thủ nội bộ.
 
+Quyết định06/11 cho G5: **quy tắc quyết định kỹ thuật, không phải ý nghĩa
+thống kê**, theo [contract](../configs/g5_decision_policy.json) và
+[quyết định](research/p2_g2_g5_decisions.md). Dev có18business nhưng chỉ4cụm;
+business trong cùng cụm có tương quan. Cả CI business và CI cụm được báo với
+nhãn **mô tả, không phải cổng**. `internal_decision`/CI acceptance cũ của
+bootstrap và policy P0 không quyết định G5 mới; không sửa split/access đã khóa.
+P5 cần tích hợp gate toàn dev/cụm/runtime, hiện chưa có implementation đó.
+
+Kỹ thuật mới cần deltaPA>=+0.01; đơn giản hóa có bằng chứng cần>=-0.005.
+Cả hai nhánh: ít nhất3/4cụm có điểm ròng>=-1; mọi cụm có điểm ròng>=
+-max(0.01*N_c,2). Điểm ròng là chênh tổng score, sai→đúng=+2; không là số
+câu thay đáp án. Với1895câu: kỹ thuật cần>=19điểm, đơn giản hóa giảm tối đa9.
+Runtime phải trong budget đo P3. P5 chỉ dùng dev cho từng kỹ thuật;
+calibration chỉ chọn ngưỡng/kiểm cấu hình cuối tại P6, holdout một lần P7.
+
 Gold chung nằm một file. Reader đọc byte/ID của toàn file để routing, nhưng
 chỉ JSON-decode record được authorize. Type/answer/alias của calibration/holdout
 không được giải mã trong P0 acceptance. Không đưa raw gold vào submission,

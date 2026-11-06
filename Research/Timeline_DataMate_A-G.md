@@ -3,17 +3,17 @@
 
 Bản đọc từ [DOCX hiện hành](<Timeline DataMate theo nhóm việc A–G.docx>). Các nhận định, nguồn nghiên cứu và model trong tài liệu là nội dung kế hoạch; cần xác minh trước khi áp dụng. Trạng thái triển khai nằm trong [state](../docs/project_state.md) và [backlog](../tasks/backlog.json).
 
-SHA-256 DOCX: `b70f5e852b156c7ff0835eebbdd96ccb71b718fd095fd797b554efe5b1837219`.
+SHA-256 DOCX: `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`.
 
 Timeline DataMate theo nhóm việc A–G
 
 Lộ trình cho một người, theo giai đoạn có cổng kiểm chứng
 
-Cập nhật 05/11/2026, sau khi hoàn tất A-T2 (source 790b1af, main bd00615). Thay kế hoạch ngày 03/11 (@Quinnie, DOCX SHA-256 e74b1292…5eb51). Theo xác nhận của chủ project: đội 1 người; được đưa dữ liệu BTC lên Modal; thời gian không phải ràng buộc chính. Cần chủ project duyệt trước khi cập nhật docs/project_state.md và tasks/backlog.json.
+Cập nhật 06/11/2026 theo quyết định chủ project: ghi quyền dev trên Modal; đưa lưới an toàn/probe lên đầu P2; thu gọn G2 và chốt G5 bằng quy tắc quyết định kỹ thuật. Giữ nền A-T1/A-T2/P0/P1, không coi kế hoạch là bằng chứng triển khai. Nguồn trước: bản 05/11 sau A-T2 (790b1af, main bd00615); thay kế hoạch 03/11. State/backlog là tracker duy nhất; cập nhật giấy tờ này đã được người dùng yêu cầu.
 
 ## 0. Tóm tắt
 
-Giả định của bản này: một người làm toàn bộ, có trợ lý lập trình AI; mọi model thật chạy trên Modal (được phép dùng dữ liệu BTC); ưu tiên chất lượng và độ chắc chắn hơn tốc độ. Vì vậy lộ trình được xếp theo thứ tự giá trị và rủi ro, không theo tuần, và đo bằng ngày công, không bằng ngày lịch.
+Một người làm toàn bộ với trợ lý lập trình AI; mọi model thật chạy trên Modal. Quyền dữ liệu đã xác nhận: P2 chỉ dùng input/câu hỏi/artifact tối thiểu của dev trên Modal; gold không vào inference, không đưa gold calibration/holdout lên cloud. Account/budget được kiểm trước mỗi job. Ưu tiên chất lượng và độ chắc chắn; lộ trình tuần tự đo bằng ngày công, không bằng ngày lịch.
 
 Năm quyết định chính:
 
@@ -21,7 +21,7 @@ Tuần tự, mỗi giai đoạn kết thúc bằng một cổng có số đo (G0
 
 Kiến trúc hai pha "thư viện dựng offline, model nhỏ dùng lúc chạy". Lúc phát triển, người + trợ lý AI mạnh dựng thư viện hàm nghiệp vụ, playbook và ví dụ từ dữ liệu dev; lúc suy luận, model ≤ 15B chỉ chọn và gọi các hàm đó, LLM sinh SQL/Python là đường dự phòng. Đây đúng là cách hệ thống đứng đầu DABstep đạt kết quả cao với model nhỏ (mục 2).
 
-Không tin sẵn kỹ thuật nào. Các nguồn mâu thuẫn nhau về self-consistency, schema linking và chế độ suy luận (thinking); mọi kỹ thuật đi vào sổ thí nghiệm (mục 7), chỉ giữ khi tăng PA có ý nghĩa thống kê trên dev.
+Không tin sẵn kỹ thuật nào. Mọi kỹ thuật ghi vào sổ thí nghiệm; P5 chọn theo quy tắc quyết định kỹ thuật G5 đã chốt trước thí nghiệm (mục 6.1), không claim ý nghĩa thống kê từ bốn cụm dev. Các khoảng bootstrap chỉ mô tả.
 
 Độ tin cậy có từ bản đầu tiên: abstain mặc định, verifier, formatter theo type. Luật chấm PA thưởng độ chính xác trên câu đã trả lời hơn độ phủ.
 
@@ -165,7 +165,7 @@ Pha phát triển (offline, được dùng model mạnh): người + trợ lý l
 
 Pha suy luận (offline, model ≤ 15B): model chỉ thấy mô tả dữ liệu, chữ ký hàm và playbook đã đóng băng; nó chọn hàm và tham số, hoặc rơi về đường sinh SQL/Python.
 
-Nếu dùng API model bên ngoài (không phải Modal) để gán nhãn hay dựng thư viện trên dữ liệu BTC, cần xác nhận quyền giống như đã xác nhận với Modal. Trợ lý lập trình chạy local trên máy có dữ liệu cũng cần chủ project chấp nhận rõ.
+Quyền dùng dữ liệu BTC trên Modal đã được chủ project xác nhận; phạm vi P2 là dev như mục 6.1. Quyền này không tự cấp quyền API model ngoài Modal hoặc publish dữ liệu. Gold không vào inference; quyền truy cập local theo policy P0, không mở holdout cho trợ lý.
 
 ### 3.2 Các lớp của pipeline
 
@@ -196,16 +196,16 @@ Loại vì vượt 15B: gpt-oss-20b (~21B), Gemma 4 26B MoE, Qwen3.6-35B-A3B, Qw
 
 ![Sơ đồ giai đoạn trong DOCX](timeline_assets/277e6aadb74d9262f6e4716774b5a3ff3a62eba0.png)
 
-Mỗi thanh là một gói việc, màu theo nhóm A–G (tên nhóm ghi bên cạnh); thanh gạch chéo là nhánh có điều kiện; vùng nền xám là phần cần cho bản nộp được tối thiểu. A-T1 và A-T2 đã xong nên không vẽ.
+Mỗi thanh là một gói việc, màu theo nhóm A–G; thanh gạch chéo có điều kiện. P2 đã đổi thứ tự ngày 06/11: safety → probe → vài họ nghiệp vụ → đánh giá G2. Thanh con P2 chỉ minh họa thứ tự; ước lượng chung bốn ngày công chưa đo. Vùng xám là bản nộp được tối thiểu sau G3; A-T1/A-T2 đã xong nên không vẽ.
 
 | Giai đoạn | Ngày công | Nội dung | Cổng: điều kiện qua | Nếu không qua |
 | --- | --- | --- | --- | --- |
 | P0 Đo lường | 2 | Scorer 9 type, run_eval, log từng câu; taxonomy câu hỏi; khóa split; giao thức thống kê; chính sách leaderboard | G0: fixture đúng/sai mọi type pass; manifest split có hash; báo cáo taxonomy | Không bắt đầu giai đoạn nào khác |
 | P1 Model chạy được | 1 | vLLM trên Modal RTX-PRO-6000, 2–3 model, structured output JSON, kiểm tất định | G1: ≥ 1 model chạy trên sm_120; JSON hợp lệ ≥ 99% trên 50 câu; 2 lượt cho cùng kết quả | Đổi bản vLLM hoặc model; xem lại danh sách |
-| P2 Lát cắt xuyên suốt | 4 | Checklist rulebook, lịch, bộ giải thời gian; làm sạch tối thiểu; ý định JSON; domain_lib cho 5 họ câu hỏi lớn nhất; SQL dự phòng; abstain mặc định; formatter; tracing | G2: mọi id có output hợp lệ; PA dev > 0 với tỷ lệ sai trên câu đã trả lời ≤ 10% (đề xuất); nộp public #1 | Thu hẹp: chỉ giữ đường đạt độ chính xác, còn lại abstain |
+| P2 Lát cắt xuyên suốt | 4 | Safety trước: formatter, abstain, checkpoint/hash/resume, deadline; probe BF16 context/throughput dev; rulebook/lịch, cleaning tối thiểu, ý định JSON, vài họ domain_lib; log tối thiểu. SQL và single_sql chuyển P4–P5. | G2 mới: mọi ID hợp lệ có output; PA toàn dev >0; wrong/(correct+wrong) ≤10% (mục tiêu nội bộ); báo coverage, không cổng độ phủ/số họ; chuẩn bị public #1 theo quyền/quota. | Thu hẹp đường trả lời, còn lại abstain; không bỏ safety/log. Qua G2 mới rồi P3, không chờ SQL. |
 | P3 Đóng gói sớm | 1,5 | Docker có sẵn weights; --network none trên proxy; đo throughput; chạy lặp | G3: đủ 1.000 câu public trong ≤ 1/3 ngân sách 6 giờ; 2 lượt lệch PA ≤ 0,01 | Sửa trước khi thêm tính năng |
-| P4 Dữ liệu và nghiệp vụ | 5,5 | View sạch đầy đủ (bắt đầu từ data_start sẵn có); ánh xạ canonical; thực thể; coverage; rulebook đọc lúc chạy; mở rộng domain_lib theo lỗi; chuẩn hóa câu hỏi; liên kết thực thể | G4: đường tất định đạt độ chính xác ≥ 95% trên phần nó trả lời (đề xuất), độ phủ báo cáo theo họ câu hỏi; ánh xạ canonical đo bằng leave-group-out trong dev | Họ câu hỏi chưa đạt chuyển sang đường LLM hoặc abstain |
-| P5 Đường LLM | 4 | Bake-off model; tự sửa lỗi; few-shot động; truy xuất giá trị; bỏ phiếu/vòng plan–verify (thí nghiệm) | G5: mỗi kỹ thuật giữ lại có khoảng tin cậy 95% của ΔPA dev > 0 (bootstrap cụm theo business) | Tắt kỹ thuật đó |
+| P4 Dữ liệu và nghiệp vụ | 5,5 | View sạch/canonical, thực thể/coverage, rulebook runtime, mở rộng domain_lib theo lỗi; SQL fallback tối thiểu read-only/timeout và tracing mở rộng chuyển từ P2. | G4: đường tất định đạt độ chính xác ≥ 95% trên phần nó trả lời (đề xuất), độ phủ báo cáo theo họ câu hỏi; ánh xạ canonical đo bằng leave-group-out trong dev | Họ câu hỏi chưa đạt chuyển sang đường LLM hoặc abstain |
+| P5 Đường LLM | 4 | Bake-off model theo protocol riêng; single_sql đối chứng; tự sửa lỗi, few-shot, retrieval, bỏ phiếu/plan–verify có đo; không dùng calibration chọn từng kỹ thuật. | G5 kỹ thuật: ΔPA dev≥+0,01; đơn giản hóa≥−0,005; ≥3/4 cụm giảm≤1 điểm ròng; mọi cụm giảm≤max(0,01×N_c,2) điểm ròng; trong budget runtime P3. CI chỉ mô tả (mục6.1). | Tắt kỹ thuật đó |
 | P6 Độ tin cậy | 2,5 | Verifier; unanswerable; mô hình điểm tin cậy; ngưỡng trên calibration | G6: đường cong rủi ro–độ phủ; PA calibration tăng so với không có abstain | Dùng ngưỡng bảo thủ hơn |
 | P7 Tổng quát hóa | 2 | Holdout đúng một lần; biến thể bố cục synthetic; rulebook biến thể; so với public | G7: PA holdout nằm trong khoảng tin cậy của calibration (hoặc có giải thích); không business nào lỗi nạp | Sửa lỗi tổng quát, không chỉnh ngưỡng theo holdout |
 | P8a Tối ưu prompt/playbook (điều kiện) | 2 | GEPA/ACE trên dev, kiểm trên calibration | Chỉ mở khi P5 đã chững; giữ khi ΔPA calibration > 0 có ý nghĩa | Bỏ |
@@ -223,7 +223,7 @@ Mục đích (giữ từ kế hoạch 03/11): biến file thô thành bảng s�
 | Mã | Việc | Giai đoạn | Câu hỏi hoặc thí nghiệm | Xong khi |
 | --- | --- | --- | --- | --- |
 | A1 | Loader/cache (A-T1); profile + descriptor (A-T2) | Đã xong | — | Giữ nguyên |
-| A2 | Làm sạch tối thiểu cho các cột mà 5 họ câu hỏi lớn nhất cần | P2 | Dùng probe của khảo sát sâu | Khớp gold cho các họ đó trên dev |
+| A2 | Làm sạch tối thiểu cho các cột mà vài họ câu hỏi dev ưu tiên cần; giữ raw/lineage | P2 | Dùng probe của khảo sát sâu | Khớp gold cho các họ đó trên dev |
 | A3 | Policy encoding/delimiter lúc chạy theo từng file, override gắn SHA nguồn, text QA chỉ gắn cờ | Đã xong (A-T2) | Không cần research; TCVN3/VNI hoãn đến khi có bằng chứng | 20/20 CSV train bom_utf_8 + auto_unique; không cờ text QA |
 | A4 | Header rule header-conservative-1: tập hàng header (kể cả header hai tầng) + data_start, unresolved khi không chắc | Đã xong (A-T2) | X1 đã trả lời | Check 218/219 tự chọn, 0 sai; toàn train 311/322, 11 unresolved có preview |
 | A5 | View sạch đầy đủ, bắt đầu từ data_start: số (k/tr, 1tr090, dấu phân cách), ngày (DMY, serial Excel, năm theo sheet), đơn vị và quy đổi, ngữ cảnh nhóm; cờ dòng tổng/ghi chú. Ghi bảng mới, giữ raw | P4 | Luật nào tổng quát, luật nào chỉ khớp train? | Unit test từ probe; số đếm khớp khảo sát |
@@ -242,7 +242,7 @@ Mục đích (giữ từ kế hoạch 03/11): đưa câu hỏi không dấu, vi�
 | B1 | Bộ giải thời gian: as_of_date, hôm nay/hôm qua, tuần theo rulebook, tháng/quý/năm trước, cùng kỳ, N ngày gần nhất, Tết và âm lịch từ calendar.csv | P2 | Quy ước tuần và cửa sổ Tết từng split | Mọi dạng thời gian trong taxonomy có test; không dùng LLM tính ngày |
 | B2 | Parser ý định: LLM xuất JSON theo schema (họ câu hỏi, chỉ số, bộ lọc, nhóm, cụm thời gian gốc, kiểu đáp án) + kiểm hợp lệ | P2 | X3 (tiếng Việt), X4 (thinking) | Độ đúng kiểu đáp án và họ câu hỏi trên dev; JSON hỏng → abstain |
 | B3 | Chuẩn hóa: NFC, chữ thường, khóa không dấu để so khớp (không ghi đè câu gốc), bảng viết tắt rút từ câu hỏi train | P4 | Viết tắt nào phổ biến? (taxonomy P0) | Unit test; 768 câu chỉ ASCII được xử lý |
-| B4 | Liên kết thực thể hai chiều: khóa không dấu + n-gram ký tự (rapidfuzz) + mã sản phẩm; nhiều ứng viên ngang nhau → verifier hoặc abstain | P4 | Ngưỡng khớp mờ chọn trên calibration | Nhóm lỗi "tên" giảm |
+| B4 | Liên kết thực thể hai chiều: khóa không dấu + n-gram ký tự (rapidfuzz) + mã sản phẩm; nhiều ứng viên ngang nhau → verifier hoặc abstain | P4; hiệu chỉnh ngưỡng P6 | Ngưỡng tạm trên dev ở P4; chọn/khóa ngưỡng bằng calibration tại P6 | Nhóm lỗi "tên" giảm |
 
 ### C. Tri thức nghiệp vụ
 
@@ -251,9 +251,9 @@ Mục đích (giữ từ kế hoạch 03/11): mọi câu tính đúng theo đị
 | Mã | Việc | Giai đoạn | Câu hỏi hoặc thí nghiệm | Xong khi |
 | --- | --- | --- | --- | --- |
 | C1 | Checklist rulebook (liệt kê điểm khác train/public); tiện ích lịch | P2 | Rulebook khác nhau ở định nghĩa nào? | Checklist có trích mục; lịch có unit test |
-| C2 | domain_lib cho 5 họ câu hỏi lớn nhất theo taxonomy (ví dụ doanh thu hợp lệ, số đơn, hủy/trả, số lượng có quy đổi, top-N, so sánh kỳ) | P2 | Thứ tự ưu tiên theo số câu dev | Mỗi hàm có test; khớp gold ≥ 95% trên phần dev đã phủ (đề xuất) |
+| C2 | domain_lib cho vài họ dev tần suất lớn, mở rộng theo lỗi ở P4; không cổng đủ5họ tại P2, không hardcode business/question ID | P2 | Thứ tự ưu tiên theo số câu dev | Mỗi hàm có test, đúng trên≥2nhóm; G2 ưu tiên precision và báo coverage; mục tiêu95% trên phần hàm phủ vẫn là mục tiêu nội bộ, không cổng độ phủ |
 | C3 | Rulebook có cấu trúc (YAML), đọc lúc chạy; LLM hỗ trợ trích, người duyệt; điều khoản không hiểu → hàm phụ thuộc trả abstain | P4 | Phần nào tham số hóa được? | Chạy với rulebook public không sửa code |
-| C4 | Mở rộng domain_lib theo lỗi dev (giá vốn, lợi nhuận, công nợ, tồn kho, lô/hạn dùng…); mỗi hàm phải đúng trên ≥ 2 nhóm business | P4 | Hàm nào cứu nhiều điểm nhất? | Mỗi hàm có test và tăng PA dev |
+| C4 | Mở rộng domain_lib theo lỗi dev; bổ sung SQL fallback tối thiểu read-only/timeout chuyển từ P2; mỗi hàm đúng trên≥2nhóm business | P4 | Hàm nào cứu nhiều điểm nhất? | Mỗi hàm có test và tăng PA dev |
 | C5 | Thử biến thể: đổi định nghĩa trong bản sao rulebook → kết quả đổi đúng hướng | P7 |  | Không còn định nghĩa hardcode |
 
 ### D. Hệ thống suy luận (agent)
@@ -263,8 +263,8 @@ Mục đích (giữ từ kế hoạch 03/11): biến câu hỏi và dữ liệu 
 | Mã | Việc | Giai đoạn | Câu hỏi hoặc thí nghiệm | Xong khi |
 | --- | --- | --- | --- | --- |
 | D1 | Chạy 2–3 model trên Modal RTX-PRO-6000, giới hạn ~30 GB; structured output; smoke 50 câu | P1 | Model và bản vLLM nào chạy ổn trên sm_120? | G1 |
-| D2 | Baseline v0: ý định → domain_lib nếu đã phủ, ngược lại LLM sinh SQL trên view sạch; DuckDB read-only có timeout; single_sql thuần chạy làm đối chứng | P2 |  | G2: PA dev theo đường/type/business; descriptor A-T2 thực sự được dùng trong prompt (acceptance D-E-T2) |
-| D3 | Bake-off model trên ~300 câu dev phân tầng, cùng pipeline; so cách đưa header vào prompt | P5 | X3, X13 | Chọn 1 model; ghi lý do, license, ngày công bố |
+| D2 | Baseline v0 P2: ý định→domain_lib nếu chắc chắn, còn lại abstain; descriptor rút gọn thật trong prompt. SQL fallback tối thiểu sang P4, single_sql đối chứng và tối ưu đường LLM sang P5. | P2; phần SQL P4–P5 |  | G2 mới theo mục6.1; PA toàn dev/type/business/route và coverage; descriptor A-T2 thật trong prompt, không thay bằng consumer synthetic |
+| D3 | Bake-off model ~300câu dev phân tầng theo protocol riêng; single_sql đối chứng chuyển từ P2; G5 kỹ thuật xác nhận trên toàn dev cố định | P5 | X3, X13 | Chọn 1 model; ghi lý do, license, ngày công bố |
 | D4 | Tự sửa lỗi tối đa 2 lần; few-shot động từ câu dev có lời giải đã kiểm | P5 | X5, X8 | Ablation bằng config |
 | D5 | Truy xuất giá trị (chỉ mục giá trị phân biệt); schema linking qua lớp canonical; K mẫu + dừng sớm khi đồng thuận | P5 | X6, X7 | Ablation bằng config |
 | D6 | Vòng plan → code → verify kiểu DS-STAR cho câu nhiều bước | P5 | X9 | Giữ nếu tăng PA, ngược lại tắt |
@@ -279,7 +279,7 @@ Mục đích (giữ từ kế hoạch 03/11): thước đo cho mọi việc, ch�
 | E1 | Scorer theo thể lệ cho 9 type (policy tạm cho làm tròn, alias, thứ tự list/table, null) + run_eval + log từng câu | P0 | Luật so khớp nào còn mơ hồ? → gắn provisional | Fixture đúng/sai từng type |
 | E2 | Taxonomy 3.000 câu train: type (từ gold), họ câu hỏi, dạng thời gian, viết tắt, tỷ lệ unanswerable | P0 |  | Báo cáo taxonomy |
 | E3 | Khóa split và giao thức thống kê (mục 8) | P0 |  | Manifest có hash và lý do |
-| E4 | Formatter tất định từng type; verifier (âm, quá lớn, rỗng, mâu thuẫn hồ sơ/coverage, hai đường lệch nhau) | P2 → P6 |  | Không còn lỗi định dạng trên dev |
+| E4 | Formatter9type, abstain mặc định, verifier cơ bản có từ đầu P2; kiểm âm/quá lớn/rỗng/mâu thuẫn và mở rộng coverage/cross-check tới P6 | P2 → P6 |  | Không còn lỗi định dạng trên dev |
 | E5 | Phân tích lỗi sau mỗi thay đổi: ánh xạ, tên, thời gian, rulebook, định dạng, code lỗi, lẽ ra nên abstain/unanswerable | P2 → P7 | Lỗi nào đáng sửa nhất lúc này? | Báo cáo lỗi gắn với commit |
 | E6 | Điểm tin cậy từ đường thực thi, mức đồng thuận, kết quả verifier (ví dụ hồi quy logistic trên calibration); ngưỡng theo đường với quy tắc p > 0,5 | P6 | X11 | Reliability diagram; ngưỡng khóa trước holdout |
 | E7 | Đánh giá holdout đúng một lần; so với calibration và public | P7 |  | G7 |
@@ -302,7 +302,7 @@ Mục đích (giữ từ kế hoạch 03/11): điểm chỉ được tính khi b
 | --- | --- | --- | --- | --- |
 | G1 | uv/lock, CLI, validator, fake runner, CI CPU, Modal CPU smoke | Đã xong |  | Giữ nguyên |
 | G2 | Image vLLM trên Modal RTX-PRO-6000; khóa bộ phiên bản vLLM/PyTorch/CUDA có sm_120; weights trong image/volume; chế độ offline | P1 | X12 (tất định) | Smoke chạy khi mạng bị chặn |
-| G3 | Tracing và log từng câu theo thể lệ; cache theo business; seed; bộ điều phối hạn giờ (ngân sách mỗi câu, hạn toàn cục ghi abstain cho phần còn lại) | P2 |  | Dừng tiến trình giữa chừng vẫn có submission đủ id |
+| G3 | Lưới an toàn đầu P2: formatter/abstain; checkpoint từng câu nối tiếp gắn hash input/config; resume hash khớp; bảo vệ output cũ, finalize temp+rename; cô lập dòng lỗi, cache/seed/log tối thiểu/deadline. Probe context/throughput sớm. | P2 |  | Kill/resume/hết giờ vẫn đủ mọi ID hợp lệ; dòng không xác định ID ghi lỗi dữ liệu, không tự tạo ID hoặc báo input hoàn toàn hợp lệ |
 | G4 | Dockerfile có sẵn weights; --network none; 2 bản vLLM (mỗi GPU một bản); throughput trên 1.000 câu public, ngoại suy cho private | P3 | Private lớn bao nhiêu? (giả định thận trọng gấp 3 public) | G3 |
 | G5 | Chạy lại image sau mỗi giai đoạn; repro_check | P3 → P9 |  | Lệch PA ≤ 0,01 (mục tiêu nội bộ; luật cho 0,03) |
 | G6 | Đóng băng, gói cuối, tài liệu | P9 |  | Bản nộp = bản đã đánh giá |
@@ -318,6 +318,22 @@ Giới hạn thời gian: giai đoạn nào vượt 150% ước lượng thì c�
 Trợ lý AI là "model lớn của pha phát triển": giao việc có acceptance rõ, luôn chạy CPU gate và đọc diff; không cho nó đọc gold holdout hay public test để chỉnh.
 
 Sau mỗi giai đoạn: chạy lại image (G5), nộp public tối đa một lần theo chính sách, cập nhật tài liệu.
+
+### 6.1 Quyết định P2 G2 và G5 ngày 06/11/2026
+
+Quyền dữ liệu: chỉ dev trên Modal, gồm input/câu hỏi/descriptor/prompt tối thiểu cho probe; gold không vào inference, gold dev chấm local qua scoped evaluator. Không upload gold calibration/holdout hoặc dữ liệu lên GitHub/API khác. Kiểm account/budget trước job, không xin lại cùng quyền Modal đã xác nhận.
+
+G2 mới ưu tiên độ đúng trên phần trả lời: mọi ID hợp lệ có output; PA toàn dev>0; wrong/(correct+wrong)≤10%; báo coverage nhưng không cổng độ phủ hoặc đủ5họ. SQL/single_sql chuyển P4–P5; log tối thiểu, safety và descriptor thật trong prompt vẫn bắt buộc.
+
+P2 checkpoint nối tiếp từng câu, hash input/config khớp mới resume; bảo toàn output cũ, finalize bằng file tạm và đổi tên. Dòng không đọc được ID ghi lỗi riêng, các dòng hợp lệ tiếp tục; không tự tạo ID. Probe BF16 context và throughput1/2/4chuỗi trong giới hạn bộ nhớ từng GPU; KV dùng chung, không suy một chuỗi8k thành bốn chuỗi8k.
+
+G5 là quy tắc quyết định kỹ thuật, không phải ý nghĩa thống kê. So với cấu hình đang được chấp nhận trên cùng toàn bộ ID dev cố định, model/revision/tokenizer, seed và scorer; freeze protocol trước thí nghiệm. Bake-off model có protocol riêng. Kỹ thuật mới cần ΔPA≥+0,01; bỏ kỹ thuật/đơn giản hóa có bằng chứng cần ΔPA≥−0,005.
+
+Điểm ròng = tổng(score_candidate−score_control), score∈{−1,0,+1}; sai→đúng là+2, không đồng nghĩa số câu thay đáp án. Với1.895câu, nhánh kỹ thuật cần≥19điểm; đơn giản hóa giảm tối đa9điểm. Cả hai nhánh: ≥3/4cụm có điểm ròng≥−1; mọi cụm có điểm ròng≥−max(0,01×N_c,2), tương đương ΔPA_c≥−max(0,01,2/N_c). Dùng phép tính chính xác; mức mất điểm nguyên cho phép là floor(max(N_c/100,2)).
+
+G5 còn yêu cầu runtime không vượt budget đo ở P3, kể cả load/IO/workload; vượt thì loại dù tăng PA. Báo CI theo business và cụm với nhãn “mô tả, không phải cổng”; 18business trong4cụm có tương quan, không dùng CI business làm cổng hoặc claim significance. Contract: configs/g5_decision_policy.json; bootstrap nội bộ cũ chỉ diagnostic, chưa là code G5 mới.
+
+P5 chỉ dùng dev cho từng kỹ thuật; nhiều vòng vẫn có thể overfit dev. P6 dùng calibration chọn ngưỡng và kiểm cấu hình cuối, không chấm từng kỹ thuật trên calibration. Holdout một lần ở P7. Một task active; giấy tờ → safety → probe → nghiệp vụ/dev → G2 mới → P3.
 
 ## 7. Sổ thí nghiệm
 
@@ -341,13 +357,13 @@ Mỗi dòng là một câu hỏi có thể trả lời bằng số đo. Mặc đ
 
 ## 8. Giao thức đánh giá
 
-Split: gom business thành nhóm (gộp các file trùng byte và các business cùng template), chia dev ~60% / calibration ~20% / holdout ~20%; holdout ưu tiên loại hình khác. Toàn bộ input train đã được khảo sát, nhưng gold chưa được parse: holdout vẫn sạch về đáp án.
+Split P0 đã khóa theo business/template/file trùng: dev 18 business/1.895 câu/4 cụm; calibration 6/397/3 cụm; holdout 6/708/2 cụm. Giữ manifest/access policy, không chia lại. Toàn input train đã khảo sát; gold dev dùng đúng scope, gold holdout giữ kín tới P7.
 
 Tận dụng nhóm của A-T2: A-T2 đã gom 322 unit thành 80 nhóm theo template header và file trùng byte; E-SPLIT nên dùng cùng cách gom (cộng thêm loại hình business) để nhóm template không nằm ở cả dev lẫn holdout.
 
-Dùng từng phần: dev để viết hàm, sửa lỗi, chọn kỹ thuật; calibration để chọn ngưỡng và tối ưu prompt; holdout mở đúng một lần ở P7.
+Dev để viết hàm, sửa lỗi và so sánh từng kỹ thuật. P5 không dùng calibration để chấm từng kỹ thuật; P6 chỉ chọn ngưỡng và kiểm cấu hình cuối. Không biến calibration thành dev thứ hai; không dùng lỗi từng câu calibration để viết hàm/prompt. Holdout mở đúng một lần ở P7 theo policy release đã khóa.
 
-Thống kê: điểm từng câu thuộc {−1, 0, +1}; so hai cấu hình bằng bootstrap ghép cặp theo cụm business (≥ 1.000 lần lấy mẫu). Giữ thay đổi khi cận dưới khoảng tin cậy 95% của ΔPA > 0, hoặc khi trung tính nhưng làm hệ thống đơn giản hơn. Với vài trăm câu, sai số chuẩn của PA có thể tới vài điểm phần trăm, nên chênh lệch nhỏ phải coi là nhiễu.
+Điểm từng câu thuộc {−1,0,+1}. So sánh ghép cặp cùng ID, bootstrap theo business và cụm rò rỉ ≥1.000 lượt, báo cả hai khoảng CI95% với nhãn “mô tả, không phải cổng”. Business cùng cụm có tương quan; không dùng khoảng theo business làm cổng G5. P5 quyết định bằng ngưỡng toàn dev, dung sai từng cụm và runtime tại mục 6.1. Nhiều vòng chọn vẫn có thể overfit dev; giữ calibration/holdout đúng vai trò.
 
 Public leaderboard (5 lượt/ngày): chỉ dùng để phát hiện lỗi định dạng/crash và kiểm khoảng cách tổng quát hóa sau mỗi giai đoạn; không dò ngưỡng hay chọn giữa nhiều biến thể nhỏ (The Ladder); ghi lại mọi lượt nộp.
 

@@ -30,6 +30,8 @@ def build_images(image_api, runtime):
                 "PYTHONPATH": "/opt/p1/src",
                 "UV_PYTHON_DOWNLOADS": "never",
                 "UV_PYTHON_INSTALL_DIR": "/opt/p1/python",
+                "UV_INDEX_URL": "https://pypi.org/simple",
+                "UV_DEFAULT_INDEX": "https://pypi.org/simple",
             }
         ).run_commands(
             f"UV_PYTHON_DOWNLOADS=automatic uv python install {full_python}",

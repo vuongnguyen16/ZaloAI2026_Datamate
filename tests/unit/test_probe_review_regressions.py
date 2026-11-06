@@ -7,7 +7,7 @@ import pytest
 def test_cloud_image_emits_sdk_series_and_installs_exact_worker_python():
     from infra.modal_model_probe import build_images
 
-    calls, commands = [], []
+    calls, commands, environment = [], [], {}
 
     class Image:
         @classmethod
@@ -28,6 +28,7 @@ def test_cloud_image_emits_sdk_series_and_installs_exact_worker_python():
             return self
 
         def env(self, *args, **kwargs):
+            environment.update(args[0])
             return self
 
         def run_commands(self, *args):
@@ -42,6 +43,8 @@ def test_cloud_image_emits_sdk_series_and_installs_exact_worker_python():
     assert all(
         "--python 3.11.18" in command for command in commands if "uv sync" in command
     )
+    assert environment["UV_INDEX_URL"] == "https://pypi.org/simple"
+    assert environment["UV_DEFAULT_INDEX"] == "https://pypi.org/simple"
 
 
 def test_deadline_accounts_for_hashing_and_leaves_return_reserve():

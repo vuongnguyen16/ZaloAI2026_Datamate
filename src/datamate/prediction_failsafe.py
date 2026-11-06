@@ -23,7 +23,7 @@ MAX_ROUTING_LINE = 1024 * 1024
 
 def _line(value):
     return (
-        json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+        json.dumps(value, ensure_ascii=True, allow_nan=False, separators=(",", ":"))
         + "\n"
     ).encode("utf-8")
 

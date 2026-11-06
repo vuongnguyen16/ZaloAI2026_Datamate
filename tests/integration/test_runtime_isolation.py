@@ -1,4 +1,7 @@
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -116,3 +119,45 @@ def test_owned_output_path_type_conflicts_are_still_refused(tmp_path, owned):
     assert not submission_predict(root, output)["valid"]
     if owned == "logs":
         assert (output / owned).read_bytes() == b"existing-file"
+
+
+@pytest.mark.parametrize("failsafe", [False, True])
+def test_native_unpaired_surrogate_filename_is_reversibly_logged(tmp_path, failsafe):
+    root = inputs(tmp_path)
+    output = tmp_path / "result"
+    output.mkdir()
+    name = "keep_\udcff"
+    unmanaged = output / name
+    unmanaged.write_bytes(b"unchanged")
+    command = [
+        sys.executable,
+        "-m",
+        "datamate.cli",
+        "predict",
+        "--input",
+        str(root),
+        "--output",
+        str(output),
+    ]
+    if failsafe:
+        config = tmp_path / "invalid.yaml"
+        config.write_text("[broken")
+        command += ["--config", str(config)]
+    child = subprocess.run(
+        command,
+        capture_output=True,
+        timeout=20,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8:strict"},
+    )
+    assert child.returncode == 0, child.stderr
+    outcome = json.loads(child.stdout.decode("utf-8"))
+    assert outcome["valid"]
+    if failsafe:
+        diagnostic = next((output / "logs").glob("failsafe-*/diagnostics.json"))
+        assert outcome["ignored_output_entries"] == [name]
+    else:
+        diagnostic = next((output / "logs/.state").glob("diagnostics-*.json"))
+    raw = diagnostic.read_bytes()
+    assert b"\\udcff" in raw
+    assert json.loads(raw.decode("utf-8"))["ignored_output_entries"] == [name]
+    assert unmanaged.read_bytes() == b"unchanged"

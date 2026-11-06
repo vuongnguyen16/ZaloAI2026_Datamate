@@ -8,6 +8,8 @@ tracker duy nhất state và tasks/backlog.json.
 **P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
 Increment hiện hành: [sửa cô lập runtime](../reports/p2a_runtime_isolation_results.md)
 trên work/p2a-runtime-isolation; bỏ ngưỡng3lỗi và bỏ qua mục output ngoài runner.
+CPU runtime follow-up405passed/2skipped, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`, đã đọc JSON/ba log.
 Khảo sát CPU/P2c scope bắt đầu sau khi PR runtime được chốt, không làm song song.
 Đã chốt tiêu chí nội bộ từng hàm: precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời;
 thiếu mẫu báo chưa đạt. G2 giữ nguyên. Chưa khảo sát gold40 hoặc chạy P2b mới.

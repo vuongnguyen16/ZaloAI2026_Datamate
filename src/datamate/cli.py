@@ -261,7 +261,7 @@ def main() -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     print(
-        json.dumps(output, ensure_ascii=False, indent=2)
+        json.dumps(output, ensure_ascii=args.command == "predict", indent=2)
         if isinstance(output, dict)
         else output
     )

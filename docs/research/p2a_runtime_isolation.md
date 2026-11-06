@@ -10,6 +10,9 @@ Quyết định: runtime chỉ kiểm các đường dẫn nó quản lý (logs/
 mục khác chỉ ghi tên vào diagnostics, không stat/resolve/open/xóa nội dung.
 Không nới guard cho output root, logs, final hoặc lock; private checkpoint vẫn
 strict. Giữ một writer và không overwrite file cũ.
+Tên mục trong diagnostics được JSON-escape để cả lone surrogate vẫn lưu được
+thuận nghịch; response JSON predict dùng ASCII escaping. Không đổi serializer
+giá trị tiền hoặc output đáp án bình thường.
 
 Timeout hoặc query error không chứng minh backend chết, bất kể số lần lặp.
 Chỉ startup_error, worker_exited, invalid_worker_result mới vô hiệu backend.

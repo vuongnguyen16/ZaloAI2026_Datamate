@@ -1,6 +1,7 @@
 """P2a CPU safety coordinator. Default backend abstains; no model or gold IO."""
 
 import hashlib
+import json
 import time
 import uuid
 from pathlib import Path
@@ -296,13 +297,16 @@ def run_predict(
         publish(
             state_dir / f"diagnostics-{uuid.uuid4().hex}.json",
             (
-                exact_json(
+                json.dumps(
                     {
                         "input_errors": errors,
                         "checkpoint_errors": store.errors,
                         "publication": publication,
                         "ignored_output_entries": ignored_entries,
-                    }
+                    },
+                    ensure_ascii=True,
+                    allow_nan=False,
+                    separators=(",", ":"),
                 )
                 + "\n"
             ).encode("utf-8"),

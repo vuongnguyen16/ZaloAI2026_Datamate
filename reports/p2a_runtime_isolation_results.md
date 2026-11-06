@@ -19,7 +19,15 @@ failsafe diagnostics,3timeout/error rồi câu sau trả lời, proven backend f
 và type conflict ở logs/final. Bộ liên quan58passed/1skipped trong40.24s,
 gồm writer cạnh tranh/identity khác, kill/resume, exclusive publication và worker.
 Skip là quyền symlink Windows, Linux CI phải chạy thật.
-Review độc lập/full CPU/CI đang chốt; không dùng gate cũ để claim source mới.
+Review độc lập tìm1Important: tên file chứa lone surrogate gây lỗi UTF-8 ở
+diagnostics. Hai regression native filename/subprocess normal+failsafe đã fail
+trước sửa và pass sau sửa; tên được JSON-escape thuận nghịch, không đọc file.
+Predict CLI cũng escape metadata để stdout UTF-8 strict không crash.
+11regression mới pass. CPU cuối405passed/2skipped trong99.93s, Ruff/format
+pass, exit0, source không đổi; đã đọc JSON/ba log tại
+`runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`, fingerprint
+`5b4877a97551c209686c8cc699cc58671301f83db1b9c38e573924ea7a203a70`.
+CI exact-head kiểm riêng khi mở PR; không dùng gate cũ.
 
 Hai assertions cũ yêu cầu từ chối user.txt được cập nhật theo yêu cầu mới;
 không bỏ test lock/final hoặc private RunStore guard để pass.

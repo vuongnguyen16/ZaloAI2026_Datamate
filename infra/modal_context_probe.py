@@ -12,6 +12,10 @@ def extra_image_files():
         (ROOT / "src/datamate/intent_probe.py", "/opt/p1/src/datamate/intent_probe.py"),
         (ROOT / "src/datamate/scoring.py", "/opt/p1/src/datamate/scoring.py"),
         (ROOT / "infra/p1_runtime/context_generate.py", "/opt/p1/context_generate.py"),
+        (
+            ROOT / "infra/context_probe_process.py",
+            "/opt/p1/src/infra/context_probe_process.py",
+        ),
     ]
 
 
@@ -80,19 +84,13 @@ def run_cloud(config, model, cases, record_event):
         directory = Path(tempfile.mkdtemp(prefix="p2-context-"))
         persistent = Path("/evidence") / evidence_key
         persistent.mkdir(parents=True, exist_ok=False)
-        check = "import json,sys; from pathlib import Path; from datamate.model_probe import verify_snapshot; verify_snapshot(Path(sys.argv[1]),json.loads(sys.argv[2]))"
-        subprocess.run(
-            [
-                "/opt/p1/runtime/.venv/bin/python",
-                "-c",
-                check,
-                str(target),
-                json.dumps(candidate["files"]),
-            ],
-            check=True,
-            timeout=240,
-            capture_output=True,
-        )
+        from infra.context_probe_process import verify_context_snapshot
+
+        try:
+            verify_context_snapshot(candidate, target, persistent / "snapshot.json")
+        except ValueError:
+            evidence.commit()
+            raise
         try:
             urllib.request.urlopen("https://example.com", timeout=3).close()
         except (urllib.error.URLError, TimeoutError, OSError):

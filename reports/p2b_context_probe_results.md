@@ -76,7 +76,8 @@ khác khi thay prefill budget/max_num_seqs.
 
 P2c có thể dùng4096 làm cấu hình đầu bảo thủ, giữ abstain cho prompt không
 vừa hoặc không đủ evidence. Cần rút projection theo metadata/dev nếu muốn
-mở rộng; không tune bằng public/calibration. Chưa có lý do bắt buộc TP2/FP8.
+mở rộng; không tune bằng public/calibration. Chưa có lý do bắt buộc TP2/FP8
+chỉ xét evidence memory; chưa kết luận tầng LLM đáp ứng ngân sách thời gian.
 Nếu8k trở thành yêu cầu, thí nghiệm mới nên tách prefill-token-budget khỏi
 context với chunked prefill, đo lại cùng memory/throughput; chưa chạy hoặc
 chứng minh phương án đó. Không tự retry cấu hình khác trong job này.
@@ -101,3 +102,18 @@ source không đổi, JSON/ba log đã đọc:
 `runs/cpu-check-20261106T174519857830Z-x32dseth/gate.json`.
 Fingerprint `720a9e1aa5dc23721245cde5f4c1d031fbd53336da94b8ab1650af7e4ae72fde`.
 UTF-8/NFC QA8tệp pass; chỉ P2 active. CI GitHub kiểm riêng sau push.
+
+## Bổ sung sau review07/11
+
+38,506s/4request tương đương9,6265s/request ở batch1. Ngoại suy tuyến tính
+đúng workload này:1000câu khoảng2,67giờ và3000câu khoảng8,02giờ/GPU, chưa gồm
+load/business analysis/data. Đây là cảnh báo phải xử lý trước full dev/model,
+không là benchmark toàn dev/private. KV5504token hạn chế concurrency nhưng
+probe chưa cô lập nguyên nhân eager/prefix-cache/output-length. Khoảng7output
+token/s gồm prefill/scheduler, không phải pure decode speed.
+
+8/16prompt quá budget4096 chỉ mô tả mẫu đã chọn, không chứng minh một nửa
+1895câu sẽ abstain. Tương tự154câu không thấy lọc không chứng minh coverage150.
+[Thiết kế P2c CPU và performance gate](../docs/research/p2c_cpu_design.md)
+chọn prompt business riêng và intent ngắn, output enum/index<=64token;
+chưa chạy probe cấu hình mới hay đạt mốc0,28request/s/GPU.

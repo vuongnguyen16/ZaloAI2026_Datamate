@@ -1,7 +1,7 @@
 """CPU-only policy for the dev context probe; never reads gold or loads models."""
 
 import json
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -17,7 +17,7 @@ class Intent(BaseModel):
     operation: Literal["revenue_total", "order_count", "revenue_change_pct", "abstain"]
     period_text: str = Field(max_length=256)
     comparison_text: str = Field(max_length=256)
-    filter_texts: list[str] = Field(max_length=12)
+    filter_texts: list[Annotated[str, Field(max_length=256)]] = Field(max_length=12)
     reason: str = Field(max_length=256)
 
 

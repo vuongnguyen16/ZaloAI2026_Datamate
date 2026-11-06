@@ -83,6 +83,7 @@ def test_image_additions_only_contain_code():
         "intent_probe.py",
         "scoring.py",
         "context_generate.py",
+        "context_probe_process.py",
     }
     assert all(
         "data" not in p.relative_to(ROOT).parts and p.suffix == ".py" for p, _ in files

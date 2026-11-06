@@ -113,6 +113,12 @@ def generate(request, destination):
         ),
     )
     evidence["engine_startup_seconds"] = time.perf_counter() - started
+    evidence.update(
+        status="warming_up",
+        torch_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
+        torch_peak_reserved_bytes=torch.cuda.max_memory_reserved(),
+    )
+    atomic_json(destination, evidence)
     sampling = SamplingParams(
         temperature=0,
         seed=0,
@@ -122,6 +128,12 @@ def generate(request, destination):
     started = time.perf_counter()
     model.generate([selected[0]], sampling, use_tqdm=False)
     evidence["warmup_seconds"] = time.perf_counter() - started
+    evidence.update(
+        status="ready",
+        torch_peak_allocated_bytes=torch.cuda.max_memory_allocated(),
+        torch_peak_reserved_bytes=torch.cuda.max_memory_reserved(),
+    )
+    atomic_json(destination, evidence)
     for repeat in (1, 2):
         for size in (1, 2, 4):
             started = time.perf_counter()

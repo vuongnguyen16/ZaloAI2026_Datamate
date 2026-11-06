@@ -17,6 +17,8 @@ vài họ nghiệp vụ → G2 ưu tiên độ đúng. SQL chuyển P4–P5.
 [Probe P2b dev đã đo](reports/p2b_context_probe_results.md): BF16 context4096
 chạy được dưới30GiB,8192+prefill8192 thiếu KV; chưa PA/G2. Phạm vi tiếp theo
 là [tổng doanh thu và đếm đơn](docs/research/p2c_domain_scope.md).
+[Core CPU P2c](docs/domain_lib.md) đã có ledger/resolver và hai hàm nghiệp vụ
+kiểm synthetic; binding business thật, model adapter và PA/G2 vẫn pending.
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên

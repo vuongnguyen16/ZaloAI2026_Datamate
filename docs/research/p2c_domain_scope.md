@@ -23,6 +23,9 @@ Khảo sát local `runs/p2c-cpu-surveys-20261107/`:
   toàn bộ, không xem đây là chứng minh mọi câu chỉ có một kỳ.
 - Có73 câu mang dấu hiệu trung bình. Nhãn aggregation chồng với average;
   vì vậy405 không phải405 câu tổng doanh thu, cũng không phải độ phủ dự kiến.
+  Kiểm chéo sau review07/11:42/154câu `none_seen` có dấu hiệu trung bình;
+  còn112ứng viên `none_seen` và không thấy average. Đây vẫn là heuristic,
+  không chứng minh112câu đủ điều kiện hay đúng, không gọi là coverage150.
 - Chọn cố định40 câu trước khi đọc đáp án:10/cụm, luân phiên strata chỉ số và
   dạng kỳ, thứ tự hash `p2c-sample-v1`. Đọc đúng40 record gold dev qua authorize
   rồi routing tập con;2960 record còn lại chỉ routing envelope. Không decode

@@ -53,8 +53,8 @@ class Binding:
         if (
             self.role not in {"lines", "headers", "events"}
             or not self.order_id
-            or self.date_format not in {"%Y-%m-%d", "%d/%m/%Y"}
-            or self.number_format not in {"plain", "vi"}
+            or self.date_format not in {"%Y-%m-%d", "%d/%m/%Y", "%d thg %m %Y"}
+            or self.number_format not in {"plain", "vi", "en"}
             or type(self.carry_order_fields) is not bool
         ):
             raise DomainAbstain("unsupported_binding")
@@ -173,11 +173,11 @@ def _cell(cells, column):
 def _date(value, binding):
     if value is None:
         return None
-    shape = (
-        r"\d{4}-\d{2}-\d{2}"
-        if binding.date_format == "%Y-%m-%d"
-        else r"\d{1,2}/\d{1,2}/\d{4}"
-    )
+    shape = {
+        "%Y-%m-%d": r"\d{4}-\d{2}-\d{2}",
+        "%d/%m/%Y": r"\d{1,2}/\d{1,2}/\d{4}",
+        "%d thg %m %Y": r"\d{1,2} thg \d{1,2} \d{4}",
+    }[binding.date_format]
     if re.fullmatch(shape, value) is None:
         raise DomainAbstain("invalid_order_date")
     try:
@@ -197,6 +197,10 @@ def _money(value, binding):
         if not re.fullmatch(r"[+-]?(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?", value):
             return None
         value = value.replace(".", "").replace(",", ".")
+    elif binding.number_format == "en":
+        if not re.fullmatch(r"[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?", value):
+            return None
+        value = value.replace(",", "")
     elif not re.fullmatch(r"[+-]?\d+(?:\.\d+)?", value):
         return None
     result = Decimal(value)

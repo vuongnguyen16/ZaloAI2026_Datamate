@@ -3,19 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from datamate.evaluation import run_eval
-from datamate.ingest import IngestError, LoaderOptions
-from datamate.ingest.loader import run_ingest
-from datamate.profile import ProfileOptions, run_profile
-from datamate.runner import run_smoke, run_stub
-from datamate.splits import (
-    authorize_access,
-    freeze_split,
-    log_public_submission,
-    open_split,
-)
-from datamate.taxonomy import run_taxonomy
-from datamate.validation import inspect_input, inspect_logs, inspect_submission
+from datamate import APPLICATION_STARTED
 
 
 def main() -> int:
@@ -32,6 +20,12 @@ def main() -> int:
     )
     stub.add_argument("--input", type=Path, required=True)
     stub.add_argument("--output", type=Path, required=True)
+    predict = commands.add_parser(
+        "predict", help="Resumable CPU safety output; no model"
+    )
+    predict.add_argument("--input", type=Path, required=True)
+    predict.add_argument("--output", type=Path, required=True)
+    predict.add_argument("--config", type=Path)
     audit = commands.add_parser(
         "validate-input", help="Split contract checks; never reads gold"
     )
@@ -122,9 +116,45 @@ def main() -> int:
         "--rules", type=Path, default=Path("configs/taxonomy_rules.json")
     )
     taxonomy.add_argument("--output", type=Path, required=True)
+    cross = commands.add_parser(
+        "taxonomy-cross", help="Cross pinned P0 dev taxonomy without reading gold"
+    )
+    cross.add_argument("--split", type=Path, required=True)
+    cross.add_argument("--manifest-sha256", required=True)
+    cross.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    ingest_errors = ()
+    if args.command != "predict":
+        from datamate.evaluation import run_eval
+        from datamate.ingest import IngestError, LoaderOptions
+        from datamate.ingest.loader import run_ingest
+        from datamate.profile import ProfileOptions, run_profile
+        from datamate.runner import run_smoke, run_stub
+        from datamate.splits import (
+            authorize_access,
+            freeze_split,
+            log_public_submission,
+            open_split,
+        )
+        from datamate.taxonomy import run_taxonomy
+        from datamate.validation import inspect_input, inspect_logs, inspect_submission
+
+        ingest_errors = (IngestError,)
     try:
-        if args.command == "run-eval":
+        if args.command == "predict":
+            from datamate.prediction_failsafe import submission_predict
+
+            output = submission_predict(
+                args.input,
+                args.output,
+                config_path=args.config,
+                started=APPLICATION_STARTED,
+            )
+        elif args.command == "taxonomy-cross":
+            from datamate.taxonomy_cross import run_taxonomy_cross
+
+            output = run_taxonomy_cross(args.split, args.manifest_sha256, args.output)
+        elif args.command == "run-eval":
             output = run_eval(
                 args.split,
                 args.manifest_sha256,
@@ -220,7 +250,7 @@ def main() -> int:
             output = run_smoke(args.config)
         else:
             output = run_stub(args.input, args.output)
-    except IngestError as exc:
+    except ingest_errors as exc:
         print(
             json.dumps(
                 {"valid": False, "errors": [exc.record()]}, ensure_ascii=False, indent=2
@@ -236,3 +266,7 @@ def main() -> int:
         else output
     )
     return 0 if not isinstance(output, dict) or output["valid"] else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

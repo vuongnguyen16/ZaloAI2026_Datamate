@@ -166,7 +166,11 @@ def inspect_logs(input_dir: Path, run_dir: Path) -> dict:
                 predictions[prediction.id] = prediction.output()
             except ValueError:
                 pass  # Already reported by inspect_submission above.
-    for path in sorted((run_dir / "logs").glob("*.json")):
+    log_root = run_dir / "logs"
+    bound_logs = log_root / f"submission-{sha256(submission_path)}"
+    if bound_logs.is_dir():
+        log_root = bound_logs
+    for path in sorted(log_root.glob("*.json")):
         try:
             entry = json_object(path.read_text("utf-8-sig"))
             identifier = entry["question_id"]

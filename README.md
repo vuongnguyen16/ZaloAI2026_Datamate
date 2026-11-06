@@ -77,8 +77,20 @@ Dùng output mới; không ghi đè input/cache cũ. Loader giữ header/tổng/
 không semantic cleaning. Profile có unresolved fallback; data_start chỉ cận dưới.
 Smoke chỉ hai câu synthetic (`12.35`, `0012`), SQL fixture tin cậy, chưa sandbox
 SQL do model sinh. Local 2 threads/DuckDB 256 MiB/fixture ≤1 MiB.
-`predict.sh` gọi stub `/data` → `/result`, chưa inference thật; validator chỉ
-kiểm cấu trúc, không chấm PA. Bằng chứng CPU hiện hành nằm ở state/context.
+`predict.sh` gọi `datamate predict` từ `/data` tới `/result/submission.jsonl`.
+P2a mặc định `no_model`/abstain, chưa inference model thật hoặc PA. Coordinator
+có checkpoint/resume; timeout/lỗi một câu được cô lập. Log từng câu ở
+`/result/logs/submission-<sha256>/`, state ở `/result/logs/.state/`; thư mục
+`logs/` rỗng có sẵn được chấp nhận. Validator hỗ trợ cả log stub cũ và log mới.
+Entrypoint có failsafe all-abstain cho ID parse được nếu pipeline lỗi và chưa
+có final; không dùng checkpoint lệch identity hay ghi đè file cũ. Mount không
+hỗ trợ hardlink dùng exclusive `xb`, ghi `non_atomic_exclusive`: chết khi copy
+có thể để lại final dở. Công cụ dev vẫn fail-closed theo thiết kế.
+Bằng chứng CPU hiện hành nằm ở state/context;
+[thiết kế sửa review P2a](docs/research/p2a_review_fixes.md).
+Primary/fallback cùng publication lock; output đang có writer hoặc thư mục lạ
+bị từ chối. Emergency routing giới hạn1MiB/dòng; vượt giới hạn báo
+`coverage_complete=false`, `valid=false`, không tuyên bố đã xuất đủ ID.
 
 ## Modal, dữ liệu và đóng gói
 

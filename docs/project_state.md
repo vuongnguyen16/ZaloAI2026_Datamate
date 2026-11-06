@@ -5,7 +5,18 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
-**P0/G0 và P1/G1 đã hoàn tất.** P2 todo/ready, chưa mở task active.
+**P0/G0 và P1/G1 đã hoàn tất.** P2 đang triển khai P2a CPU safety và bảng chéo taxonomy dev; chưa qua G2.
+P2a đã sửa review PR1 mục1–6:
+[bằng chứng sửa](../reports/p2a_review_fixes_results.md),
+[bản đầu](../reports/p2a_results.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
+Đã push `work/p2a-safety` và mở [PR#1](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/1)
+vào `main` theo yêu cầu người dùng. Trạng thái tích hợp hiện hành xem PR1;
+người dùng đã cho phép gate/CI xanh rồi merge, không cần hỏi lại tích hợp.
+CPU cuối394passed/2skipped, Ruff/format pass, source không đổi, đã đọc JSON/ba log:
+`runs/cpu-check-20261106T150301669878Z-gu4dqicp/gate.json`.
+Review độc lập bổ sung3Important đã sửa bằng regression; coverage-limit false pass
+cũng đã sửa. README sửa riêng ởf33bf08. Chưa model/PA/G2 hoặc public submission.
+Taxonomy cross local:1895unique/199cells/2589memberships, không mở lại gold.
 Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;
 primary Qwen3-14B,14,768,307,200 parameters. Chưa B0/PA BTC hoặc pipeline
 predict thật/Docker/public submission. [Kết quả P1](../reports/p1_results.md).

@@ -4,9 +4,9 @@ The organizer's evaluator is not present; this is structural validation, not sco
 """
 
 import json
-import math
 import re
 from datetime import date
+from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -71,7 +71,17 @@ AnswerType = Literal[
 
 
 def finite_number(value: Any) -> bool:
-    return type(value) in (int, float) and (type(value) is int or math.isfinite(value))
+    if type(value) not in (int, float, Decimal):
+        return False
+    try:
+        number = Decimal(str(value))
+        return (
+            number.is_finite()
+            and len(number.as_tuple().digits) <= 256
+            and abs(number.adjusted()) <= 1000
+        )
+    except (ValueError, InvalidOperation):
+        return False
 
 
 def cell(value: Any) -> bool:

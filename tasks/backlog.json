@@ -378,7 +378,7 @@
       "E5",
       "G3"
     ],
-    "status": "todo",
+    "status": "in_progress",
     "depends_on": [
       "P1",
       "A-T1",
@@ -395,7 +395,13 @@
       "Chuẩn bị public#1; xác minh quota/quy định và scope thao tác trước khi gửi; SQL fallback tối thiểu chuyển P4, single_sql đối chứng chuyển P5; P3 ngay sau G2 mới"
     ],
     "evidence": [
-      "docs/research/p2_g2_g5_decisions.md"
+      "docs/research/p2_g2_g5_decisions.md",
+      "docs/research/p2a_safety_design.md",
+      "docs/research/p2a_safety_plan.md",
+      "reports/p2a_results.md",
+      "docs/research/p2a_review_fixes.md",
+      "docs/research/p2a_review_fixes_plan.md",
+      "reports/p2a_review_fixes_results.md"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -404,7 +410,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "scope/data permission approved; implementation and G2 evidence pending",
+    "decision_status": "P2a PR1 review1-6 implemented; current verification/CI and merge evidence in reports/p2a_review_fixes_results.md; P2b/P2c and G2 pending",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",

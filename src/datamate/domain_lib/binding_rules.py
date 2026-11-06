@@ -12,6 +12,7 @@ from .orders import Binding, _date, _money
 
 DATE_FORMATS = ("%Y-%m-%d", "%d/%m/%Y", "%d thg %m %Y")
 NUMBER_FORMATS = ("plain", "en", "vi")
+VERIFIED_HEADERS = {"auto_rule", "source_schema", "explicit_annotation"}
 
 
 def norm(text):
@@ -108,12 +109,19 @@ def propose(unit, readme):
     found["amount"] = []
     evidence = {}
     net = set()
+    reasons = []
     for column in unit["columns"]:
         label = header(column)
         description = dictionary.get(norm(label), "")
         name = column["sql_name"]
+        label_roles = {r for r, terms in ROLES.items() if norm(label) in terms}
+        description_roles = {
+            r for r, terms in ROLES.items() if norm(description) in terms
+        }
+        if description and label_roles and label_roles != description_roles:
+            reasons.append("conflicting_or_unverified_readme_role")
         for role, terms in ROLES.items():
-            if norm(description) in terms or norm(label) in terms:
+            if role in (description_roles if description else label_roles):
                 found[role].append(name)
                 evidence[name] = dict(label=label, definition=description)
         description_key = norm(description)
@@ -136,9 +144,8 @@ def propose(unit, readme):
             found["amount"].append(name)
             evidence[name] = dict(label=label, definition=description)
     columns = {role: values[0] for role, values in found.items() if len(values) == 1}
-    reasons = []
     if (
-        unit.get("header_status") not in {"auto_rule", "explicit", "schema"}
+        unit.get("header_status") not in VERIFIED_HEADERS
         or unit.get("data_start_row") is None
     ):
         reasons.append("unresolved_header")

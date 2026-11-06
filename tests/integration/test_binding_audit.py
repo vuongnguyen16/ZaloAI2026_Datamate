@@ -1,4 +1,5 @@
 import json
+import sqlite3
 
 import pytest
 
@@ -7,7 +8,7 @@ from datamate.ingest.loader import ingest_split
 from datamate.profile.engine import run_profile
 
 
-def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None):
+def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None, native=False):
     root = tmp_path / "train"
     biz = root / "data/synthetic_b"
     biz.mkdir(parents=True)
@@ -40,6 +41,25 @@ def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None):
         (biz / extra_file).write_text(
             "Mã đơn,Ngày đặt,Tiền\nC,2026-11-03,40\n", encoding="utf-8"
         )
+    if native:
+        readme = biz / "README.md"
+        readme.write_text(
+            readme.read_text("utf-8").replace("orders.csv", "orders.sqlite"),
+            encoding="utf-8",
+        )
+        (biz / "orders.csv").unlink()
+        con = sqlite3.connect(biz / "orders.sqlite")
+        try:
+            con.execute(
+                'CREATE TABLE orders ("Mã đơn" TEXT,"Ngày đặt" TEXT,"Trạng thái" TEXT,"SL" TEXT,"Đơn giá" TEXT,"Tiền" TEXT,"Sản phẩm" TEXT)'
+            )
+            con.execute(
+                "INSERT INTO orders VALUES (?,?,?,?,?,?,?)",
+                ("A", "2026-11-01", "Hoàn thành", "1", "10", "10", "Tea"),
+            )
+            con.commit()
+        finally:
+            con.close()
     report = ingest_split(root, tmp_path / "cache")
     folder = tmp_path / "ingest"
     folder.mkdir()
@@ -57,6 +77,13 @@ def test_complete_verified_pipeline_and_author_packet_are_not_oracle(tmp_path):
     assert result["review_status"] == "machine_checked_pending_independent_review"
     assert result["ledger_orders"] == 2 and result["ledger_lines"] == 2
     assert result["peak_rss_bytes"] > 0 and result["elapsed_seconds"] > 0
+
+
+def test_native_sqlite_source_schema_can_be_checked(tmp_path):
+    root, index = prepare(tmp_path, native=True)
+    result = audit_business(index, root, "synthetic_b")
+    assert result["count_checked"] and result["revenue_checked"]
+    assert result["ledger_orders"] == 1
 
 
 def test_unknown_status_blocks_business_and_resource_failure_never_passes(tmp_path):

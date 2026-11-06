@@ -74,6 +74,31 @@ def _verify_headers(con, profile):
         coords = {
             h["source_row"] for c in unit["columns"] for h in c.get("header_cells", [])
         }
+        structure = unit["header"]
+        header_rows = structure["rows"]
+        if len(header_rows) != len(set(header_rows)) or set(header_rows) != coords:
+            raise DomainAbstain("header_coordinate_mismatch")
+        status = structure["status"]
+        if status == "source_schema":
+            if (
+                unit["source_kind"] != "sqlite_table"
+                or coords
+                or structure["data_start_row"] != (1 if unit["row_count"] else None)
+            ):
+                raise DomainAbstain("unverified_data_boundary")
+        elif status in {"auto_rule", "explicit_annotation"}:
+            if not coords or any(type(n) is not int or n < 1 for n in coords):
+                raise DomainAbstain("invalid_header_coordinate")
+            nonempty = " OR ".join(
+                f"({loader.identifier(c['sql_name'])} IS NOT NULL AND {loader.identifier(c['sql_name'])}<>'')"
+                for c in unit["columns"]
+            )
+            first_data = con.execute(
+                f"SELECT min(__row) FROM {loader.identifier(unit['view_name'])} WHERE __row>? AND ({nonempty})",
+                [max(coords)],
+            ).fetchone()[0]
+            if structure["data_start_row"] != first_data:
+                raise DomainAbstain("unverified_data_boundary")
         if not coords:
             continue
         if any(type(n) is not int or not 1 <= n <= unit["row_count"] for n in coords):

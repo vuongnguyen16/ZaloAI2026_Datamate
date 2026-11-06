@@ -66,3 +66,21 @@ rồi báo pass. Chỉ source artifacts tối thiểu local, không publish BTC.
 Bindings tự động chưa đủ để trả lời câu thật đến khi được duyệt theo scope.
 Sau binding mới làm short prompt/probe throughput đã chốt; không chạy model
 toàn1895dev ở increment này. Billing vẫn cần actual dashboard khi công cụ hoạt động.
+
+## Cache cũ và provenance
+
+Lượt audit đầu bị `stale_ingest_identity` ở cả18business, trước khi binder
+đọc dòng dữ liệu. Code ingest đã đổi sau generation A-T2; thử toàn bộ tổ hợp
+LF/CRLF của5file ingest hiện hành không khớp hash cũ. Không bỏ kiểm tra code
+hash hoặc sửa manifest để dùng lại cache. Dựng generation/profile mới chỉ cho
+18business dev đã authorize, giữ options ingest/profile cũ và giữ nguyên
+source/cache cũ. Báo lỗi provenance này riêng, không tính thành18binding sai.
+Đối chiếu Git chỉ để chẩn đoán: hash cũ khớp chính xác5file ingest LF tại
+`790b1af`; các commit sau đổi docstring, vị trí import và formatting. Không
+checkout/chạy mã cũ hoặc khôi phục timeline lịch sử.
+
+Review lượt hai bổ sung guard: tọa độ header phải khớp và data_start là hàng
+không rỗng đầu tiên sau header; annotation bỏ qua hàng không rỗng chưa được
+v0 chấp nhận. Chỉ dùng vocabulary A-T2 thực `auto_rule`, `source_schema`,
+`explicit_annotation`. README có định nghĩa mâu thuẫn/chưa hiểu thì veto
+mapping của header quen thuộc; không coi định nghĩa đó là thiếu để fallback.

@@ -71,7 +71,7 @@ def test_new_source_file_before_or_during_read_is_detected(verified_fixture):
             pass
 
 
-@pytest.mark.parametrize("remove", ["unit", "column", "header", "declared"])
+@pytest.mark.parametrize("remove", ["unit", "column", "header", "declared", "boundary"])
 def test_self_consistent_profile_cannot_omit_cache_units_or_columns(
     verified_fixture, remove
 ):
@@ -92,6 +92,8 @@ def test_self_consistent_profile_cannot_omit_cache_units_or_columns(
         profile["units"][0]["columns"][0]["header_cells"][0]["cell"]["value"] = (
             "forged label"
         )
+    elif remove == "boundary":
+        profile["units"][0]["header"]["data_start_row"] = 3
     else:
         profile["units"][0]["columns"][0]["declared_name"] = "forged label"
     for kind, value in [("profile", profile), ("schema", schema_descriptor(profile))]:

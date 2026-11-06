@@ -30,11 +30,11 @@ format/status/data checks→ledger per metric; không tự duyệt thành oracle
 tests/unit/test_binding_codecs.py.
 **Interfaces:** `VerifiedBusiness`, `open_business(index,source,business_id)`;
 `iter_rows(unit)` yields full RawRow; explicit en/vi-text-date codec in Binding.
-- [ ] RED synthetic source+cache+profile fixture: correct rows, invalid hash/view/
+- [x] RED synthetic source+cache+profile fixture: correct rows, invalid hash/view/
   source mutation rejected, repeated header/totals accounted, full cells preserved.
-- [ ] RED codec/grouped-comma/vi-text date tests, no permissive week/date guessing.
-- [ ] Implement minimal generic reader, read-only safe SQL identifiers, bounded batches.
-- [ ] Run targeted tests; Expected pass; commit.
+- [x] RED codec/grouped-comma/vi-text date tests, no permissive week/date guessing.
+- [x] Implement minimal generic reader, read-only safe SQL identifiers, bounded batches.
+- [x] Run targeted tests; Expected pass; commit.
 
 ### Task 2: Rule binder, audit và local review packet
 **Files:** domain_lib/binding_rules.py, binding_audit.py; scripts/p2_binding_audit.py;
@@ -42,12 +42,12 @@ unit/integration synthetic tests for semantic/machine gates and CLI scope.
 **Consumes:** reader task1/Binding/ledger CPU.
 **Produces:** per-business candidate/check/reason/capability/provenance/resource
 artifact and review packet local; aggregate result report.
-- [ ] RED false-net despite perfect arithmetic; grammar ambiguity; unknown status;
+- [x] RED false-net despite perfect arithmetic; grammar ambiguity; unknown status;
   row/resource/sheet gap and sealed CLI scope; count independent of money.
-- [ ] Implement exact README/header rules, full inventories/data checks, serialized
+- [x] Implement exact README/header rules, full inventories/data checks, serialized
   worker time/RSS; research CLI authorize all18dev context before reading.
-- [ ] Run synthetic tests/full CPU gate; Expected pass/current; review source round1.
-- [ ] Run18business CPU, measure largest, inspect candidate bindings as author;
+- [x] Run synthetic tests/full CPU gate; Expected pass/current; review source round1.
+- [x] Run18business CPU, measure largest, inspect candidate bindings as author;
   write local packet, no independent/oracle claim. Report actual failures.
-- [ ] Review round2 source/synthetic+aggregate only per explicit user request,
+- [x] Review round2 source/synthetic+aggregate only per explicit user request,
   fix important RED→GREEN, final gate/current; update state/backlog, commit.

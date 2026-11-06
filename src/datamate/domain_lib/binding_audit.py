@@ -9,7 +9,14 @@ from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
-from .binding_rules import classify_row, header, inspect_rows, norm, propose
+from .binding_rules import (
+    VERIFIED_HEADERS,
+    classify_row,
+    header,
+    inspect_rows,
+    norm,
+    propose,
+)
 from .model import DomainAbstain
 from .orders import Binding, BoundSource, adapt_sources
 from .raw_reader import open_business
@@ -172,8 +179,7 @@ def audit_business(
                     disposition = "selected_order_source"
                 elif (
                     not c.columns.get("id")
-                    and c.unit.get("header_status")
-                    in {"auto_rule", "explicit", "schema"}
+                    and c.unit.get("header_status") in VERIFIED_HEADERS
                     and labels
                     and labels <= conversion_names
                     and labels & {"heso", "hesoquydoi", "quydoi"}

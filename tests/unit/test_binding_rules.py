@@ -49,6 +49,22 @@ def test_semantic_net_proof_is_required_even_with_perfect_arithmetic():
     )
 
 
+def test_readme_conflicts_and_unknown_definitions_veto_header_roles():
+    for old, new in [
+        ("ngày bán", "ngày giao hàng"),
+        ("mã đơn", "mã khách hàng"),
+        ("trạng thái đơn", "mô tả chưa được xác minh"),
+    ]:
+        candidate = propose(unit(), readme().replace(f": {old}\n", f": {new}\n"))
+        assert candidate.reasons
+        assert not inspect_rows(rows(), candidate)["count_format_ok"]
+
+
+def test_header_status_vocabulary_matches_profile_producer():
+    for status in ["source_schema", "explicit_annotation", "auto_rule"]:
+        assert not propose(unit() | {"header_status": status}, readme()).reasons
+
+
 def test_extra_vat_shipping_or_voucher_semantics_are_not_net():
     for definition in [
         "thành tiền sau giảm + VAT + shipping",

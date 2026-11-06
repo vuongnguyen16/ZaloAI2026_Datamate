@@ -18,7 +18,10 @@ vài họ nghiệp vụ → G2 ưu tiên độ đúng. SQL chuyển P4–P5.
 chạy được dưới30GiB,8192+prefill8192 thiếu KV; chưa PA/G2. Phạm vi tiếp theo
 là [tổng doanh thu và đếm đơn](docs/research/p2c_domain_scope.md).
 [Core CPU P2c](docs/domain_lib.md) đã có ledger/resolver và hai hàm nghiệp vụ
-kiểm synthetic; binding business thật, model adapter và PA/G2 vẫn pending.
+kiểm synthetic; duyệt binding business thật, model adapter và PA/G2 vẫn pending.
+[Audit binding CPU v0](reports/p2c_binding_results.md) đã kiểm18business dev:
+1business qua cả hai metric, chỉ một cụm; mapping thật chưa được duyệt độc lập.
+Reader/audit research đã có, chưa nối predict; cần mở rộng binding trước G2.
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên

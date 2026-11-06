@@ -28,25 +28,64 @@ TABLE_SUFFIXES = {".csv", ".xlsx", ".sqlite"}
 
 
 def identifier(name: str) -> str:
+    """Bọc tên trong dấu nháy, an toàn khi viết SQL"""
     return '"' + name.replace('"', '""') + '"'
 
 
 def code_hash() -> str:
+    """Dấu vấn tay của code loader, khi thay đổi code thì sẽ tạo mã mới"""
     files = {p.name: sha256(p) for p in sorted(Path(__file__).parent.glob("*.py"))}
     return hashlib.sha256(dump(files).encode()).hexdigest()
 
 
 def is_link(path: Path) -> bool:
+    """Kiểm tra xem đường dẫn có phải là liên kết mềm hoặc thư mục ẩn (trên Windows)
+    Args:
+        path: đường dẫn
+    Returns:
+        bool
+    """
     return path.is_symlink() or (
         path.exists() and bool(getattr(path.lstat(), "st_file_attributes", 0) & 0x400)
     )
 
 
 def disjoint(a: Path, b: Path) -> bool:
+    """Kiểm tra hai thư mục có tách biệt nhau không.
+
+    Hai thư mục bị coi là dính nhau khi trùng nhau, hoặc một cái nằm
+    bên trong cái kia. Hàm chỉ trả kết quả, không tự báo lỗi; nơi gọi
+    (ví dụ ``roots``) sẽ quyết định ném ``IngestError``.
+
+    Args:
+        a (Path): Đường dẫn thư mục thứ nhất, nên là đường dẫn tuyệt đối.
+        b (Path): Đường dẫn thư mục thứ hai, nên là đường dẫn tuyệt đối.
+
+    Returns:
+        bool: ``True`` nếu tách biệt, ``False`` nếu trùng hoặc lồng nhau.
+    """
+    
     return not (a == b or a.is_relative_to(b) or b.is_relative_to(a))
 
 
 def roots(input_dir: Path, cache_root: Path) -> tuple[Path, Path]:
+    """Xác định 2 thư mục gốc (dữ liệu nguồn, cache) và đảm bảo chúng tách biệt.
+
+    Là bước kiểm tra đầu tiên trước khi ingest, để cache không nằm lẫn
+    trong dữ liệu gốc (hoặc ngược lại).
+
+    Args:
+        input_dir (Path): Thư mục dữ liệu nguồn. Bắt buộc phải tồn tại.
+        cache_root (Path): Thư mục cache. Chưa có cũng được, sẽ tạo sau.
+
+    Raises:
+        IngestError: ``output_overlap`` nếu input không phải thư mục,
+            hoặc input và cache trùng hay lồng vào nhau.
+        FileNotFoundError: Nếu ``input_dir`` không tồn tại.
+
+    Returns:
+        tuple[Path, Path]: Cặp``(source, cache)``đã đổi sang đường dẫn tuyệt đối.
+    """
     source = input_dir.resolve(strict=True)
     cache = cache_root.resolve()
     if not source.is_dir() or not disjoint(source, cache):
@@ -612,7 +651,8 @@ def run_ingest(
         )
     map_hash = None
     if format_map is not None:
-        mapping = Path(format_map).resolve(strict=True)
+        
+        mapping = Path(format_map).resolve(strict=True)         # Kiểm tra xem file có thật sự tồn tại không
         if (
             not disjoint(mapping, source)
             or not disjoint(mapping, cache)

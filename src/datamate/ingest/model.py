@@ -1,32 +1,74 @@
 import codecs
+import re
 from dataclasses import asdict, dataclass, field
 from pathlib import PurePosixPath
 from typing import Iterator
 
 
 class IngestError(ValueError):
-    """Stable diagnostic with no source cell value in its message."""
+    """Mẫu phiếu báo lỗi chung khi nạp dữ liệu.
+
+    Để mọi chỗ trong chương trình báo lỗi theo cùng một cách, luôn đủ
+    3 thông tin:
+    * 1. Lỗi gì? (``code``)
+    * 2. Thế nào? (``message``)
+    * 3. Ở đâu? (``location``)
+    
+    Quy định: trên phiếu không được chép nội dung dữ liệu gốc
+    (giá trị trong ô), để bảo mật dữ liệu.
+    
+    Cách dùng:
+        Báo lỗi (ném phiếu lên)::
+
+            raise IngestError("row_limit", "Too many rows", source_file="sales.csv")
+
+        Bắt lỗi và ghi ra JSON::
+
+            try:
+                ...
+            except IngestError as exc:
+                errors.append(exc.record())
+    """
 
     def __init__(self, code: str, message: str, **location):
+        """Tạo một phiếu báo lỗi.
+
+        Args:
+            code: Lỗi gì, ví dụ ``"row_limit"``.
+            message: Mô tả lỗi cho người đọc.
+            **location: Lỗi ở đâu, truyền dạng tên=giá trị, ví dụ
+                ``source_file="sales.csv", unit="sales"``.
+                Giá trị ``None`` bị bỏ qua.
+        """
+        # Giao message cho ValueError giữ, để str(lỗi) in ra đúng câu này.
         super().__init__(message)
         self.code = code
         self.location = {k: v for k, v in location.items() if v is not None}
 
     def record(self) -> dict:
+        """Đổi phiếu báo lỗi thành dict để ghi ra JSON.
+
+        Returns:
+            dict: Gồm ``code``, ``message`` và các mục trong ``location``.
+        """
         return {"code": self.code, "message": str(self), **self.location}
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True)      
 class CsvFormat:
+    """
+    CsvFormat là tờ ghi chú cách đọc riêng cho đúng một file CSV, 
+    gồm: file nào (business, đường dẫn, mã niêm phong) và đọc thế nào (bảng mã, ký tự ngăn cách). 
+    Mã niêm phong đảm bảo ghi chú chỉ áp dụng khi file chưa bị thay đổi.       
+    """
     business_id: str
     source_file: str
     source_sha256: str
-    encoding: str = "auto"
-    delimiter: str = "auto"
-
+    encoding: str = "auto"          # Mặc định tự đoán (có thể sai)
+    delimiter: str = "auto"         # Mặc định tự đoán (có thể sai)
+    
     def __post_init__(self):
-        import re
-
+        """Kiểm tra tính hợp lệ của các thuộc tính. Nếu không hợp lệ, ném IngestError."""
         if (
             not self.business_id
             or any(c in self.business_id for c in "/\\:\0")

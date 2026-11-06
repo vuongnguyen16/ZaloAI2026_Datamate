@@ -414,7 +414,11 @@
       "runs/p2b-context-20261107/ (local): BF16 context4096 completed24/24JSON,peak29.833GiB,batch1/2/4;8192+prefill8192 failed KV memory; no PA",
       "docs/research/p2c_cpu_design.md",
       "docs/research/p2c_cpu_plan.md",
-      "reports/p2c_cpu_results.md"
+      "reports/p2c_cpu_results.md",
+      "docs/research/p2c_binding_design.md",
+      "docs/research/p2c_binding_plan.md",
+      "reports/p2c_binding_results.md",
+      "runs/p2c-binding-audit-20261107-v2/ (local):18dev businesses; count/revenue checked1/18,one cluster; author check only; no newgold/model/PA/G2"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -423,7 +427,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "P2a runtime isolation follow-up implemented, proof in reports/p2a_runtime_isolation_results.md; next sequential CPU surveys then P2c scope/prompt/cache/P2b; G2 pending",
+    "decision_status": "P2c CPU core PR5 merged98c1c1e; verified reader/rule binding audit implemented; one business/one cluster checked, G2 pending",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -435,7 +439,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "P2c: verifier/binding dev thật và reader vào raw layer; tách business/short-intent prompt, đo throughput/VRAM/latency mới trước full1895dev/model. CPU ledger/resolver/revenue_total/order_count synthetic đã có; chưa predict/model/PA/G2. Ba minor P2b đã sửa CPU, runtime mới chưa probe. Billing dashboard chưa đọc được do CUA lỗi."
+    "next_action": "P2c CPU: explain unbound sources/header-detail layouts and unknown statuses from source semantics, obtain reviewed bindings across at least2dev clusters; then short-intent adapter/throughput probe before full1895dev. No newgold/model/PA/G2 in binding increment; independent business approval and largest-business ledger budget pending."
   },
   {
     "id": "P3",

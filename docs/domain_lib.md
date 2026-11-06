@@ -9,7 +9,8 @@ Consumer chịu trách nhiệm kiểm file/hash, chọn đúng row role, cột/n
 vị và cung cấp iterator đầy đủ. `BoundSource.sha256` ghi provenance, không tự
 hash lại file. Chỉ cột net line amount **sau** chiết khấu dòng được bind vào
 amount; VAT/ship/voucher toàn đơn không thuộc amount. Chưa chứng minh nghĩa
-hoặc grain thì không tạo capability. Reader A-T1/A-T2→binding thật còn pending.
+hoặc grain thì không tạo capability. Reader và audit binding CPU research
+đã có; duyệt mapping business thật và nối vào predict vẫn là bước riêng.
 
 Ví dụ sau chỉ là fixture synthetic, hash không phải bằng chứng dữ liệu thật:
 
@@ -66,10 +67,30 @@ có. Không bắt lỗi rồi thay bằng0. Thiếu tiền không ngăn count n�
 status còn đủ; revenue abstain khi tiền của line phù hợp không hợp lệ.
 Ngoài extent bảo thủ abstain; zero chỉ trong extent đã có evidence.
 
-Date source chỉ ISO calendar YYYY-MM-DD hoặc D/M/YYYY theo binding; số chỉ
-plain hoặc vi explicit, không đoán separator. Resolver cụm kỳ full-match;
+Date source chỉ ISO calendar YYYY-MM-DD, D/M/YYYY hoặc D thg M YYYY theo
+binding; số plain, vi hoặc en explicit, không đoán separator. Resolver cụm kỳ full-match;
 so sánh tháng này dùng L32. Tết/âm lịch và comparison chưa rõ luật abstain.
 Giới hạn rows/estimated bytes là application guard, không là peak RAM đã đo.
 
 [Thiết kế](research/p2c_cpu_design.md), [scope](research/p2c_domain_scope.md),
 [bằng chứng](../reports/p2c_cpu_results.md). Full-dev precision/PA/G2 vẫn pending.
+
+## Audit binding CPU research
+
+`scripts/p2_binding_audit.py audit --profile-index <profile.json> --output <new-directory>`
+chỉ authorize context dev từ split đã khóa. Mỗi business chạy subprocess
+riêng,2threads/DuckDB256MiB, timeout90giây; không đọc gold hay gọi model.
+Reader đối chiếu source inventory, code/runtime, cache/catalog, profile/schema
+và header evidence trước/sau đọc. Cache lệch identity phải dựng lại bằng
+ingest/profile hiện hành; không sửa hash trong manifest để vượt guard.
+
+Rule binder chỉ nhận mapping cột có nghĩa rõ; mọi unit phải được bind hoặc
+thuộc signature bảng quy đổi đóng. Nguồn chưa giải thích, trạng thái lạ hay
+ngày mơ hồ làm business chưa qua kiểm. Gate đếm đơn độc lập với gate tiền.
+Số học≥95% là screen phụ; không thay định nghĩa net, không chọn scale tiền
+nếu thiếu dòng phân biệt hoặc nhiều grammar vẫn cho giá trị khác nhau.
+
+Artifact `binding.json`, `businesses-local.json` và `review-packet-local.md`
+chứa dữ liệu nguồn nên giữ local trong runs. `machine_checked` chưa là oracle
+được duyệt, precision hay G2; chưa tự cấp quyền trả lời trong predict.
+[Thiết kế và giới hạn](research/p2c_binding_design.md).

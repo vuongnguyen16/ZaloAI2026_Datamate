@@ -10,21 +10,33 @@ vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime C
 405passed/2skipped, Ruff/format pass và source không đổi ở record lịch sử
 `runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`.
 
-Increment hiện hành `work/p2c-cpu-domain`, từ main6ac467e (PR3/4 đã merge).
-[CPU P2c](../reports/p2c_cpu_results.md) đã có ledger theo binding explicit,
-resolver kỳ và revenue_total/order_count;60test liên quan synthetic pass.
-Ba minor P2b đã sửa bằng regression. Chưa binding/reader business thật được
-nghiệm thu, chưa nối predict/model/PA; G2/per-cluster acceptance chưa đạt.
-[Thiết kế](research/p2c_cpu_design.md) bổ sung cảnh báo throughput, tách
-business analysis/short intent và mốc trước đo; chưa probe runtime mới hoặc
-chạy full1895dev qua model. Billing thực chưa đọc được do CUA lỗi khởi tạo.
-CPU cuối477passed/2skipped105,95s, Ruff/format pass, source không đổi;
-`runs/cpu-check-20261106T183602599624Z-drtv7dh3/gate.json`, đã đọc JSON/ba log.
-Review độc lập4nhóm lỗi đã sửa bằng12regression RED→GREEN; không minor hoãn.
-Record6ac trước increment là lịch sử; CI nhánh mới kiểm riêng sau push.
-P2b cũ4096 chạy24/24JSON/peak29,833GiB trên4prompt lặp;8192+prefill8192 thiếuKV.
-Không suy tỷ lệ quá dài toàn dev hoặc quy mọi độ chậm cho KV; chưa6giờ/PA/G2.
-Tiêu chí từng hàm precision>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời giữ nguyên.
+Increment hiện hành `work/p2c-binding-cpu`, từ main98c1c1e (PR#5 đã merge).
+[Core CPU P2c](../reports/p2c_cpu_results.md) có ledger/resolver và hai metric.
+[Audit binding](../reports/p2c_binding_results.md) mới đã kiểm đủ18business dev:
+count/revenue qua kiểm1/18, chỉ một cụm; chưa đủ điều kiện>=2cụm cho từng hàm.
+13business còn nguồn chưa giải thích,1thiếu partition,2không qua data checks,
+1không có candidate. Không gọi đó là17binding sai hoặc lỗi LLM.
+Reader/rules/audit research đã có, chưa nối predict. Mapping qua kiểm mới được
+đối chiếu bởi tác giả, chưa có independent business/oracle approval.
+
+Cache A-T2 cũ lệch loadercode, audit đầu fail trước binder; giữ nguyên artifact
+lỗi. Dựng mới18dev ingest/profile bằng code hiện hành, giữ options, không sửa
+source/cache/manifest cũ hoặc bỏ identity guard. Profile mới valid18/18;
+artifact và review packet chỉ local dưới runs/p2c-binding-inputs-20261107/
+và runs/p2c-binding-audit-20261107-v2/. Không mở gold mới hoặc gọi model/cloud.
+Business dựng được ledger56.501dòng/22.428đơn: ledger12,75s,worker25,28s,
+peak process142,84MiB; chưa dựng ledger business lớn nhất toàn dev hoặc chứng
+minh6giờ. Hai lượt review source/synthetic độc lập;7Important và1điểm số học
+được nâng mức đều đã sửa bằng regression RED→GREEN, không minor hoãn.
+CPU cuối509passed/2skipped154,59s; Ruff lint/format pass, source không đổi.
+`runs/cpu-check-20261106T200626300303Z-p8p_2mc9/gate.json`; đã đọc gate.json và ba log. Đã push nhánh và mở [PR#6](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/pull/6);
+CI exact-head và quyết định merge theo PR, chưa merge. Workspace giữ nguyên.
+
+Bước kế tiếp vẫn P2c CPU: giải thích nguồn/header-detail/bảng phụ và nhãn lạ
+bằng nghĩa nguồn để có binding được duyệt ở thêm cụm, rồi adapter short intent
+và probe throughput trước full1895dev. Chưa PA/G2. Billing thực Modal chưa đọc
+được do CUA lỗi. Mốc throughput đã ghi trước đo vẫn giữ; model job tiếp theo
+phải xác minh lại account/budget. Docker vẫn P3 sau G2.
 
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),

@@ -50,3 +50,42 @@ Model integration thuộc D/G: eligibility ≤15B gồm auxiliary/MoE, full revi
 license/cutoff, tokenizer/template, cloud runtime, output thật và budget phải có
 trước khi khẳng định model adapter hoạt động. Không tạo Volume/tải weights như side effect cleanup.
 Docker offline/full run ở P3 thuộc G, sau lát cắt P2/G2; không chờ tối ưu P4–P8.
+
+## P1 model probe
+
+Thiết kế đã duyệt ở `docs/research/p1_modal_design.md`; plan thực hiện ở
+`docs/research/p1_modal_plan.md`. `scripts/p1_probe.py check` chỉ đọc account,
+app và kiểm billing. `run` mới build Image/Volume và gọi staging/GPU.
+Không gọi trực tiếp infra để bỏ qua preflight.
+
+```powershell
+$env:MODAL_PROFILE = 'vuonghungnguyen07'
+$env:UV_CACHE_DIR = "$PWD\.uv-cache"
+$env:UV_PYTHON_INSTALL_DIR = "$PWD\.uv-python"
+uv run --locked --group cloud python scripts/p1_probe.py check --model Qwen/Qwen3-14B --billing-json .tmp/p1-billing.json
+uv run --locked --group cloud python scripts/p1_probe.py run --model Qwen/Qwen3-14B --billing-json .tmp/p1-billing.json
+```
+
+Billing JSON giữ local, gồm `available_usd`, `checked_at` ISO có timezone và
+`source` (`user-confirmed` hoặc `dashboard`); bằng chứng phải trong24h, không
+ở tương lai và đủ dự toán. Không đưa token/credential vào file này. Ceiling
+30USD vẫn không phải hard cap. Không tự retry khi mất kết nối; đọc events/app
+trước. CLI chặn app P1 đang hoạt động để tránh submit trùng.
+
+Các candidate được ghim trong `manifests/models.json`; `inference_models`
+giữ rỗng cho tới khi chọn model từ evidence thật. CUDA OCI digest ở
+`configs/p1_runtime.json`; dependency/uv.lock riêng trong `infra/p1_runtime/`.
+**Không sync project GPU đó local.** Chỉ resolve lock local; cloud mới install.
+CPU CI không import torch/vLLM/Modal khi collection.
+
+Chỉ allowlist code, lock, model metadata và fixture synthetic được gửi cloud.
+50 câu phủ9type, hai engine subprocess mới trong cùng GPU container, serial,
+không tái dùng engine/prefix cache. Weights stage online trên CPU rồi hash;
+GPU chỉ đọc Volume, block_network và local-files-only. Volume giữ weights cho
+P2 và tiếp tục có chi phí storage; không tự xóa như cleanup.
+
+Mỗi run tạo `runs/p1-probe-.../`: preflight/config/model/source hash,
+synthetic fixture local, events/app ID, raw_result và acceptance. Expected của
+fixture không vào inference payload. Timeout/failure được ghi, không repair
+JSON hoặc biến fake thành G1. Bộ nhớ là target vLLM30GiB và peak đo, không
+phải physical GPU partition. Bằng chứng synthetic này không phải PA/B0.

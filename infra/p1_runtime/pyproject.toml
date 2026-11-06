@@ -1,0 +1,20 @@
+[project]
+name = "datamate-p1-cloud-runtime"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = []
+
+[dependency-groups]
+staging = ["huggingface-hub==0.36.0", "pydantic==2.12.3"]
+gpu = ["vllm==0.11.1", "torch==2.9.0", "huggingface-hub==0.36.0", "pydantic==2.12.3"]
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

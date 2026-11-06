@@ -14,6 +14,9 @@ hai lượt trùng; peak<30GiB, weights read-only và inference offline.
 bước tiếp theo là P2 bảo thủ: lưới an toàn → probe context/throughput dev →
 vài họ nghiệp vụ → G2 ưu tiên độ đúng. SQL chuyển P4–P5.
 [Quyền dev trên Modal và cổng G2/G5 đã chốt](docs/research/p2_g2_g5_decisions.md).
+[Probe P2b dev đã đo](reports/p2b_context_probe_results.md): BF16 context4096
+chạy được dưới30GiB,8192+prefill8192 thiếu KV; chưa PA/G2. Phạm vi tiếp theo
+là [tổng doanh thu và đếm đơn](docs/research/p2c_domain_scope.md).
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên

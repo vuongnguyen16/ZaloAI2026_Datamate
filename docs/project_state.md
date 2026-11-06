@@ -10,15 +10,20 @@ vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime C
 405passed/2skipped, Ruff/format pass và source không đổi ở record lịch sử
 `runs/cpu-check-20261106T164009995664Z-shvczgld/gate.json`.
 
-Increment hiện hành trên `work/p2c-dev-surveys`: đã khảo sát CPU theo
-[phạm vi P2c](research/p2c_domain_scope.md),405 câu text và40 gold dev chọn
-trước (10/cụm); ngoài dev decode0. Taxonomy có cả câu trung bình trong ô405,
-không coi count là coverage. Đã chốt precision>=90% ở>=2cụm, mỗi cụm>=15 câu
-đã trả lời; chưa đủ mẫu không đạt. G2 giữ nguyên. Prompt/cache có
-[dự thảo](research/p2_intent_prompt_cache.md); P2b đang chuẩn bị CPU/review,
-chưa có context/throughput dev thật hoặc PA. Payload16 câu + descriptor A-T2
-thực, chỉ dev/không gold, giữ local. Người dùng xác nhận credit>=30USD ngày07/11;
-account đúng workspace và không app đang chạy khi kiểm trước probe.
+Increment hiện hành trên `work/p2c-dev-surveys`: khảo sát CPU và phạm vi P2c
+đã ghi ở [note](research/p2c_domain_scope.md);405 câu text/40gold dev chọn trước,
+ngoài dev decode0. [Prompt/cache](research/p2_intent_prompt_cache.md) đã phác.
+[P2b thực](../reports/p2b_context_probe_results.md): BF16/TP1 context4096 chạy
+24/24JSON,peak29,833GiB, khoảng0,10–0,11request/s trên4prompt lặp;
+8192 với prefill8192 thất bại KV. Offline/read-only/hash weights/cleanup pass.
+Không claim8k bất khả thi hoặc6giờ đạt; không PA/semantic accuracy/G2.
+Source7396c84 đã review độc lập, không lỗi chặn;3minor ghi trong report.
+Domain_lib chưa triển khai. Bước tiếp theo: P2c hai hàm + calendar/filter/tests
+và dev evaluation, context4096 bảo thủ; không chạy thêm GPU tự động.
+Precision từng hàm>=90% ở>=2cụm, mỗi cụm>=15câu đã trả lời, thiếu mẫu không đạt.
+CPU cuối417passed/2skipped77,22s, Ruff/format pass, source không đổi;
+`runs/cpu-check-20261106T174519857830Z-x32dseth/gate.json`, đã đọc JSON/ba log.
+Gate/QA sau cập nhật tracker ghi ở cuối report; CI remote kiểm riêng sau push.
 
 P2a đã sửa review PR1 mục1–6:
 [bằng chứng sửa](../reports/p2a_review_fixes_results.md),

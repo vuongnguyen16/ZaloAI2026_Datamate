@@ -409,7 +409,9 @@
       "docs/research/p2_intent_prompt_cache.md",
       "docs/research/p2b_context_probe_plan.md",
       "runs/p2c-cpu-surveys-20261107/ (local): 405 text-only tags;40 preselected dev gold records,10/cluster; outside-dev value decode0; no PA",
-      "Runtime PR3 merged2f1dbb2 after explicit approval; Linux CI407pass; surveys started afterward"
+      "Runtime PR3 merged2f1dbb2 after explicit approval; Linux CI407pass; surveys started afterward",
+      "reports/p2b_context_probe_results.md",
+      "runs/p2b-context-20261107/ (local): BF16 context4096 completed24/24JSON,peak29.833GiB,batch1/2/4;8192+prefill8192 failed KV memory; no PA"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -430,7 +432,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "P2b: kiểm CPU/review và probe BF16 dev context/throughput4096/8192,batch1/2/4; chỉ sau đó nối hai hàm theo scope P2c. Domain_lib/PA/G2 chưa có evidence."
+    "next_action": "P2c theo note phạm vi: triển khai revenue_total/order_count và synthetic edge tests, parser/calendar/exact filters; dùng context4096 bảo thủ. Xử lý3minor adapter trước production. Dev PA/per-cluster precision chưa đo; G2 chưa qua. 8k cần thí nghiệm tách prefill nếu thực sự cần, không tự retry."
   },
   {
     "id": "P3",

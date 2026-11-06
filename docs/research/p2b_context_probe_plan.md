@@ -42,12 +42,12 @@ engine thường trú qua warmup và các batch. Dữ liệu/kết quả thật 
 `intent_schema() -> dict`, `validate_intent(text) -> dict`,
 `batch_schedule(n, size) -> list[list[int]]`.
 
-- [ ] Test RED: config context không khóa2048, vẫn chặn budget>30;
+- [x] Test RED: config context không khóa2048, vẫn chặn budget>30;
   projection bỏ business/cache path/samples và báo omission;
   make_case từ chối keygold, schema strict, parser không repair;
   schedule4request cho batch1/2/4 không mất/trùng.
-- [ ] Implement đúng interface, không import model/cloud ở CPU.
-- [ ] Run `.venv/Scripts/python.exe -m pytest tests/unit/test_intent_probe.py -q`;
+- [x] Implement đúng interface, không import model/cloud ở CPU.
+- [x] Run `.venv/Scripts/python.exe -m pytest tests/unit/test_intent_probe.py -q`;
   Expected: tất cả pass. Commit task1.
 
 ### Task 2: Transport, chuẩn bị dev và evidence
@@ -57,17 +57,17 @@ engine thường trú qua warmup và các batch. Dữ liệu/kết quả thật 
 **Consumes:** interface task1; P1 preflight/build_images/probe_process helpers.
 **Produces:** local payload/provenance/events/result/summary; app/evidence key.
 
-- [ ] Test RED: bad billing/account không gọi factory; image chỉ allowlist code;
+- [x] Test RED: bad billing/account không gọi factory; image chỉ allowlist code;
   inference payload chỉ `id/messages`, không gold; app inventory chặn P2 đang chạy.
-- [ ] Implement prepare/check/run tách biệt. Prepare chỉ scoped dev và descriptor
+- [x] Implement prepare/check/run tách biệt. Prepare chỉ scoped dev và descriptor
   từ profile index có provenance hash; verify source/schema hashes. Validate
   payload cả local và remote, finite bounded inputs. Chọn4 request/context
   theo độ dài prompt đo được, không theo gold/độ đúng output.
-- [ ] Worker offline/read-only/hash weights, max_num_seqs4, eager, cache tắt;
+- [x] Worker offline/read-only/hash weights, max_num_seqs4, eager, cache tắt;
   checkpoint warmup/init/token/VRAM/log và2lượt batch. Giữ failure evidence.
-- [ ] Run tests task1+integration. Expected: pass, cloud factory fake trong CPU.
-- [ ] Full CPU gate + đọc JSON/log. Expected: passed/current. Review độc lập
+- [x] Run tests task1+integration. Expected: pass, cloud factory fake trong CPU.
+- [x] Full CPU gate + đọc JSON/log. Expected: passed/current. Review độc lập
   source/synthetic package; không gửi payload thật/gold cho reviewer.
-- [ ] Check account/apps/billing, sau đó một job tối đa1200s GPU, không retry.
+- [x] Check account/apps/billing, sau đó một job tối đa1200s GPU, không retry.
   Expected: evidence thật hoặc failure có nguyên nhân, không giả pass.
-- [ ] Báo kết quả thực, cập nhật state/backlog. Commit task2.
+- [x] Báo kết quả thực, cập nhật state/backlog. Commit task2.

@@ -33,19 +33,27 @@ def output_layout(output):
     output = safe_path(output)
     if output.exists():
         for path in output.iterdir():
+            if path.name not in {"logs", "submission.jsonl"}:
+                continue
             safe_path(path)
             if path.name == "logs" and path.is_dir():
                 continue
             if path.name == "submission.jsonl" and path.is_file():
                 continue
-            if (
-                path.name.startswith(".submission.jsonl.")
-                and path.name.endswith(".pending")
-                and path.is_file()
-            ):
-                continue
-            raise ValueError("foreign nonempty output directory")
+            raise ValueError("owned output path type conflict")
     return output / "logs" / ".state"
+
+
+def ignored_output_entries(output):
+    output = safe_path(output)
+    if not output.exists():
+        return []
+    # Names only. Unknown entries may be unreadable files or external links.
+    return sorted(
+        path.name
+        for path in output.iterdir()
+        if path.name not in {"logs", "submission.jsonl"}
+    )
 
 
 @contextmanager

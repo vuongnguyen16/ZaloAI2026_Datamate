@@ -250,7 +250,7 @@ def test_failsafe_cannot_steal_publication_from_active_writer(tmp_path, changed_
         assert not final.exists(), "fallback stole the healthy writer's final path"
 
 
-def test_submission_failsafe_retains_foreign_output_admission_guard(tmp_path):
+def test_submission_preserves_unmanaged_output_entries(tmp_path):
     from datamate.prediction_failsafe import submission_predict
 
     root = inputs(tmp_path)
@@ -258,8 +258,8 @@ def test_submission_failsafe_retains_foreign_output_admission_guard(tmp_path):
     output.mkdir()
     (output / "user.txt").write_bytes(b"preserve")
     outcome = submission_predict(root, output)
-    assert not outcome["valid"]
-    assert not (output / "submission.jsonl").exists()
+    assert outcome["valid"]
+    assert (output / "submission.jsonl").is_file()
     assert (output / "user.txt").read_bytes() == b"preserve"
 
 

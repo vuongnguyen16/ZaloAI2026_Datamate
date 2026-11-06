@@ -11,6 +11,7 @@ from datamate.prediction_store import publish, publish_chunks, safe_path
 from datamate.runtime_paths import (
     OutputBusyError,
     disjoint,
+    ignored_output_entries,
     is_link,
     output_layout,
     publication_lock,
@@ -22,7 +23,7 @@ MAX_ROUTING_LINE = 1024 * 1024
 
 def _line(value):
     return (
-        json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+        json.dumps(value, ensure_ascii=True, allow_nan=False, separators=(",", ":"))
         + "\n"
     ).encode("utf-8")
 
@@ -50,6 +51,7 @@ def run_failsafe(input_dir, output, primary_error):
 
 def _run_failsafe(input_dir, output, primary_error):
     source, output = _admit(input_dir, output)
+    ignored_entries = ignored_output_entries(output)
     final = safe_path(output / "submission.jsonl")
     if final.exists():
         raise FileExistsError("existing submission preserved")
@@ -123,6 +125,7 @@ def _run_failsafe(input_dir, output, primary_error):
         "primary_error": primary_error,
         "publication": publication,
         "gold_content_read": False,
+        "ignored_output_entries": ignored_entries,
     }
     publish(
         scratch / "diagnostics.json",

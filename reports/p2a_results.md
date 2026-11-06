@@ -63,12 +63,13 @@ regression riêng; strict UTF-8 được xử lý cùng syntax-only ID projectio
 Không chạy lại reviewer sau fix; tác giả kiểm regression và toàn CPU suite.
 
 CPU cuối: `uv run --locked python scripts/check.py`, exit0, Ruff/format pass,
-**369passed,1skipped trong133.71s**. Skip symlink fixture vì quyền Windows.
-`runs/cpu-check-20261106T135742184879Z-u_1t7kow/gate.json`, source không đổi
+**369passed,1skipped trong85.94s**. Skip symlink fixture vì quyền Windows.
+`runs/cpu-check-20261106T140338585948Z-ltr1oldz/gate.json`, source không đổi
 trong gate. Đã đọc JSON và cả3log; fingerprint
-`062b9064d9ba2a069a6cd8db07367677b958603e74451f15933aa604a6b3eab4`.
-Timeline current, Graphify current812nodes/2679edges/73files. Context P2 phải
-current trước handoff; P2 là task in_progress duy nhất. CPU không là G2/PA.
+`aaa6eedba5b0732abb78a739ed2fe1e16d75e4bf820dce30c14016001d5b398f`.
+Timeline current, Graphify current812nodes/2679edges/73files. Context P2
+passed/current, dependency ready, không planning error/warning/active task khác;
+P2 là task in_progress duy nhất. CPU không là G2/PA.
 
 Minor còn lại: README tools dòng80 vẫn mô tả predict.sh gọi stub; CLI help,
 design và báo cáo này đã mô tả coordinator mới đúng. Để sửa editorial ở lượt sau.

@@ -9,7 +9,8 @@ tracker duy nhất state và tasks/backlog.json.
 P2a CPU safety và bảng chéo đã hoàn tất: [bằng chứng](../reports/p2a_results.md),
 [thiết kế](research/p2a_safety_design.md). Chỉ CPU/no_model; probe/domain_lib/PA còn pending.
 CPU hiện hành369passed/1skipped, Ruff/format pass, source không đổi;
-`runs/cpu-check-20261106T135742184879Z-u_1t7kow/gate.json`, đã đọc JSON/ba log.
+`runs/cpu-check-20261106T140338585948Z-ltr1oldz/gate.json`, đã đọc JSON/ba log;
+context P2 passed/current, dependency ready, không planning error/warning.
 Review độc lập6Important đã sửa bằng regression;1minor README tools còn lại.
 Taxonomy cross local:1895unique/199cells/2589memberships, không mở lại gold.
 Hai model thật đã qua sm_120/JSON/repeatability/offline/memory synthetic;

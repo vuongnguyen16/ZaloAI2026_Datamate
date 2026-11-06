@@ -30,7 +30,9 @@ Windows không có portable directory fsync trong os; khả năng này phải gh
 rõ là unavailable, bảo đảm thử là process-crash recovery, không claim
 power-loss durability. Linux dùng fsync directory; filesystem/mount thực
 tế /result và hard-link support phải kiểm tại P3. Không giả vờ fsync thành
-công trên Windows, cũng không ghi đè để né lỗi filesystem.
+công trên Windows, cũng không ghi đè để né lỗi filesystem. Sửa review PR1 bổ
+sung opt-in exclusive xb khi filesystem không hỗ trợ link cho CLI nộp bài;
+ghi non_atomic_exclusive, không bảo đảm atomic khi chết giữa copy. Dev giữ strict.
 
 Checkpoint mỗi invocation một segment O_EXCL riêng, append+flush+fsync từng
 dòng; giữ nguyên segment cũ. Resume phải có identity khớp: input inventory,
@@ -55,8 +57,8 @@ gộp, khác payload → abstain; các ID khác tiếp tục. Tập ID được 
 khi gọi backend, không đọc answers.jsonl. Nếu input scan hết giờ/bị kill,
 không claim đã biết toàn bộ ID; resume hoàn tất scan rồi xuất đủ ID hợp lệ.
 
-Runner dùng lô hữu hạn, checkpoint ngay từng câu; mọi exception/backend
-timeout chuyển phần còn lại sang abstain và finalize. Timer tính từ entry
+Runner dùng lô hữu hạn, checkpoint ngay từng câu; lỗi/timeout một câu chỉ câu
+đó abstain. Startup/dead worker hoặc3lỗi liên tiếp mới tắt backend. Timer tính từ entry
 application trước nạp dữ liệu; dành reserve cho output. Stop/kill rồi resume
 cùng identity phải ra đúng một dòng/ID, không ghi đè final cũ. Final đã có mà
 khác kết quả mới là conflict, không âm thầm thay output.
@@ -96,3 +98,10 @@ deadline/input errors và taxonomy scope/hash/multi-label. Giữ test cũ.
 CPU gate sau source cuối; review độc lập một lần toàn branch, fix có regression.
 Task P2 là in_progress duy nhất, P2a done không đồng nghĩa G2/P2 done.
 Không gọi cloud, không tải weights hoặc cài dependency GPU local.
+
+## Sửa review hiện hành
+
+[Thiết kế PR1 mục1–6](p2a_review_fixes.md) bổ sung logs/.state, log theo hash final,
+failsafe CLI prediction-only, recursive code fingerprint và exclusive fallback.
+Các lựa chọn mới này thay các mô tả strict-only của bản đầu khi chạy submission CLI;
+không thay split/scorer/G5, không là model baseline hoặc G2.

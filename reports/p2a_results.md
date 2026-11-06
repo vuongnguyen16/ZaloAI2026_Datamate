@@ -3,6 +3,8 @@
 Ngày06/11/2026, branch `work/p2a-safety`, base `4dbe1c8`.
 Thiết kế: [p2a_safety_design](../docs/research/p2a_safety_design.md);
 [plan triển khai](../docs/research/p2a_safety_plan.md).
+Bản này ghi nghiệm thu ban đầu. Thay đổi sau phản hồi Linux PR1 nằm ở
+[báo cáo sửa review](p2a_review_fixes_results.md), không dùng gate cũ cho source mới.
 
 ## Kết quả và phạm vi
 
@@ -71,8 +73,8 @@ Timeline current, Graphify current812nodes/2679edges/73files. Context P2
 passed/current, dependency ready, không planning error/warning/active task khác;
 P2 là task in_progress duy nhất. CPU không là G2/PA.
 
-Minor còn lại: README tools dòng80 vẫn mô tả predict.sh gọi stub; CLI help,
-design và báo cáo này đã mô tả coordinator mới đúng. Để sửa editorial ở lượt sau.
+Minor README tools của bản đầu đã được sửa trong commit tài liệu riêngf33bf08
+theo phản hồi PR1; xem báo cáo sửa review cho trạng thái hiện hành.
 
 ## Quyết định và giới hạn review
 

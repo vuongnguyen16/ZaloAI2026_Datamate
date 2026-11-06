@@ -129,6 +129,12 @@ def main() -> int:
         "--rules", type=Path, default=Path("configs/taxonomy_rules.json")
     )
     taxonomy.add_argument("--output", type=Path, required=True)
+    cross = commands.add_parser(
+        "taxonomy-cross", help="Cross pinned P0 dev taxonomy without reading gold"
+    )
+    cross.add_argument("--split", type=Path, required=True)
+    cross.add_argument("--manifest-sha256", required=True)
+    cross.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command == "predict":
@@ -144,6 +150,10 @@ def main() -> int:
             output = run_predict(
                 args.input, args.output, config, started=APPLICATION_STARTED
             )
+        elif args.command == "taxonomy-cross":
+            from datamate.taxonomy_cross import run_taxonomy_cross
+
+            output = run_taxonomy_cross(args.split, args.manifest_sha256, args.output)
         elif args.command == "run-eval":
             output = run_eval(
                 args.split,

@@ -308,9 +308,11 @@ real-gold evaluation. Quyền gửi dữ liệu BTC cloud ở P2 cần xác minh
 
 P1 done, P2 todo/ready theo dependency; chưa mở P2, Docker vẫn P3 sau G2.
 Phiên tiếp: `uv run --locked python scripts/harness.py context --task P2`.
-CPU final: **314 passed, 1 skipped in 35.97s**, Ruff lint/format pass, exit0,
+CPU sau merge local: **314 passed, 1 skipped in 70.79s**, Ruff lint/format pass, exit0,
 source không đổi; đã đọc JSON/ba log tại
-`runs/cpu-check-20261106T085823004284Z-ub9a2irz/gate.json`.
+`runs/cpu-check-20261106T094846717921Z-mpg559ct/gate.json`.
 Context P2: dependency ready, CPU passed/current, không active task, warning
-hoặc planning error; timeline check current. Nhánh local `work/p1-modal-probe`
-đã chốt code/config/docs; P1 chưa push/merge, chờ lựa chọn tích hợp cuối.
+hoặc planning error; timeline check current. Theo lựa chọn của người dùng,
+`main` local đã fast-forward từ7371bf6 tới3f03996 ngày06/11/2026;
+nhánh `work/p1-modal-probe` được dọn sau khi gate pass. Workspace được giữ.
+P1 chưa push lên GitHub; P2 vẫn todo/ready, chưa mở triển khai.

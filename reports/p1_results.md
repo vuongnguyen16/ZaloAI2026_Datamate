@@ -78,9 +78,9 @@ giảm trong trần, không tăng budget hoặc đổi model/quant. Mỗi fix RE
 
 ## CPU và review
 
-CPU cuối sau đăng ký evidence, tracker và sửa ignore: **314 passed, 1 skipped in 35.97s**,
+CPU cuối trên `main` sau merge local: **314 passed, 1 skipped in 70.79s**,
 Ruff lint/format pass, exit0, source không đổi trong gate;
-`runs/cpu-check-20261106T085823004284Z-ub9a2irz/gate.json`.
+`runs/cpu-check-20261106T094846717921Z-mpg559ct/gate.json`.
 Đã đọc gate.json và ba log. Skip duy nhất: Windows không có quyền tạo symlink
 cho fixture, test giữ nguyên và có thể chạy trên môi trường hỗ trợ.
 CPU không import GPU/SDK khi collection; local không cài torch/vLLM/weights.
@@ -141,8 +141,10 @@ Chưa chạy PA dev/calibration/holdout, chưa B0, chưa inference pipeline/pred
 thật hoặc Docker P3. Holdout/membership và dữ liệu BTC tiếp tục local/kín.
 State/backlog đã chốt P1 done, P2 todo/ready; context P2 có CPU passed/current,
 không task active, warning hoặc planning error. Timeline check current.
-Code/config/docs được commit trên nhánh local `work/p1-modal-probe`;
-chưa push hoặc merge P1, chờ quyết định tích hợp nhánh.
+Người dùng chọn merge local ngày06/11/2026. Đã pull main bằng ff-only
+(remote không đổi), fast-forward `main` từ7371bf6 tới3f03996 và kiểm lại
+toàn cổng CPU trên cây sạch. Nhánh P1 được dọn sau khi test pass;
+workspace chính được giữ nguyên. P1 chưa push lên GitHub.
 
 Cả hai app pass đã completed và CLI live check không có app P1 xung đột lúc
 08:34:32UTC. Runtime có cảnh báo nanobind lúc shutdown (Qwen3 đã kiểm), nhưng

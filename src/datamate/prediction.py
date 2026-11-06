@@ -238,11 +238,9 @@ def run_predict(
                     result = {"status": "startup_error", "error": type(exc).__name__}
                 if result["status"] != "ok":
                     reason = "backend_" + result["status"]
-                    backend_failed = (
-                        result["status"] == "startup_error"
-                        or result.get("error")
-                        in {"worker_exited", "invalid_worker_result"}
-                    )
+                    backend_failed = result["status"] == "startup_error" or result.get(
+                        "error"
+                    ) in {"worker_exited", "invalid_worker_result"}
                 else:
                     candidate = result["value"]
             if reason:

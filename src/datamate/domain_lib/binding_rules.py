@@ -117,7 +117,10 @@ def propose(unit, readme):
                 found[role].append(name)
                 evidence[name] = dict(label=label, definition=description)
         description_key = norm(description)
-        if description_key.startswith("thanhtiensaugiam") or description_key in {
+        if description_key in {
+            "thanhtiensaugiam",
+            "thanhtiensaugiamgia",
+            "thanhtiensaugiamgiadong",
             "thanhtiendongdasaugiamgia",
             "thanhtiendasaugiamgiadong",
         }:
@@ -201,6 +204,7 @@ def inspect_rows(rows, candidate):
         for fmt in NUMBER_FORMATS
     }
     count = 0
+    outcome_patterns = Counter()
     for row in rows:
         count += 1
         values = row.cells
@@ -218,6 +222,7 @@ def inspect_rows(rows, candidate):
         amount = (values.get(col.get("amount")) or "").strip() or None
         if amount is None:
             missing_net += 1
+        outcomes = {}
         for fmt, binding in number_bindings.items():
             parsed = _money(amount, binding)
             if parsed is not None:
@@ -239,7 +244,10 @@ def inspect_rows(rows, candidate):
                 if None not in (qty, price, parsed, discount):
                     with localcontext() as ctx:
                         ctx.prec = 128
-                        numbers[fmt]["matched"] += parsed == qty * price - discount
+                        matched = parsed == qty * price - discount
+                        numbers[fmt]["matched"] += matched
+                        outcomes[fmt] = matched
+        outcome_patterns[tuple(outcomes.get(f) for f in NUMBER_FORMATS)] += 1
     reasons = list(candidate.reasons)
     dates = [fmt for fmt in DATE_FORMATS if date_fail[fmt] == 0 and date_n]
     date_format = dates[0] if len(dates) == 1 else None
@@ -254,6 +262,14 @@ def inspect_rows(rows, candidate):
         reasons.append("net_semantics_missing")
     valid = [fmt for fmt in NUMBER_FORMATS if numbers[fmt]["parsed"] == count and count]
     fingerprints = {numbers[fmt]["digest"].hexdigest() for fmt in valid}
+    indexes = [NUMBER_FORMATS.index(f) for f in valid]
+    informative = sum(
+        n
+        for pattern, n in outcome_patterns.items()
+        if indexes
+        and None not in [pattern[i] for i in indexes]
+        and len({pattern[i] for i in indexes}) > 1
+    )
     chosen = None
     if len(fingerprints) == 1:
         chosen = max(valid, key=lambda f: numbers[f]["matched"])
@@ -261,7 +277,7 @@ def inspect_rows(rows, candidate):
         fitting = [
             fmt
             for fmt in valid
-            if numbers[fmt]["total"] >= 10
+            if informative >= 10
             and numbers[fmt]["matched"] / numbers[fmt]["total"] >= 0.95
         ]
         if (
@@ -296,6 +312,11 @@ def inspect_rows(rows, candidate):
         and "arithmetic_screen_failed" not in reasons
     )
     return dict(
+        informative_arithmetic_rows=informative,
+        equivalent_number_grammars=[
+            [f for f in valid if numbers[f]["digest"].hexdigest() == fingerprint]
+            for fingerprint in sorted(fingerprints)
+        ],
         rows=count,
         date_format=date_format,
         number_format=chosen,

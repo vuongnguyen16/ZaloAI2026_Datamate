@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 
@@ -16,6 +17,7 @@ def verified_fixture(tmp_path):
     (biz / "README.md").write_text("# Synthetic fixture\n", encoding="utf-8")
     text = "Mã đơn,Ngày đặt,Trạng thái,Số lượng,Đơn giá,Thành tiền,Ghi chú\nA,2026-11-01,Hoàn thành,1,10,10,original\nB,2026-11-02,Hoàn thành,1,20,20,other\n"
     (biz / "orders.csv").write_text(text, encoding="utf-8")
+    (biz / "other.csv").write_text(text, encoding="utf-8")
     report = ingest_split(root, tmp_path / "cache")
     (tmp_path / "ingest").mkdir()
     ingest = tmp_path / "ingest/ingest.json"
@@ -53,6 +55,50 @@ def test_changed_source_rejected_and_context_checks_after_read(verified_fixture)
         with open_business(index, root, "synthetic_b"):
             with source.open("a", encoding="utf-8") as handle:
                 handle.write("\n")
+    with pytest.raises(DomainAbstain):
+        with open_business(index, root, "synthetic_b"):
+            pass
+
+
+def test_new_source_file_before_or_during_read_is_detected(verified_fixture):
+    root, index, source = verified_fixture
+    added = source.with_name("returns.csv")
+    with pytest.raises(DomainAbstain):
+        with open_business(index, root, "synthetic_b"):
+            added.write_text("order,status\nA,returned\n", encoding="utf-8")
+    with pytest.raises(DomainAbstain):
+        with open_business(index, root, "synthetic_b"):
+            pass
+
+
+@pytest.mark.parametrize("remove", ["unit", "column", "header", "declared"])
+def test_self_consistent_profile_cannot_omit_cache_units_or_columns(
+    verified_fixture, remove
+):
+    import hashlib
+
+    from datamate.profile.engine import schema_descriptor
+
+    root, index, _ = verified_fixture
+    data = json.loads(index.read_text("utf-8"))
+    entry = data["businesses"][0]
+    path = Path(entry["profile"]["path"])
+    profile = json.loads(path.read_text("utf-8"))
+    if remove == "unit":
+        profile["units"].pop()
+    elif remove == "column":
+        profile["units"][0]["columns"].pop()
+    elif remove == "header":
+        profile["units"][0]["columns"][0]["header_cells"][0]["cell"]["value"] = (
+            "forged label"
+        )
+    else:
+        profile["units"][0]["columns"][0]["declared_name"] = "forged label"
+    for kind, value in [("profile", profile), ("schema", schema_descriptor(profile))]:
+        target = Path(entry[kind]["path"])
+        target.write_text(json.dumps(value), encoding="utf-8")
+        entry[kind]["sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+    index.write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(DomainAbstain):
         with open_business(index, root, "synthetic_b"):
             pass

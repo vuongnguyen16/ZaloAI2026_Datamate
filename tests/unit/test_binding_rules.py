@@ -49,6 +49,18 @@ def test_semantic_net_proof_is_required_even_with_perfect_arithmetic():
     )
 
 
+def test_extra_vat_shipping_or_voucher_semantics_are_not_net():
+    for definition in [
+        "thành tiền sau giảm + VAT + shipping",
+        "thành tiền sau giảm rồi trừ voucher toàn đơn",
+    ]:
+        check = inspect_rows(rows(), propose(unit(), readme(definition)))
+        assert (
+            not check["revenue_format_ok"]
+            and "net_semantics_missing" in check["reasons"]
+        )
+
+
 def test_arithmetic_can_discriminate_money_scale_but_never_invent_semantics():
     candidate = propose(unit(), readme())
     check = inspect_rows(rows(), candidate)
@@ -65,6 +77,19 @@ def test_equivalent_arithmetic_with_different_money_values_stays_ambiguous():
     check = inspect_rows(data, propose(unit(), readme()))
     assert check["count_format_ok"] and not check["revenue_format_ok"]
     assert "number_scale_ambiguous" in check["reasons"]
+
+
+def test_one_informative_row_cannot_establish_money_scale():
+    data = [
+        RawRow(i + 2, r.cells | {"c0004": "1", "c0005": "1,000", "c0006": "1,000"})
+        for i, r in enumerate(rows()[:9])
+    ]
+    data.append(
+        RawRow(11, rows()[0].cells | {"c0004": "2", "c0005": "1000", "c0006": "2,000"})
+    )
+    check = inspect_rows(data, propose(unit(), readme()))
+    assert not check["revenue_format_ok"]
+    assert check["informative_arithmetic_rows"] == 1
 
 
 def test_unknown_status_and_missing_net_do_not_get_dropped():

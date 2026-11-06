@@ -9,7 +9,7 @@ from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
-from .binding_rules import classify_row, inspect_rows, norm, propose
+from .binding_rules import classify_row, header, inspect_rows, norm, propose
 from .model import DomainAbstain
 from .orders import Binding, BoundSource, adapt_sources
 from .raw_reader import open_business
@@ -136,20 +136,69 @@ def audit_business(
                 )
 
             families = {family(c) for c in selected}
-            if any(
-                c.reasons
-                and family(c) in families
-                and ("id" in c.columns or c.unit.get("header_status") == "unresolved")
-                for c in candidates
-            ):
-                raise DomainAbstain("unbound_order_partition")
             return_sources = [
                 t
                 for t in business.schema["tables"]
-                if "trahang" in norm(t["source_file"] + t["source_name"])
+                if any(
+                    term in norm(t["source_file"] + t["source_name"])
+                    for term in ["trahang", "return", "refund", "cancel", "huydon"]
+                )
             ]
             if return_sources:
                 raise DomainAbstain("unbound_return_source")
+            conversion_names = {
+                "tensanpham",
+                "tenhang",
+                "mahang",
+                "masanpham",
+                "masp",
+                "donvilon",
+                "donvinho",
+                "donvicoban",
+                "donvitinhcoban",
+                "donviban",
+                "donvitinh",
+                "heso",
+                "hesoquydoi",
+                "quydoi",
+                "soluongquydoi",
+            }
+            coverage = []
+            unbound = []
+            selected_names = {c.unit["sql_name"] for c in selected}
+            for c in candidates:
+                labels = {norm(header(column)) for column in c.unit["columns"]}
+                if c.unit["sql_name"] in selected_names:
+                    disposition = "selected_order_source"
+                elif (
+                    not c.columns.get("id")
+                    and c.unit.get("header_status")
+                    in {"auto_rule", "explicit", "schema"}
+                    and labels
+                    and labels <= conversion_names
+                    and labels & {"heso", "hesoquydoi", "quydoi"}
+                    and labels
+                    & {"tensanpham", "tenhang", "mahang", "masanpham", "masp"}
+                ):
+                    disposition = "excluded_closed_conversion_signature"
+                else:
+                    disposition = "unresolved_source_role"
+                    unbound.append(c)
+                coverage.append(
+                    dict(
+                        unit=c.unit["sql_name"],
+                        source_file=c.unit["source_file"],
+                        source_name=c.unit["source_name"],
+                        disposition=disposition,
+                    )
+                )
+            result["unit_coverage"] = coverage
+            if unbound:
+                raise DomainAbstain(
+                    "unbound_order_partition"
+                    if any(family(c) in families for c in unbound)
+                    else "unbound_relevant_source"
+                )
             budget = [0]
             source_sha = {
                 r["path"]: r["sha256"] for r in business.profile["provenance"]["files"]

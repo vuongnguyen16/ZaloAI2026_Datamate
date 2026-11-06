@@ -30,6 +30,74 @@ def _json(path, limit=64 * 1024**2):
     return json.loads(raw), hashlib.sha256(raw).hexdigest()
 
 
+def _verify_unit_inventory(profile, schema, units):
+    expected = {u["view_name"]: u for u in units}
+    observed = {u["view_name"]: u for u in profile["units"]}
+    if (
+        len(expected) != len(units)
+        or len(observed) != len(profile["units"])
+        or set(expected) != set(observed)
+        or {u["sql_name"] for u in schema["tables"]} != set(expected)
+    ):
+        raise DomainAbstain("incomplete_profile_inventory")
+    fields = (
+        "source_file",
+        "source_name",
+        "source_kind",
+        "storage_table",
+        "view_name",
+        "row_count",
+        "max_width",
+        "frame_sha256",
+    )
+    for name, unit in expected.items():
+        actual = observed[name]
+        if any(actual.get(k) != unit.get(k) for k in fields) or [
+            c["sql_name"] for c in actual["columns"]
+        ] != [f"c{i:04d}" for i in range(1, unit["max_width"] + 1)]:
+            raise DomainAbstain("incomplete_profile_columns")
+        declared = unit.get("metadata", {}).get("columns", [])
+        for i, column in enumerate(actual["columns"]):
+            if unit["source_kind"] == "sqlite_table":
+                if (
+                    i >= len(declared)
+                    or column.get("declared_name") != declared[i][1]
+                    or column.get("declared_type") != declared[i][2]
+                ):
+                    raise DomainAbstain("declared_column_mismatch")
+            elif "declared_name" in column or "declared_type" in column:
+                raise DomainAbstain("unexpected_declared_column")
+
+
+def _verify_headers(con, profile):
+    for unit in profile["units"]:
+        coords = {
+            h["source_row"] for c in unit["columns"] for h in c.get("header_cells", [])
+        }
+        if not coords:
+            continue
+        if any(type(n) is not int or not 1 <= n <= unit["row_count"] for n in coords):
+            raise DomainAbstain("invalid_header_coordinate")
+        columns = [c["sql_name"] for c in unit["columns"]]
+        query = f"SELECT __row,{','.join(loader.identifier(c) for c in columns)} FROM {loader.identifier(unit['view_name'])} WHERE __row IN ({','.join('?' for _ in coords)})"
+        actual = {
+            r[0]: dict(zip(columns, r[1:], strict=True))
+            for r in con.execute(query, sorted(coords)).fetchall()
+        }
+        for column in unit["columns"]:
+            for record in column.get("header_cells", []):
+                value = record.get("cell")
+                if isinstance(value, dict):
+                    if value.get("truncated") is True:
+                        continue
+                    value = value.get("value")
+                if (
+                    actual.get(record["source_row"], {}).get(column["sql_name"])
+                    != value
+                ):
+                    raise DomainAbstain("header_evidence_mismatch")
+
+
 class VerifiedBusiness:
     def __init__(self, con, schema, profile, readme, proof):
         self._con = con
@@ -140,10 +208,14 @@ def open_business(index: Path, source: Path, business_id: str):
         ):
             raise DomainAbstain("stale_ingest_identity")
         checked = loader.validate_cache(database.parent, signature, fingerprint)
+        _verify_unit_inventory(profile, schema, checked["units"])
         if checked["database_sha256"] != provenance["database_sha256"]:
             raise DomainAbstain("cache_profile_mismatch")
         tracked[database] = provenance["database_sha256"]
         tracked[manifest_path] = manifest_sha
+        options = loader.LoaderOptions(**signature["options"])
+        if loader.snapshot(raw, options) != provenance["files"]:
+            raise DomainAbstain("source_changed")
         source_files = {}
         for record in provenance["files"]:
             if not safe_relative(record["path"]):
@@ -157,6 +229,7 @@ def open_business(index: Path, source: Path, business_id: str):
             raise DomainAbstain("readme_not_verified")
         text = readme.read_text(inspect_encoding(readme)["encoding"])
         con = loader.connect(database, read_only=True)
+        _verify_headers(con, profile)
         business = VerifiedBusiness(
             con,
             schema,
@@ -174,6 +247,8 @@ def open_business(index: Path, source: Path, business_id: str):
             yield business
         finally:
             business.closed = True
+            if loader.snapshot(raw, options) != provenance["files"]:
+                raise DomainAbstain("source_changed")
             for path, sha in source_files.items():
                 if file_hash(path) != sha:
                     raise DomainAbstain("source_changed")

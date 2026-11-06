@@ -1,11 +1,13 @@
 import json
 
+import pytest
+
 from datamate.domain_lib.binding_audit import audit_business
 from datamate.ingest.loader import ingest_split
 from datamate.profile.engine import run_profile
 
 
-def prepare(tmp_path, unknown=False, missing_part=False):
+def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None):
     root = tmp_path / "train"
     biz = root / "data/synthetic_b"
     biz.mkdir(parents=True)
@@ -33,6 +35,10 @@ def prepare(tmp_path, unknown=False, missing_part=False):
     if missing_part:
         (biz / "orders_2.csv").write_text(
             "Mã đơn,Ngày đặt,Sản phẩm,Tiền\nC,2026-11-03,Tea,40\n", encoding="utf-8"
+        )
+    if extra_file:
+        (biz / extra_file).write_text(
+            "Mã đơn,Ngày đặt,Tiền\nC,2026-11-03,40\n", encoding="utf-8"
         )
     report = ingest_split(root, tmp_path / "cache")
     folder = tmp_path / "ingest"
@@ -66,6 +72,13 @@ def test_resource_limit_is_not_a_truncated_checked_ledger(tmp_path):
     assert (
         not result["count_checked"] and result["reason"] == "row_resource_or_coordinate"
     )
+
+
+@pytest.mark.parametrize("name", ["sales.csv", "returns.csv"])
+def test_other_unbound_order_or_return_source_is_not_omitted(tmp_path, name):
+    root, index = prepare(tmp_path, extra_file=name)
+    result = audit_business(index, root, "synthetic_b")
+    assert not result["count_checked"] and not result["revenue_checked"]
 
 
 def test_unbound_order_part_cannot_be_silently_omitted(tmp_path):

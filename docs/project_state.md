@@ -5,6 +5,33 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
+Increment source approvals08/11: người dùng duyệt6catalog/payment exclusions
+đúng scope default-unfiltered của hai metric. Đã có loader/matcher SHA+proof+
+unit/raw/README, CLI paired flags và traceable coverage; không theo basename,
+không bỏ known order/return hoặc data/resource gates.
+[Kết quả](../reports/p2c_source_exclusions_results.md),
+[design](research/p2c_source_exclusions_design.md),
+[plan/ledger](research/p2c_source_exclusions_plan.md).
+Audit18dev có review-assisted machine checks: **count3/18 ở2cụm C3/C4**,
+revenue1/18/1cụm. Count mở thêm2business C3, không regression; revenue ở2business
+này còn amount_format_unverified.18worker cùng receipt SHA; chỉ6unit đổi
+disposition, mọi nguồn chưa duyệt giữ nguyên, lexicon/SHA/6unknown không đổi.
+Artifact nguồn/receipt local `runs/p2c-source-exclusions-approved-20261108/`;
+audit/delta/resource `runs/p2c-reviewed-source-audit-20261108/`.
+Required ledger scan ở2business mới complete; full physical scan vẫn false
+vì approved-excluded sources không quét, báo riêng. Chưa full-binding
+independent approval/PA/G2; pure-rule baseline không receipt vẫn1business.
+Scope/filter khác không được thừa hưởng loại trừ. Inventory12count candidates
+C3/8C4 chưa15answered/cụm; giữ acceptance. Bước tiếp là short-intent/capability
+verifier/throughput/predict với thêm coverage có chứng minh, không tự chạy
+model hoặc nới guard. PR8 cập nhật code, chưa merge. CPU cuối xem báo cáo trên.
+CPU cuối source exclusions:603passed/2skipped109,67s, Ruff/format pass,
+source không đổi; đã đọc gate.json/ba log ở
+`runs/cpu-check-20261108T060549767365Z-q29ky47_/gate.json`.
+Context passed/current, timeline current. Review source/synthetic không có
+Critical/Important; minor hoãn là positive CLI-forwarding synthetic coverage,
+đã ghi report. Có kiểm thực18worker SHA và đúng6disposition thay đổi.
+
 Follow-up feasibility08/11: PR#7 d5c9ea2 đã merge thành aee0785 sau CI Linux
 576passed35,18s, Ruff/format pass, không unresolved review; theo quyền merge
 khi xanh của người dùng. Nhánh follow-up `work/p2c-count-feasibility` từ main

@@ -8,7 +8,14 @@ from datamate.ingest.loader import ingest_split
 from datamate.profile.engine import run_profile
 
 
-def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None, native=False):
+def prepare(
+    tmp_path,
+    unknown=False,
+    missing_part=False,
+    extra_file=None,
+    native=False,
+    review_aux=False,
+):
     root = tmp_path / "train"
     biz = root / "data/synthetic_b"
     biz.mkdir(parents=True)
@@ -40,6 +47,20 @@ def prepare(tmp_path, unknown=False, missing_part=False, extra_file=None, native
     if extra_file:
         (biz / extra_file).write_text(
             "Mã đơn,Ngày đặt,Tiền\nC,2026-11-03,40\n", encoding="utf-8"
+        )
+    if review_aux:
+        (biz / "payments.csv").write_text(
+            "Mã đơn,Ngày thu,Mã phiếu,Tiền thu\nA,2026-11-02,R1,10\n", encoding="utf-8"
+        )
+        readme = biz / "README.md"
+        readme.write_text(
+            readme.read_text("utf-8")
+            + "\n## Cột trong "
+            + chr(96)
+            + "payments.csv"
+            + chr(96)
+            + "\n- **Mã đơn**: mã đơn\n- **Ngày thu**: thời điểm thu\n- **Mã phiếu**: mã phiếu thu\n- **Tiền thu**: số tiền khách trả lần đó\n",
+            encoding="utf-8",
         )
     if native:
         readme = biz / "README.md"
@@ -167,3 +188,116 @@ def test_review_evidence_hash_identifies_original_readme_bytes(tmp_path):
     with open_business(index, root, "synthetic_b") as business:
         result = inventory_business(business)
     assert result["source_decisions"][0]["evidence"][0]["sha256"] == digest
+
+
+def approved_sources(tmp_path, root, index, source_file="payments.csv", stale=False):
+    import hashlib
+
+    from datamate.domain_lib.raw_reader import open_business
+    from datamate.domain_lib.source_exclusions import (
+        load_source_exclusions,
+        unit_digest,
+    )
+
+    with open_business(index, root, "synthetic_b") as business:
+        unit = next(
+            u for u in business.schema["tables"] if u["source_file"] == source_file
+        )
+        hashes = {
+            f["path"]: f["sha256"] for f in business.profile["provenance"]["files"]
+        }
+        record = dict(
+            business_id="synthetic_b",
+            provenance=business.proof,
+            sources=[
+                dict(
+                    unit=unit["sql_name"],
+                    source_file=unit["source_file"],
+                    source_name=unit["source_name"],
+                    unit_sha256="0" * 64 if stale else unit_digest(unit),
+                    source_sha256=hashes[source_file],
+                    readme_sha256=hashes["README.md"],
+                    role="payments",
+                    decision="approved_exclude",
+                )
+            ],
+        )
+    value = dict(
+        version=1,
+        kind="reviewed_source_exclusions",
+        partition="dev",
+        scope="default_unfiltered",
+        metrics=["order_count", "revenue_total"],
+        rulebook_sha256="b" * 64,
+        reviewed_packet_sha256="c" * 64,
+        review=dict(
+            state="approved",
+            reviewer="human fixture owner",
+            reviewed_at="2020-01-01T00:00:00+00:00",
+            approval_text="Fixture payment source, unfiltered only",
+        ),
+        businesses=[record],
+    )
+    path = tmp_path / "approved-sources.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    return load_source_exclusions(
+        path, hashlib.sha256(path.read_bytes()).hexdigest(), "b" * 64, {"synthetic_b"}
+    )
+
+
+def test_explicit_approved_auxiliary_source_unlocks_without_claiming_physical_scan(
+    tmp_path,
+):
+    root, index = prepare(tmp_path, review_aux=True)
+    review = approved_sources(tmp_path, root, index)
+    baseline = audit_business(index, root, "synthetic_b")
+    assert not baseline["count_checked"]
+    result = audit_business(index, root, "synthetic_b", source_exclusions=review)
+    assert result["count_checked"] and result["revenue_checked"]
+    assert result["inspection"]["required_row_scan_complete"]
+    assert not result["inspection"]["row_scan_complete"]
+    assert result["inspection"]["uninspected_units"]
+    excluded = [
+        u for u in result["unit_coverage"] if u["disposition"] == "excluded_by_review"
+    ]
+    assert len(excluded) == 1 and excluded[0]["review_sha256"] == review.sha256
+    assert not any(
+        b.get("unit") == excluded[0]["unit"]
+        for b in result["metric_blockers"]["order_count"]
+    )
+    assert any(
+        s["kind"] == "reviewed_exclusion" and s["pattern"] == "unresolved"
+        for s in result["sources"]
+    )
+
+
+@pytest.mark.parametrize(
+    "options", [dict(unknown=True), dict(extra_file="unreviewed.csv")]
+)
+def test_exclusion_does_not_bypass_status_or_another_unapproved_source(
+    tmp_path, options
+):
+    root, index = prepare(tmp_path, review_aux=True, **options)
+    review = approved_sources(tmp_path, root, index)
+    result = audit_business(index, root, "synthetic_b", source_exclusions=review)
+    assert not result["count_checked"] and not result["revenue_checked"]
+
+
+def test_exclusion_never_relaxes_resource_or_stale_or_known_order_checks(tmp_path):
+    root, index = prepare(tmp_path, review_aux=True)
+    review = approved_sources(tmp_path, root, index)
+    result = audit_business(
+        index, root, "synthetic_b", source_exclusions=review, max_rows=1
+    )
+    assert (
+        not result["count_checked"] and result["reason"] == "row_resource_or_coordinate"
+    )
+    for review in [
+        approved_sources(tmp_path, root, index, stale=True),
+        approved_sources(tmp_path, root, index, source_file="orders.csv"),
+    ]:
+        result = audit_business(index, root, "synthetic_b", source_exclusions=review)
+        assert (
+            not result["count_checked"]
+            and result["reason"] == "source_exclusion_identity_or_plan_mismatch"
+        )

@@ -85,3 +85,62 @@ def test_pending_lexicon_stops_before_auditor_or_output(tmp_path):
             auditor=lambda *a, **k: called.append(True),
         )
     assert not output.exists() and not called
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [[], ["--exclusions-sha256", "0" * 64], ["--source-exclusions", "missing.json"]],
+)
+def test_source_exclusion_flags_are_paired_and_diagnose_cannot_apply(tmp_path, extra):
+    args = [
+        "worker" if extra else "diagnose",
+        "--profile-index",
+        str(tmp_path / "profile/index.json"),
+        "--output",
+        str(tmp_path / "out"),
+        "--business",
+        "dev",
+    ]
+    if not extra:
+        extra = ["--source-exclusions", "missing.json", "--exclusions-sha256", "0" * 64]
+    with pytest.raises(ValueError, match="both exclusions path/hash|diagnose"):
+        entry().main(
+            args + extra,
+            scope_reader=lambda: dict(
+                source=tmp_path / "raw",
+                split=tmp_path / "split",
+                businesses={"dev"},
+                groups={},
+            ),
+        )
+    assert not (tmp_path / "out").exists()
+
+
+def test_pending_source_receipt_stops_before_auditor_or_output(tmp_path):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "rulebook.md").write_text("rules", encoding="utf-8")
+    receipt = tmp_path / "source-review.json"
+    receipt.write_text(json.dumps(dict(review=dict(state="pending"))), encoding="utf-8")
+    called = []
+    with pytest.raises(ValueError, match="approval"):
+        entry().main(
+            [
+                "worker",
+                "--profile-index",
+                str(tmp_path / "profile/index.json"),
+                "--output",
+                str(tmp_path / "out"),
+                "--business",
+                "dev",
+                "--source-exclusions",
+                str(receipt),
+                "--exclusions-sha256",
+                hashlib.sha256(receipt.read_bytes()).hexdigest(),
+            ],
+            scope_reader=lambda: dict(
+                source=raw, split=tmp_path / "split", businesses={"dev"}, groups={}
+            ),
+            auditor=lambda *a, **k: called.append(True),
+        )
+    assert not called and not (tmp_path / "out").exists()

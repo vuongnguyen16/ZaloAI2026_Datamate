@@ -435,7 +435,12 @@
       "reports/p2c_count_feasibility_results.md",
       "PR7 merged aee0785efc33699879d770dc1789200a5a0790d4 after explicit user instruction and CI run42449917024 success:576Linux tests/35.18s, lint/format pass, review threads clear; expected-head lock used",
       "runs/p2c-count-feasibility-20261108/ (local):1895dev text-only questions,no gold type/answer;203primary count/217signals,105default-unfiltered candidates; author inspected217plus56supplemental texts; source-only C2=3,C3=12,already-bound C4=8; candidate counts are not support/answered",
-      "runs/p2c-count-feasibility-20261108/source-author-proposals-local and binary-status-proposals-local (local):23source proposals per metric+unfiltered,16scope-limited exclusions pending;6status review proposals pending,approved lexicon unchanged,no fifth state or activation"
+      "runs/p2c-count-feasibility-20261108/source-author-proposals-local and binary-status-proposals-local (local):23source proposals per metric+unfiltered,16scope-limited exclusions pending;6status review proposals pending,approved lexicon unchanged,no fifth state or activation",
+      "docs/research/p2c_source_exclusions_design.md",
+      "docs/research/p2c_source_exclusions_plan.md",
+      "reports/p2c_source_exclusions_results.md",
+      "runs/p2c-source-exclusions-approved-20261108/ (local): exact six-source user approval compiled via verified reader; SHA3fd4c1ccfc6f9a143f645424e155d06a15034c0aa2fd3011d3e68b673a1fd032; both default-unfiltered metrics only;6unknown/other17sources unchanged",
+      "runs/p2c-reviewed-source-audit-20261108/ (local):18dev,source/status SHA pinned on18workers; count1to3businesses/1to2clusters(C3,C4),revenue1/18/one cluster,no regressions;exactly6unit dispositions changed;new2ledger scans validated,revenue format veto retained;no gold/model/PA/G2"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -444,7 +449,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "PR7 merged after green exact-head CI. Text feasibility:105default-unfiltered count candidates; source-only C2=3/C3=12 and bound C4=8 do not establish15answered in two clusters. Binding remains1/18; source and binary proposals pending, per-function acceptance unchanged.",
+    "decision_status": "Approved source-exclusion loader/matcher and scope gates implemented. Review-assisted dev count checks3/18 across2clusters(C3,C4),revenue1/18; default pure-rule baseline unchanged. No answered/PA/G2 claim;15sample per-function requirement retained.",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -456,7 +461,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "Review the annotated23source proposals per metric AND filter scope; retain possible-return sources for reconciliation and CPU gates. Source-only business count does not guarantee enough count questions: seek additional evidenced bindings/supported scope while retaining>=15answered/cluster and>=90%precision for each function in>=2clusters. Do not pool revenue to certify order_count, auto-exclude unknown labels or add a fifth lifecycle state. Existing approved6unknown stay unchanged until explicit new approval; new local binary proposal is not active. Then CPU audit, short-intent/throughput/predict with verified capabilities; no model without fresh account/budget, P3 after G2."
+    "next_action": "Move count slice toward short-intent/capability verifier, throughput and predict with CPU-verified unfiltered bindings; source exclusions cannot authorize entity/payment filters. Current text candidates C3=12/C4=8 remain below15answered/cluster,so add evidenced scope/bindings without relaxing per-function precision/sample acceptance or pooling revenue. Revenue retains amount-format vetoes. Six approved exclusions applied; do not ask them again; other17source proposals and6unknown unchanged. Fresh account/budget before model; P3 after G2. Positive CLI-forwarding synthetic regression is a deferred minor; real18worker SHA verified."
   },
   {
     "id": "P3",

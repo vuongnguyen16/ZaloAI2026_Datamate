@@ -10,6 +10,15 @@ from collections import Counter
 from pathlib import Path
 
 from datamate.domain_lib.binding_audit import audit_business
+from datamate.domain_lib.binding_diagnostics import (
+    METRICS,
+    aggregate_patterns,
+    attach_repetition,
+    blocker_profile,
+    diagnose_business,
+    summarize_blockers,
+)
+from datamate.domain_lib.semantic_review import load_approved_lexicon
 from datamate.evaluation import external_metadata, output_path
 from datamate.splits import authorize_access, open_split
 
@@ -60,16 +69,36 @@ def dev_scope():
 
 def main(argv=None, *, scope_reader=None, auditor=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["audit", "worker"])
+    parser.add_argument(
+        "mode", choices=["audit", "worker", "diagnose", "diagnose-worker"]
+    )
     parser.add_argument("--profile-index", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--business")
+    parser.add_argument("--status-lexicon", type=Path)
+    parser.add_argument("--lexicon-sha256")
     args = parser.parse_args(argv)
     scope = (scope_reader or dev_scope)()
     if args.business is not None and args.business not in scope["businesses"]:
         raise PermissionError("only authorized dev business allowed")
-    if args.mode == "worker" and args.business is None:
+    if args.mode in {"worker", "diagnose-worker"} and args.business is None:
         parser.error("worker requires business")
+    status_values = None
+    if args.status_lexicon or args.lexicon_sha256:
+        if (
+            not args.status_lexicon
+            or not args.lexicon_sha256
+            or args.mode in {"diagnose", "diagnose-worker"}
+        ):
+            raise ValueError(
+                "audit requires both lexicon path/hash; diagnose cannot apply semantics"
+            )
+        external_metadata(args.status_lexicon, scope["source"], scope["split"])
+        status_values = load_approved_lexicon(
+            args.status_lexicon,
+            args.lexicon_sha256,
+            hashlib.sha256((scope["source"] / "rulebook.md").read_bytes()).hexdigest(),
+        )
     external_metadata(args.profile_index, scope["source"], scope["split"])
     output = output_path(args.output, scope["source"], scope["split"])
     if not args.profile_index.resolve().parent.is_relative_to(
@@ -79,10 +108,18 @@ def main(argv=None, *, scope_reader=None, auditor=None):
     else:
         raise ValueError("output must be disjoint from profile artifacts")
     output.mkdir(parents=True, exist_ok=False)
-    if args.mode == "worker":
-        result = (auditor or audit_business)(
-            args.profile_index, scope["source"], args.business
+    if args.mode in {"worker", "diagnose-worker"}:
+        result = (
+            auditor
+            or (diagnose_business if args.mode == "diagnose-worker" else audit_business)
+        )(
+            args.profile_index,
+            scope["source"],
+            args.business,
+            **({"status_values": status_values} if status_values is not None else {}),
         )
+        if args.status_lexicon:
+            result["approved_lexicon_sha256"] = args.lexicon_sha256
         write(output / "binding.json", result)
         return 0
     selected = sorted([args.business] if args.business else scope["businesses"])
@@ -92,7 +129,7 @@ def main(argv=None, *, scope_reader=None, auditor=None):
         command = [
             sys.executable,
             str(Path(__file__).resolve()),
-            "worker",
+            "diagnose-worker" if args.mode == "diagnose" else "worker",
             "--profile-index",
             str(args.profile_index.resolve()),
             "--business",
@@ -105,6 +142,13 @@ def main(argv=None, *, scope_reader=None, auditor=None):
             "OPENBLAS_NUM_THREADS": "2",
             "PYTHONIOENCODING": "utf-8",
         }
+        if args.status_lexicon:
+            command += [
+                "--status-lexicon",
+                str(args.status_lexicon.resolve()),
+                "--lexicon-sha256",
+                args.lexicon_sha256,
+            ]
         try:
             run = subprocess.run(
                 command,
@@ -167,6 +211,28 @@ def main(argv=None, *, scope_reader=None, auditor=None):
         model_called=False,
         review_status="machine checks only; author review and independent/human approval separate",
     )
+    summary["mode"] = args.mode
+    summary["patterns"] = aggregate_patterns(
+        [r | {"sources": r.get("sources", [])} for r in results]
+    )
+    attach_repetition(results, summary["patterns"])
+    summary["observed_blocker_sets"] = summarize_blockers(results)
+    for result in results:
+        result["observed_blocker_profiles"] = {
+            m: blocker_profile(result, m) for m in METRICS
+        }
+    summary["blocker_businesses"] = {
+        metric: dict(
+            Counter(
+                reason
+                for r in results
+                for reason in {
+                    b["reason"] for b in r.get("metric_blockers", {}).get(metric, [])
+                }
+            )
+        )
+        for metric in METRICS
+    }
     write(output / "summary.json", summary)
     write(output / "businesses-local.json", results)
     lines = [

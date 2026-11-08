@@ -57,7 +57,101 @@ Báo18business và4cụm với reason; “qua kiểm CPU” không là precision
 taxonomy đã pin để báo upper-bound ứng viên/cụm; không hứa>=15answered khi chưa
 parser/model và evaluator. Không dùng calibration/holdout để bù.
 
+## Bổ sung sau review: giới hạn mở rộng rule — 08/11/2026
+
+Nguồn: phản biện PR#6 tại664e5d4 và yêu cầu người dùng bổ sung hai tiêu chí
+vào note thiết kế. Đây là giới hạn cho bước P2c tiếp theo, chưa là khả năng
+đã triển khai hoặc kết quả chẩn đoán mới; giữ nguyên G2/split/scorer.
+
+Chẩn đoán trên18business dev, lập bảng local theo từng business và từng
+metric `order_count`/`revenue_total`. Mỗi blocker ghi nguồn/locator/hash,
+vai trò nguồn cần giải thích, mẫu cấu trúc, số business/cụm có cùng mẫu và
+bằng chứng còn thiếu. Một business có thể có nhiều blocker; không ép mọi
+nguyên nhân vào một loại duy nhất. Chỉ đưa số liệu tổng hợp ra báo cáo repo,
+không commit membership hoặc dữ liệu/packet BTC.
+
+| Loại | Blocker | Cách xử lý |
+|---|---|---|
+| (a) | Cấu trúc phổ biến mà core đã hỗ trợ, như header–detail hoặc events | Nối binder với core, kiểm quan hệ khóa/cardinality/orphan và nghĩa nghiệp vụ trước khi công bố capability |
+| (b) | Cấu trúc mới nhưng lặp lại | Chỉ bổ sung khả năng rule khi cùng mẫu xuất hiện ở ít nhất2business; ưu tiên thuộc ít nhất2cụm |
+| (c) | Quyết định ngữ nghĩa chưa đủ căn cứ, như vai trò nguồn, nghĩa tiền hoặc nhãn trạng thái | Chuyển sang LLM đề xuất có evidence; CPU kiểm phần kiểm được, chưa đủ căn cứ thì chờ duyệt hoặc abstain |
+
+Mọi khả năng binder mới, kể cả nối core cho(a), cần bằng chứng mẫu lặp ở
+ít nhất2business trước khi chọn làm rule chung; số cụm phải báo riêng, không
+coi2business cùng mẫu là bằng chứng tổng quát hóa. Mẫu chỉ có ở1business
+để LLM đề xuất/CPU kiểm hoặc abstain, không viết nhánh riêng theo business.
+Fixture synthetic kiểm được hành vi/phản ví dụ, không thay số business thật.
+
+Xét mức liên quan của nguồn theo từng metric. `order_count` không bị chặn
+chỉ vì chưa giải được tiền/quy đổi; vẫn phải đủ bằng chứng ngày/trạng thái/
+nguồn ảnh hưởng tới đếm đơn. Không loại nguồn chỉ vì thiếu ngày hoặc không
+thấy mã đơn trùng trực tiếp. LLM trích đúng README chỉ chứng minh đoạn dẫn
+tồn tại; chưa chứng minh mapping đúng nghĩa hoặc đủ nguồn.
+
+Điểm dừng bước rule: chẩn đoán trước, chỉ làm(a)/(b) đủ điều kiện lặp;
+(c) chuyển thẳng sang nhánh đề xuất LLM, không kéo dài từ điển để né phần
+ngữ nghĩa. Sau lượt nối header–detail/events đủ điều kiện và đo lại, nếu
+vẫn chưa có business qua kiểm cho metric đang xét ở cụm thứ hai thì dừng
+mở rộng rule trong lượt này, ghi blocker còn lại và chuyển sang LLM. Không
+nới guard để tăng số qua kiểm. Chưa ấn định số giờ; không coi ước lượng
+"nửa ngày" là thời gian đã đo hoặc cam kết hoàn tất.
+
+LLM phân tích business theo thiết kế hai tầng tại `p2c_cpu_design.md`, cache
+theo content/code/model/rulebook hash; đổi evidence phải vô hiệu cache.
+Điểm dừng rule không tự cấp quyền chạy job: vẫn kiểm account/budget trước
+Modal và giữ scope dev đã được cấp. Mỗi hàm vẫn cần bằng chứng đúng trên
+ít nhất2cụm trước nghiệm thu P2; không thêm cổng6business hoặc15câu/cụm.
+Calibration tiếp tục hoãn. Chưa chạy chẩn đoán mới, model, throughput hay PA
+trong lần cập nhật note này.
+
 ## Tài nguyên và bước sau
+
+### Phép thử structural round — 08/11/2026
+
+Reconnaissance bằng scoped verified reader ởmain664e5d4:18dev/212unit,
+71mẫu header chính xác,18mẫu lặp giữa business; header thiếu evidence không
+được tính là mẫu header đã hiểu. Chi tiết chỉ local tại
+`runs/p2c-structural-20261108/`; không mở gold.
+
+Giả thuyết: binder có thể tăng số qua kiểm bằng nối core header–detail và
+event số lượng trả có định nghĩa rõ, cùng nhận diện bảng quy đổi theo định
+nghĩa cột thay vì chỉ tên cột. Bảng quy đổi4cột lặp5business/1cụm; header–detail
+và số lượng trả lặp>=2business. Chỉ nhận nghĩa đóng đã xuất hiện lặp; bảng
+không đủ định nghĩa, nhãn lạ, net chưa rõ hoặc layout singleton vẫn unresolved.
+Phương án bỏ nguồn theo thiếu ngày/khóa bị loại vì không chứng minh độc lập
+metric; LLM vẫn dành cho phần nghĩa còn thiếu sau lượt bounded này.
+
+Phép thử: synthetic đếm2đơn/3dòng, một đơn returned qua quantity>0; duplicate
+header, orphan detail và orphan event kể cả quantity0 phải fail. Giá trị tiền
+không parse không chặn count, nhãn trạng thái lạ phải chặn cả hai metric.
+Mapping event chỉ đổi quantity>0 thành returned theo policy core hiện hành;
+không triển khai trừ doanh thu một phần hoặc dùng ngày trả thay ngày đặt.
+Audit18dev mới đo theo metric/cụm, giữ kết quả fail cũ, không gọi machine-check
+là binding được duyệt độc lập hoặc PA. Sau vòng này áp dụng điểm dừng đã chốt.
+
+Kết quả vòng đầu vẫn1/18/1cụm; dừng thêm khả năng rule. Probe LLM kế tiếp
+chỉ tối đa16case metadata/status dev, chọn theo hash và cụm, không theo gold.
+Nguồn: schema/README đã xác minh, nhãn trạng thái lấy từ tối đa128dòng đầu
+của unit được chọn; đây là mẫu để đề xuất, không phải inventory đủ hoặc phép
+đo độ đúng. Tách case vai trò/cột nguồn và case trạng thái để giới hạn output256
+token/context4096. Hash cache gắn nội dung/code/model/rulebook; tối đa1job,
+không retry hoặc tự áp mapping. CPU kiểm JSON, cột có thật và trích dẫn đúng
+substring nguồn; mọi đề xuất vẫn pending semantic review. Thiếu căn cứ trả
+unknown. Không thay capability/binding dựa riêng vào quote hợp lệ.
+
+So với phân tích tất cả212unit ngay, probe nhỏ kiểm được đường vận chuyển/
+cache/citation với chi phí hữu hạn trước khi mở rộng. Phép thử phân biệt:
+quote bịa/cột ngoài source/truncated phải bị từ chối, nguồn thực phải được
+rebuild từ scoped reader trước upload; output thật phải có model revision,
+snapshot/offline/read-only/memory evidence. Người dùng xác nhận credit>=30USD
+ngày08/11; vẫn xác minh account/dự toán trước job, billing cap không phải hard.
+
+Lượt cloud đầu fail trước inference do helper diagnostic kéo pydantic vào
+Python hệ thống. Phép thử Python-S đã tái hiện, sau tách sanitizer stdlib
+thì pass; cả staging/GPU đóng gói helper mới, API model_probe giữ tương thích.
+Cho một lượt kiểm chứng revision đã sửa sau CPU/review/preflight, SDK vẫn
+retries0; giữ artifact lỗi, dự toán dự phòng gộp20USD dưới ceiling30USD.
+Không tự lặp lại revision lỗi hoặc đổi cấu hình model để che lỗi môi trường.
 
 Audit tuần tự, streaming, từng business trong subprocess có timeout và đo peak
 RSS/elapsed; không trả ledger qua IPC. Mỗi child chỉ2CPU/DuckDB256MB; giới hạn

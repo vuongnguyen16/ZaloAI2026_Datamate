@@ -3,7 +3,7 @@
 import json
 import subprocess
 
-from datamate.model_probe import sanitize_diagnostic
+from datamate.probe_diagnostics import sanitize_diagnostic
 from infra.probe_process import atomic_json
 
 

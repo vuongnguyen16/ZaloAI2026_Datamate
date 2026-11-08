@@ -1,9 +1,96 @@
 # Trạng thái DataMate
 
-Cập nhật 07/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
+Cập nhật 08/11/2026, giờ Việt Nam. Timeline DOCX là nguồn kế hoạch duy nhất,
 hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
+
+Follow-up08/11 sau duyệt lexicon: chủ project duyệt đúng Proposed group,
+giữ unknown; đã tạo artifact SHA-pinned local,23entry approved/6unknown.
+[Kết quả áp dụng](../reports/p2c_approved_lexicon_results.md).
+Audit mới18dev vẫn count/revenue1/18/1cụm, không regression;
+unknown_status giảm13→10business, source-role vẫn12, resource guard2.
+Count có3business/2cụm chỉ còn observed blocker nguồn, chưa có pass mới.
+Receipt local `runs/p2c-status-approved-20261108/`; audit/comparison/packet
+ưu tiên23source của3business tại `runs/p2c-approved-lexicon-audit-20261108/`.
+Lexicon chỉ audit opt-in bằng SHA, không đổi STATUS mặc định.6nhãn unknown
+tiếp tục abstain; chưa duyệt source-role/oracle, chưa gọi model/PA/G2.
+Bước tiếp là duyệt role/column/join/relevance của packet nguồn ưu tiên,
+không hỏi lại duyệt lexicon hoặc tự ghi đè unknown. Gate mới xem báo cáo trên;
+các trạng thái pending lexicon/gate bên dưới là lịch sử trước follow-up này.
+CPU cuối follow-up:574passed/2skipped123,80s, Ruff/format pass, source không
+đổi; gate.json/ba log đã đọc ở
+`runs/cpu-check-20261108T050931075922Z-3mp7smxr/gate.json`.
+Context P2 passed/current, timeline current; không code runtime mới.
+
+Increment semantic review08/11 trên cùng `work/p2c-structural-binding`:
+[kết quả](../reports/p2c_reviewed_semantics_results.md),
+[design](research/p2c_reviewed_semantics_design.md),
+[plan/ledger](research/p2c_reviewed_semantics_plan.md).
+Đã có observed blocker sets theo business/metric, inspection completeness,
+dev-only inventory và pending lexicon/source packet; chỉ apply lexicon khi
+receipt người dùng + artifact SHA + rulebook hash khớp. Projection chọn đúng
+clause/source, bỏ prefix2500, quote không xuyên span, decoder keyed column và
+budget output512 riêng. Chưa gọi model mới hoặc tự chấp nhận mapping.
+Inventory chỉ cột status order đã nhận diện:29nhãn/18dev,212source units để
+duyệt; không chứng nhận status ở nguồn unresolved. Default audit mới vẫn
+count/revenue1/18,1cụm. Chỉ status:count4business/2cụm; source-only1/1;
+status+source-only3/2; đây là observed potential, không dự báo pass.
+Packet hiện hành chỉ local `runs/p2c-semantic-review-20261108-v3/`.
+Phần chờ: người dùng duyệt lexicon/source role-column-join/relevance, audit
+lại với approved lexicon, oracle-binding control riêng (không G2/answer
+oracle), proposal accuracy/unknowns rồi intent/throughput trước full dev.
+Giữ guard cho tới đo ledger thật; P3 sau G2. Bằng chứng CPU cuối increment
+này xem báo cáo trên; các gate/Modal/branch bên dưới là lịch sử trước đó.
+CPU cuối increment semantic:574passed/2skipped158,76s, Ruff/format pass,
+source không đổi; đã đọc JSON/ba log ở
+`runs/cpu-check-20261108T045459818853Z-429czhr5/gate.json`.
+Review source/synthetic:4Important kể cả1điểm được tác giả nâng mức;5regression
+RED→GREEN, không minor hoãn. Packet/labels/member vẫn local, không auto-apply.
+
+Increment08/11 hiện hành trên `work/p2c-structural-binding` từ main664e5d4:
+[kết quả và giới hạn](../reports/p2c_structural_results.md),
+[plan](research/p2c_structural_plan.md), [design đã duyệt](research/p2c_binding_design.md).
+Đã có diagnosis(a)/(b)/(c) theo metric, nối header–detail/return quantity với
+core, kiểm orphan/duplicate/metadata mơ hồ và nguồn quy đổi có nghĩa đóng.
+Nguồn/cột/trạng thái chưa rõ vẫn fail; không thêm rule family sau điểm dừng.
+
+Audit cuối18dev vẫn count/revenue1/18, một cụm; observed unknown_status13,
+unresolved_source_role12, row-resource guard2 (không loại trừ, có scan dở do
+guard). Artifact `runs/p2c-structural-audit-20261108-v3/` chỉ local. Chưa binding
+business được duyệt độc lập ở cụm thứ hai, chưa predict integration/PA/G2.
+
+Đã triển khai semantic proposal adapter/cache/guard và chạy thật13case trên
+Modal:8output hợp lệ đều unknown,5reject,0mapping mới được chấp nhận. Peak
+29,8389GiB, offline/read-only/snapshot/exit0/cleanup pass. App
+ap-B3NoZEEC0ILIr4tN7dAwrt đã completed; live container inventory rỗng.
+Artifact/packet local `runs/p2c-proposal-model-20261108-v2/`, không auto-apply.
+App đầu ap-xWPWXkNx9WRQjrAqD72Ikc fail trước model vì helper diagnostic kéo
+pydantic vào Python hệ thống; Python-S tái hiện và fix stdlib-only đã qua
+regression/review trước lượt kiểm chứng mới. Hai lượt giữ riêng, không che
+fail; dự phòng gộp20USD dưới ceiling30USD, billing thực chưa có.
+
+CPU cuối trước xuất bản:549passed/2skipped131,45s, Ruff/format pass,
+source không đổi; record
+`runs/cpu-check-20261108T041210308529Z-ervunqx1/gate.json`.
+Gate131,61s trước model là lịch sử trước cập nhật tracker cuối.
+Đã đọc gate.json/ba stage log; context P2 passed/current, không warning hoặc
+planning error, timeline đồng bộ.
+Test kill/resume gốc pass trong
+phiên, không sửa timeout/assertion; nguyên nhân timeout ở gate lịch sử chưa
+được xác nhận. Review độc lập chỉ source/synthetic, không đọc kit/gold/packet.
+Nhánh review theo yêu cầu08/11:
+[work/p2c-structural-binding](https://github.com/vuongnguyen16/ZaloAI2026_Datamate/tree/work/p2c-structural-binding).
+Chỉ source/test synthetic/tài liệu tổng hợp đưa lên GitHub; kit/gold/payload/
+packet/runs/credentials giữ local. Chưa merge; CI của nhánh kiểm riêng.
+
+Bước kế tiếp: kiểm completeness của projection/citation và role-only cho
+nguồn ngoài ledger bằng synthetic/dev; duyệt nghĩa nhãn/nguồn để có binding
+ở>=2cụm. Sau đó short-intent/throughput rồi full1895dev. Chưa có lý do chạy
+full dev từ8unknown/5reject. P2 active duy nhất; giữ G2/split/scorer, không
+thêm cổng6business/15câu mỗi cụm; calibration hoãn, gold không inference.
+Quyền dev Modal đã có; mỗi job mới vẫn kiểm account/budget. Docker P3 sau G2.
+PR#6 đã merge; các ghi chú branch/chưa merge/CPU509pass bên dưới là lịch sử.
 
 **P0/G0 và P1/G1 đã hoàn tất; P2 chưa qua G2.** Runtime PR#3 đã merge
 vào main `2f1dbb2` theo xác nhận trực tiếp; Linux407test pass. Runtime CPU

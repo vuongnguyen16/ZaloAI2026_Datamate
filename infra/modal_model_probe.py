@@ -21,7 +21,7 @@ def build_images(image_api, runtime):
             image = image.add_local_file(
                 ROOT / "infra/p1_runtime" / name, f"/opt/p1/runtime/{name}", copy=True
             )
-        for name in ("__init__.py", "model_probe.py"):
+        for name in ("__init__.py", "model_probe.py", "probe_diagnostics.py"):
             image = image.add_local_file(
                 ROOT / "src/datamate" / name, f"/opt/p1/src/datamate/{name}", copy=True
             )

@@ -151,6 +151,8 @@ def propose(unit, readme):
         reasons.append("unresolved_header")
     if any(len(found[r]) != 1 for r in ("id", "day", "status")):
         reasons.append("missing_or_ambiguous_order_columns")
+    if any(len(found[r]) > 1 for r in ("id", "day", "status")):
+        reasons.append("ambiguous_order_columns")
     role = (
         "lines"
         if "product" in columns and ("qty" in columns or "amount" in columns)
@@ -180,7 +182,8 @@ def classify_row(row, candidate):
     return "data"
 
 
-def inspect_rows(rows, candidate):
+def inspect_rows(rows, candidate, *, header_join=False, status_values=None):
+    status_map = dict(STATUS) | (status_values or {})
     col = candidate.columns
     date_fail = Counter()
     date_n = 0
@@ -258,12 +261,12 @@ def inspect_rows(rows, candidate):
     reasons = list(candidate.reasons)
     dates = [fmt for fmt in DATE_FORMATS if date_fail[fmt] == 0 and date_n]
     date_format = dates[0] if len(dates) == 1 else None
-    if date_format is None:
+    if date_format is None and not (header_join and "day" not in col):
         reasons.append("date_format_unverified")
-    unknown = sum(n for label, n in status.items() if norm(label) not in STATUS)
+    unknown = sum(n for label, n in status.items() if not status_map.get(norm(label)))
     if unknown:
         reasons.append("unknown_status")
-    if not status:
+    if not status and not (header_join and "status" not in col):
         reasons.append("missing_status_inventory")
     if not candidate.net_semantics:
         reasons.append("net_semantics_missing")
@@ -306,9 +309,9 @@ def inspect_rows(rows, candidate):
         reasons.append("missing_net_amount")
     count_ok = (
         not candidate.reasons
-        and date_format is not None
+        and (date_format is not None or (header_join and "day" not in col))
         and not unknown
-        and bool(status)
+        and (bool(status) or (header_join and "status" not in col))
     )
     revenue_ok = (
         count_ok
@@ -331,7 +334,9 @@ def inspect_rows(rows, candidate):
         revenue_format_ok=revenue_ok,
         unknown_status_rows=unknown,
         status_counts=dict(status),
-        status_values={s: STATUS[norm(s)] for s in status if norm(s) in STATUS},
+        status_values={
+            s: status_map[norm(s)] for s in status if status_map.get(norm(s))
+        },
         arithmetic={
             fmt: {k: v for k, v in data.items() if k != "digest"}
             for fmt, data in numbers.items()

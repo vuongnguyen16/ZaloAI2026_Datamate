@@ -76,6 +76,8 @@ def test_complete_verified_pipeline_and_author_packet_are_not_oracle(tmp_path):
     assert result["count_checked"] and result["revenue_checked"]
     assert result["review_status"] == "machine_checked_pending_independent_review"
     assert result["ledger_orders"] == 2 and result["ledger_lines"] == 2
+    assert result["inspection"]["row_scan_complete"]
+    assert result["inspection"]["ledger_validated"]
     assert result["peak_rss_bytes"] > 0 and result["elapsed_seconds"] > 0
 
 
@@ -99,6 +101,9 @@ def test_resource_limit_is_not_a_truncated_checked_ledger(tmp_path):
     assert (
         not result["count_checked"] and result["reason"] == "row_resource_or_coordinate"
     )
+    assert result["inspection"]["uninspected_units"]
+    assert not result["inspection"]["row_scan_complete"]
+    assert not result["inspection"]["ledger_validated"]
 
 
 @pytest.mark.parametrize("name", ["sales.csv", "returns.csv"])
@@ -112,3 +117,53 @@ def test_unbound_order_part_cannot_be_silently_omitted(tmp_path):
     root, index = prepare(tmp_path, missing_part=True)
     result = audit_business(index, root, "synthetic_b")
     assert not result["count_checked"] and result["reason"] == "unbound_order_partition"
+
+
+def test_semantic_inventory_reads_verified_dev_statuses_without_money_or_gold(tmp_path):
+    from datamate.domain_lib.raw_reader import open_business
+    from datamate.domain_lib.semantic_review import inventory_business
+
+    root, index = prepare(tmp_path, unknown=True)
+    with open_business(index, root, "synthetic_b") as business:
+        result = inventory_business(business)
+    assert result["labels"] == {"Mystery": 1, "Hoàn thành": 1}
+    assert result["inventory_complete"]
+    assert result["source_decisions"][0]["decision"] == "pending"
+
+
+def test_reviewed_status_map_is_explicit_and_unseen_labels_still_fail(tmp_path):
+    root, index = prepare(tmp_path, unknown=True)
+    result = audit_business(
+        index, root, "synthetic_b", status_values={"mystery": "completed"}
+    )
+    assert result["count_checked"] and result["revenue_checked"]
+    result = audit_business(
+        index, root, "synthetic_b", status_values={"unrelated": "completed"}
+    )
+    assert not result["count_checked"]
+
+
+def test_inventory_guard_keeps_all_source_metadata_for_human_review(tmp_path):
+    from datamate.domain_lib.raw_reader import open_business
+    from datamate.domain_lib.semantic_review import inventory_business
+
+    root, index = prepare(tmp_path, missing_part=True)
+    with open_business(index, root, "synthetic_b") as business:
+        result = inventory_business(business, max_rows=1)
+    assert not result["inventory_complete"]
+    assert len(result["source_decisions"]) == 2
+
+
+def test_review_evidence_hash_identifies_original_readme_bytes(tmp_path):
+    import hashlib
+
+    from datamate.domain_lib.raw_reader import open_business
+    from datamate.domain_lib.semantic_review import inventory_business
+
+    root, index = prepare(tmp_path)
+    digest = hashlib.sha256(
+        (root / "data/synthetic_b/README.md").read_bytes()
+    ).hexdigest()
+    with open_business(index, root, "synthetic_b") as business:
+        result = inventory_business(business)
+    assert result["source_decisions"][0]["evidence"][0]["sha256"] == digest

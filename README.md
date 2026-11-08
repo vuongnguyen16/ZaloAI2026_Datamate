@@ -22,6 +22,11 @@ kiểm synthetic; duyệt binding business thật, model adapter và PA/G2 vẫn
 [Audit binding CPU v0](reports/p2c_binding_results.md) đã kiểm18business dev:
 1business qua cả hai metric, chỉ một cụm; mapping thật chưa được duyệt độc lập.
 Reader/audit research đã có, chưa nối predict; cần mở rộng binding trước G2.
+[Structural round và semantic proposal probe](reports/p2c_structural_results.md)
+đã triển khai diagnosis theo metric, header–detail/events và cache/guard proposal.
+Audit cuối vẫn1/18business/1cụm;13lần sinh Modal cho8unknown hợp lệ/5reject,
+chưa có mapping mới được chấp nhận hoặc PA/G2. Giữ điểm dừng rule; kiểm lại
+projection/citation và nghĩa nguồn trước mở rộng inference.
 Tracker duy nhất là [backlog](tasks/backlog.json) và [state](docs/project_state.md).
 
 ## Bắt đầu phiên

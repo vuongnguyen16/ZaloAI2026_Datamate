@@ -6,7 +6,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .intent_probe import ContextProbeConfig
 from .scoring import parse_object
+
+
+class BindingProposalConfig(ContextProbeConfig):
+    max_tokens: int = Field(default=512, ge=1, le=512)
+
 
 SOURCE_CHOICES = {
     "headers",
@@ -28,6 +34,9 @@ SYSTEM = (
     "contiguous evidence for choice and each column binding. A real quote alone does not prove semantics. "
     "If evidence does not establish the meaning choose unknown, quote empty, bindings empty. "
     "For status no column bindings. Output only JSON matching the schema, without reasoning."
+    " Bindings are an object keyed by supplied column ID, one role per column, no duplicate roles. "
+    "Non-ledger sources have no bindings. Projection flags disclose omitted/missing evidence; "
+    "never infer absent text. A citation must stay within one supplied source span."
 )
 
 
@@ -61,10 +70,24 @@ class Proposal(BaseModel):
     bindings: list[ColumnProposal] = Field(max_length=8)
 
 
-def make_case(kind, evidence, columns, status, identity):
+def make_case(kind, evidence, columns, status, identity, *, projection=None):
     if kind not in {"source", "status"} or not isinstance(evidence, str):
         raise ValueError("invalid proposal kind/evidence")
     data = dict(kind=kind, evidence=evidence, columns=columns, status=status)
+    if projection is not None:
+        if projection.get("version") != 2:
+            raise ValueError("invalid projection version")
+        previous = 0
+        for span in projection["spans"]:
+            start, end = span["start"], span["end"]
+            if (
+                type(start) is not int
+                or type(end) is not int
+                or not previous <= start < end <= len(evidence)
+            ):
+                raise ValueError("invalid evidence span")
+            previous = end
+        data["projection"] = projection
     body = json.dumps(
         data, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")
     )
@@ -100,6 +123,7 @@ def validate_cases(cases):
                 data["columns"],
                 data["status"],
                 case["identity"],
+                projection=data.get("projection"),
             )
             != case
         ):
@@ -109,25 +133,46 @@ def validate_cases(cases):
 def validate_proposal(text, case):
     if len(text.encode("utf-8")) > 8192:
         raise ValueError("proposal too large")
-    proposal = Proposal.model_validate(parse_object(text))
+    value = parse_object(text)
+    # Legacy list outputs remain readable; new guided generation uses column keys.
+    if isinstance(value.get("bindings"), dict):
+        value["bindings"] = [dict(column=k, **v) for k, v in value["bindings"].items()]
+    proposal = Proposal.model_validate(value)
     data = case["data"]
+    spans = data.get("projection", {}).get("spans")
+
+    def cited(quote):
+        return bool(quote) and any(
+            quote in data["evidence"][s["start"] : s["end"]]
+            for s in (
+                spans
+                if spans is not None
+                else [dict(start=0, end=len(data["evidence"]))]
+            )
+        )
+
     allowed = SOURCE_CHOICES if data["kind"] == "source" else STATUS_CHOICES
     if proposal.choice not in allowed:
         raise ValueError("choice outside case kind")
     if proposal.choice == "unknown":
         if proposal.quote or proposal.bindings:
             raise ValueError("unknown cannot make semantic claims")
-    elif not proposal.quote or proposal.quote not in data["evidence"]:
+    elif not cited(proposal.quote):
         raise ValueError("choice citation not in evidence")
     if data["kind"] == "status" and proposal.bindings:
         raise ValueError("status case cannot bind columns")
+    if (
+        proposal.choice in SOURCE_CHOICES - {"headers", "lines", "events", "unknown"}
+        and proposal.bindings
+    ):
+        raise ValueError("non-ledger source cannot bind columns")
     columns = {c["id"] for c in data["columns"]}
     if len({b.column for b in proposal.bindings}) != len(proposal.bindings) or len(
         {b.role for b in proposal.bindings}
     ) != len(proposal.bindings):
         raise ValueError("duplicate binding column or role")
     for binding in proposal.bindings:
-        if binding.column not in columns or binding.quote not in data["evidence"]:
+        if binding.column not in columns or not cited(binding.quote):
             raise ValueError("binding column/citation not in source")
     return dict(
         proposal=proposal.model_dump(),
@@ -135,6 +180,51 @@ def validate_proposal(text, case):
         capabilities_granted=False,
         review_status="pending_semantic_review",
     )
+
+
+def proposal_schema(case):
+    """A case-specific decoder: each column can occur only once as an object key."""
+    choices = SOURCE_CHOICES if case["data"]["kind"] == "source" else STATUS_CHOICES
+    alternatives = []
+    roles = list(ColumnProposal.model_fields["role"].annotation.__args__)
+    for choice in sorted(choices):
+        ledger = choice in {"headers", "lines", "events"}
+        binding = dict(
+            type="object",
+            additionalProperties=False,
+            properties={},
+            maxProperties=8 if ledger else 0,
+        )
+        if ledger:
+            binding["properties"] = {
+                c["id"]: dict(
+                    type="object",
+                    additionalProperties=False,
+                    required=["role", "quote"],
+                    properties=dict(
+                        role=dict(type="string", enum=roles),
+                        quote=dict(type="string", minLength=1, maxLength=600),
+                    ),
+                )
+                for c in case["data"]["columns"]
+            }
+        alternatives.append(
+            dict(
+                type="object",
+                additionalProperties=False,
+                required=["choice", "quote", "bindings"],
+                properties=dict(
+                    choice=dict(type="string", const=choice),
+                    quote=dict(
+                        type="string",
+                        minLength=0 if choice == "unknown" else 1,
+                        maxLength=0 if choice == "unknown" else 600,
+                    ),
+                    bindings=binding,
+                ),
+            )
+        )
+    return dict(oneOf=alternatives)
 
 
 def validate_cached_record(record, case):

@@ -1,4 +1,6 @@
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -42,3 +44,44 @@ def test_worker_denies_nondev_before_reader_or_output(tmp_path, mode):
 def test_cli_has_no_partition_override():
     with pytest.raises(SystemExit):
         entry().main(["worker", "--partition", "holdout"])
+
+
+def test_pending_lexicon_stops_before_auditor_or_output(tmp_path):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "rulebook.md").write_text("rules", encoding="utf-8")
+    lexicon = tmp_path / "lexicon.json"
+    lexicon.write_text(
+        json.dumps(
+            dict(
+                version=1,
+                partition="dev",
+                rulebook_sha256=hashlib.sha256(b"rules").hexdigest(),
+                review=dict(state="pending"),
+            )
+        ),
+        encoding="utf-8",
+    )
+    called = []
+    output = tmp_path / "out"
+    with pytest.raises(ValueError, match="approval"):
+        entry().main(
+            [
+                "worker",
+                "--profile-index",
+                str(tmp_path / "profile/index.json"),
+                "--output",
+                str(output),
+                "--business",
+                "dev",
+                "--status-lexicon",
+                str(lexicon),
+                "--lexicon-sha256",
+                hashlib.sha256(lexicon.read_bytes()).hexdigest(),
+            ],
+            scope_reader=lambda: dict(
+                source=raw, split=tmp_path / "split", businesses={"dev"}, groups={}
+            ),
+            auditor=lambda *a, **k: called.append(True),
+        )
+    assert not output.exists() and not called

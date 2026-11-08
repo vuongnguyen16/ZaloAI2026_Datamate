@@ -5,6 +5,31 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
+Increment semantic review08/11 trên cùng `work/p2c-structural-binding`:
+[kết quả](../reports/p2c_reviewed_semantics_results.md),
+[design](research/p2c_reviewed_semantics_design.md),
+[plan/ledger](research/p2c_reviewed_semantics_plan.md).
+Đã có observed blocker sets theo business/metric, inspection completeness,
+dev-only inventory và pending lexicon/source packet; chỉ apply lexicon khi
+receipt người dùng + artifact SHA + rulebook hash khớp. Projection chọn đúng
+clause/source, bỏ prefix2500, quote không xuyên span, decoder keyed column và
+budget output512 riêng. Chưa gọi model mới hoặc tự chấp nhận mapping.
+Inventory chỉ cột status order đã nhận diện:29nhãn/18dev,212source units để
+duyệt; không chứng nhận status ở nguồn unresolved. Default audit mới vẫn
+count/revenue1/18,1cụm. Chỉ status:count4business/2cụm; source-only1/1;
+status+source-only3/2; đây là observed potential, không dự báo pass.
+Packet hiện hành chỉ local `runs/p2c-semantic-review-20261108-v3/`.
+Phần chờ: người dùng duyệt lexicon/source role-column-join/relevance, audit
+lại với approved lexicon, oracle-binding control riêng (không G2/answer
+oracle), proposal accuracy/unknowns rồi intent/throughput trước full dev.
+Giữ guard cho tới đo ledger thật; P3 sau G2. Bằng chứng CPU cuối increment
+này xem báo cáo trên; các gate/Modal/branch bên dưới là lịch sử trước đó.
+CPU cuối increment semantic:574passed/2skipped158,76s, Ruff/format pass,
+source không đổi; đã đọc JSON/ba log ở
+`runs/cpu-check-20261108T045459818853Z-429czhr5/gate.json`.
+Review source/synthetic:4Important kể cả1điểm được tác giả nâng mức;5regression
+RED→GREEN, không minor hoãn. Packet/labels/member vẫn local, không auto-apply.
+
 Increment08/11 hiện hành trên `work/p2c-structural-binding` từ main664e5d4:
 [kết quả và giới hạn](../reports/p2c_structural_results.md),
 [plan](research/p2c_structural_plan.md), [design đã duyệt](research/p2c_binding_design.md).

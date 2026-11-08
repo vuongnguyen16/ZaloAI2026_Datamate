@@ -26,11 +26,10 @@ def extra_image_files():
 def run_cloud(config, model, cases, record_event):
     import modal
 
-    from datamate.binding_proposals import validate_cases
-    from datamate.intent_probe import ContextProbeConfig
+    from datamate.binding_proposals import BindingProposalConfig, validate_cases
     from infra.modal_model_probe import build_images, failure_event
 
-    ContextProbeConfig.model_validate(config)
+    BindingProposalConfig.model_validate(config)
     validate_cases(cases)
     runtime = json.loads((ROOT / "configs/p1_runtime.json").read_text("utf-8"))
     _, gpu = build_images(modal.Image, runtime)

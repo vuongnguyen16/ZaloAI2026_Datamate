@@ -7,14 +7,18 @@ import platform
 import time
 from pathlib import Path
 
-from datamate.binding_proposals import Proposal, validate_cases, validate_proposal
-from datamate.intent_probe import ContextProbeConfig
+from datamate.binding_proposals import (
+    BindingProposalConfig,
+    proposal_schema,
+    validate_cases,
+    validate_proposal,
+)
 from infra.probe_process import atomic_json
 
 
 def generate(request, destination):
     validate_cases(request["cases"])
-    config = ContextProbeConfig.model_validate(request["config"])
+    config = BindingProposalConfig.model_validate(request["config"])
     os.environ["VLLM_ENABLE_V1_MULTIPROCESSING"] = "0"
     import torch
     import vllm
@@ -91,13 +95,13 @@ def generate(request, destination):
         torch_peak_reserved_bytes=torch.cuda.max_memory_reserved(),
     )
     atomic_json(destination, evidence)
-    sampling = SamplingParams(
-        temperature=0,
-        seed=0,
-        max_tokens=config.max_tokens,
-        structured_outputs=StructuredOutputsParams(json=Proposal.model_json_schema()),
-    )
     for case, prompt, length in zip(request["cases"], prompts, lengths, strict=True):
+        sampling = SamplingParams(
+            temperature=0,
+            seed=0,
+            max_tokens=config.max_tokens,
+            structured_outputs=StructuredOutputsParams(json=proposal_schema(case)),
+        )
         record = dict(
             case_id=case["id"],
             prompt_tokens=length,

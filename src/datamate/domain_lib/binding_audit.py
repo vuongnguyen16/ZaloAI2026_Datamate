@@ -138,6 +138,7 @@ def audit_business(
     *,
     max_rows=200000,
     max_bytes=128 * 1024**2,
+    status_values=None,
 ):
     started = time.perf_counter()
     result = dict(
@@ -149,10 +150,14 @@ def audit_business(
         reason=None,
         gold_read=False,
         metric_scope="unfiltered only; no question/inference or PA acceptance",
+        inspection=dict(
+            row_scan_complete=False, ledger_validated=False, uninspected_units=[]
+        ),
     )
     try:
         with open_business(index, source, business_id) as business:
             units = business.schema["tables"]
+            result["inspection"]["uninspected_units"] = [u["sql_name"] for u in units]
             diagnosis = diagnose_sources(units, business.readme)
             result["sources"] = diagnosis["sources"]
             result["diagnosis_blockers"] = diagnosis["metric_blockers"]
@@ -256,8 +261,21 @@ def audit_business(
                     )
                 else:
                     checks = inspect_rows(
-                        rows_with_ids(), candidate, header_join=joined
+                        rows_with_ids(),
+                        candidate,
+                        header_join=joined,
+                        status_values=status_values,
                     )
+                if (
+                    business.consumed.get(candidate.unit["sql_name"])
+                    == candidate.unit["row_count"]
+                ):
+                    result["inspection"]["uninspected_units"].remove(
+                        candidate.unit["sql_name"]
+                    )
+                result["inspection"]["row_scan_complete"] = not result["inspection"][
+                    "uninspected_units"
+                ]
                 result["candidates"].append(
                     dict(
                         unit=candidate.unit["sql_name"],
@@ -364,6 +382,7 @@ def audit_business(
             ]
             ledger_started = time.perf_counter()
             ledger = adapt_sources(sources, max_rows=max_rows, max_bytes=max_bytes)
+            result["inspection"]["ledger_validated"] = True
             result["ledger_seconds"] = time.perf_counter() - ledger_started
             if any(
                 business.consumed.get(p.candidate.unit["sql_name"])
@@ -403,6 +422,7 @@ def audit_business(
                 else "mismatch_not_automatically_repaired"
             )
     except DomainAbstain as exc:
+        result["inspection"]["ledger_validated"] = False
         metric_blockers = result.setdefault("metric_blockers", {m: [] for m in METRICS})
         for metric in METRICS:
             metric_blockers[metric].append(blocker(exc.code))

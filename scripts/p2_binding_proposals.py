@@ -4,11 +4,11 @@ import argparse
 import hashlib
 import json
 import os
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 from datamate.binding_proposals import (
+    BindingProposalConfig,
     make_case,
     validate_cached_record,
     validate_cases,
@@ -17,9 +17,14 @@ from datamate.binding_proposals import (
 from datamate.domain_lib.binding_rules import STATUS, header, norm
 from datamate.domain_lib.binding_structure import plan_source
 from datamate.domain_lib.raw_reader import open_business
-from datamate.intent_probe import ContextProbeConfig
 from datamate.model_probe import PROFILE, ModelCandidate, preflight
 from datamate.prediction_store import regular_bytes
+from datamate.proposal_evidence import (
+    combine_spans,
+    project_business_readme,
+    project_readme,
+    project_rulebook,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = dict(
@@ -31,7 +36,7 @@ CONFIG = dict(
     memory_budget_bytes=32212254720,
     seed=0,
     max_model_len=4096,
-    max_tokens=256,
+    max_tokens=512,
     gpu_timeout_seconds=900,
     startup_timeout_seconds=600,
     staging_timeout_seconds=300,
@@ -66,6 +71,7 @@ def code_digest():
     files = [
         Path(__file__),
         ROOT / "src/datamate/binding_proposals.py",
+        ROOT / "src/datamate/proposal_evidence.py",
         ROOT / "infra/modal_binding_proposals.py",
         ROOT / "infra/p1_runtime/binding_generate.py",
         ROOT / "configs/p1_runtime.json",
@@ -91,14 +97,8 @@ def code_digest():
 
 
 def excerpt(readme, file):
-    match = re.search(
-        r"(?m)^#{2,3}\s+Cột trong `" + re.escape(file) + r"`\s*$", readme, re.IGNORECASE
-    )
-    if not match:
-        return ""
-    rest = readme[match.start() :]
-    end = re.search(r"\n#{1,3}\s", rest)
-    return rest[: end.start() if end else len(rest)].strip()
+    spans, _ = project_readme(readme, file, "")
+    return "\n\n".join(s["text"] for s in spans)
 
 
 def build_payload(profile_index):
@@ -147,12 +147,15 @@ def build_payload(profile_index):
                     dict(id=c["sql_name"], label=header(c)) for c in unit["columns"]
                 ]
                 try:
+                    spans, metadata = project_business_readme(business, unit)
+                    evidence, projection = combine_spans(spans, [metadata])
                     case = make_case(
                         "source",
-                        excerpt(business.readme, unit["source_file"]),
+                        evidence,
                         columns,
                         None,
                         identity,
+                        projection=projection,
                     )
                     cases.append(case)
                     local.append(
@@ -197,11 +200,33 @@ def build_payload(profile_index):
                     label = sorted(
                         labels, key=lambda s: (norm(s) in STATUS, sha(s.encode()))
                     )[0]
-                    # A contiguous source slice; no fabricated concatenation can pass citation checks.
-                    evidence = (
-                        rulebook if len(rulebook.encode()) <= 8000 else rulebook[:2500]
+                    spans, meta = project_rulebook(
+                        rulebook, "status", identity["rulebook_sha256"]
                     )
-                    case = make_case("status", evidence, [], label, identity)
+                    readme_spans, readme_meta = project_business_readme(
+                        business, selected.unit
+                    )
+                    evidence, projection = combine_spans(
+                        spans + readme_spans, [meta, readme_meta]
+                    )
+                    try:
+                        case = make_case(
+                            "status",
+                            evidence,
+                            [],
+                            label,
+                            identity,
+                            projection=projection,
+                        )
+                    except ValueError:
+                        omitted.append(
+                            dict(
+                                business_id=bid,
+                                kind="status",
+                                reason="projection_budget",
+                            )
+                        )
+                        continue
                     cases.append(case)
                     local.append(
                         dict(
@@ -300,7 +325,7 @@ def main(argv=None, *, account_reader=None, transport_factory=None, now=None):
         return 0
     if os.environ.get("MODAL_PROFILE") != PROFILE or not args.billing_json:
         raise ValueError("explicit profile and fresh billing required")
-    config = ContextProbeConfig.model_validate(CONFIG)
+    config = BindingProposalConfig.model_validate(CONFIG)
     model = registry_model()
     checked = preflight(
         config,

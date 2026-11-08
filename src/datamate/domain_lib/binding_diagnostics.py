@@ -123,3 +123,149 @@ def diagnose_business(index, source, business_id):
             pa_measured=False,
         )
     return result
+
+
+def blocker_profile(record, metric):
+    reasons = {b["reason"] for b in record.get("metric_blockers", {}).get(metric, [])}
+    checked = (
+        record.get("count_checked" if metric == "order_count" else "revenue_checked")
+        is True
+    )
+    if not reasons and not checked:
+        reasons.add(record.get("reason") or "unreported_failure")
+    families = set()
+    groups = {
+        "status": {
+            "unknown_status",
+            "missing_status_inventory",
+            "unknown_order_status",
+        },
+        "source": {
+            "unresolved_source_role",
+            "unbound_relevant_source",
+            "unbound_order_partition",
+            "missing_or_ambiguous_order_columns",
+            "conflicting_or_unverified_readme_role",
+            "repeated_unresolved_structure",
+            "event_metadata_requires_review",
+            "no_order_candidate",
+            "missing_verified_header",
+        },
+        "header": {"unresolved_header"},
+        "date": {"date_format_unverified", "conflicting_or_missing_order_date"},
+        "money": {
+            "net_semantics_missing",
+            "amount_format_unverified",
+            "number_scale_ambiguous",
+            "arithmetic_screen_failed",
+            "missing_net_amount",
+            "missing_order_details",
+            "header_without_order_details",
+        },
+        "resource": {
+            "row_resource_or_coordinate",
+            "identity_byte_limit",
+            "row_byte_limit",
+            "worker_timeout",
+            "row_resource_limit",
+        },
+        "structure": {
+            "duplicate_order_header",
+            "orphan_order_detail",
+            "orphan_order_event",
+            "unresolved_order_row",
+            "missing_group_metadata",
+            "ambiguous_order_columns",
+            "conflicting_order_status",
+        },
+    }
+    for reason in reasons - {"binding_data_checks_failed"}:
+        families.add(
+            next(
+                (family for family, members in groups.items() if reason in members),
+                "other",
+            )
+        )
+    if "binding_data_checks_failed" in reasons and not families:
+        families.add("other")
+    inspection = record.get("inspection", {})
+    unexecuted = []
+    if inspection.get("row_scan_complete") is not True:
+        unexecuted.append("row_scan")
+    if inspection.get("ledger_validated") is not True:
+        unexecuted.append("ledger")
+    scenarios = {
+        "status": {"status"},
+        "source": {"source"},
+        "status_and_source": {"status", "source"},
+    }
+    return dict(
+        families=sorted(families),
+        observed_reasons=sorted(reasons),
+        checked=checked,
+        unexecuted_checks=unexecuted,
+        after_removing={
+            name: dict(
+                remaining_observed=sorted(families - removed),
+                recheck_required=not checked,
+                proven_pass=checked,
+            )
+            for name, removed in scenarios.items()
+        },
+    )
+
+
+def summarize_blockers(records):
+    result = {}
+    for metric in METRICS:
+        buckets = {
+            "observed_status_only": {"status"},
+            "observed_source_only": {"source"},
+            "observed_status_and_source_only": {"status", "source"},
+        }
+        profiles = [(r, blocker_profile(r, metric)) for r in records]
+        result[metric] = {
+            name: dict(
+                businesses=len(
+                    {
+                        r["business_id"]
+                        for r, p in profiles
+                        if set(p["families"]) == wanted and not p["checked"]
+                    }
+                ),
+                clusters=len(
+                    {
+                        r["cluster"]
+                        for r, p in profiles
+                        if set(p["families"]) == wanted and not p["checked"]
+                    }
+                ),
+            )
+            for name, wanted in buckets.items()
+        }
+        result[metric].update(
+            remaining_blocked=dict(
+                businesses=len(
+                    {
+                        r["business_id"]
+                        for r, p in profiles
+                        if not p["checked"]
+                        and set(p["families"]) not in buckets.values()
+                    }
+                ),
+                clusters=len(
+                    {
+                        r["cluster"]
+                        for r, p in profiles
+                        if not p["checked"]
+                        and set(p["families"]) not in buckets.values()
+                    }
+                ),
+            ),
+            is_pass_prediction=False,
+            incomplete_inspection=sum(
+                bool(p["unexecuted_checks"]) for _, p in profiles
+            ),
+            already_checked=sum(p["checked"] for _, p in profiles),
+        )
+    return result

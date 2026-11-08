@@ -9,16 +9,16 @@ from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
+from .binding_diagnostics import METRICS, blocker, diagnose_sources
 from .binding_rules import (
-    VERIFIED_HEADERS,
+    NUMBER_FORMATS,
     classify_row,
-    header,
     inspect_rows,
     norm,
-    propose,
 )
+from .binding_structure import plan_source
 from .model import DomainAbstain
-from .orders import Binding, BoundSource, adapt_sources
+from .orders import Binding, BoundSource, RawRow, _money, adapt_sources
 from .raw_reader import open_business
 
 
@@ -63,7 +63,9 @@ def peak_rss_bytes():
     return int(info.PeakWorkingSetSize)
 
 
-def data_rows(business, candidate, counts, samples, budget, max_rows):
+def data_rows(
+    business, candidate, counts, samples, budget, max_rows, *, require_metadata=True
+):
     col = candidate.columns
     can_carry = False
     last_id = None
@@ -83,7 +85,7 @@ def data_rows(business, candidate, counts, samples, budget, max_rows):
             if not can_carry or candidate.role != "lines" or not has_product:
                 raise DomainAbstain("unresolved_order_row")
         elif not can_carry or qid != last_id:
-            if not all(
+            if require_metadata and not all(
                 (row.cells.get(col.get(k)) or "").strip() for k in ("day", "status")
             ):
                 raise DomainAbstain("missing_group_metadata")
@@ -102,6 +104,31 @@ def data_rows(business, candidate, counts, samples, budget, max_rows):
                 )
             )
         yield row
+
+
+def return_quantity(row, candidate):
+    value = (row.cells.get(candidate.columns["return_qty"]) or "").strip()
+    outcomes = {
+        parsed
+        for fmt in NUMBER_FORMATS
+        if (
+            parsed := _money(
+                value, Binding("events", "id", None, "status", number_format=fmt)
+            )
+        )
+        is not None
+    }
+    if len(outcomes) != 1 or next(iter(outcomes)) < 0:
+        raise DomainAbstain("unverified_return_quantity")
+    return next(iter(outcomes))
+
+
+def event_rows(rows, candidate):
+    for row in rows:
+        if return_quantity(row, candidate) > 0:
+            yield RawRow(
+                row.row, dict(row.cells) | {"derived_return_status": "returned"}
+            )
 
 
 def audit_business(
@@ -125,98 +152,112 @@ def audit_business(
     )
     try:
         with open_business(index, source, business_id) as business:
-            candidates = [
-                propose(t, business.readme) for t in business.schema["tables"]
-            ]
-            valid = [c for c in candidates if not c.reasons]
-            lines = [c for c in valid if c.role == "lines"]
-            headers = [c for c in valid if c.role == "headers"]
-            if not valid:
-                raise DomainAbstain("no_order_candidate")
-            if lines and headers:
-                raise DomainAbstain("ambiguous_order_grains")
-            selected = lines or headers
+            units = business.schema["tables"]
+            diagnosis = diagnose_sources(units, business.readme)
+            result["sources"] = diagnosis["sources"]
+            result["diagnosis_blockers"] = diagnosis["metric_blockers"]
+            plans = [plan_source(t, business.readme) for t in units]
+            selected = [p for p in plans if p.kind not in {"conversion", "unresolved"}]
+            unbound = [p.candidate for p in plans if p.kind == "unresolved"]
+            headers = [p for p in selected if p.kind == "headers"]
+            lines = [p for p in selected if p.candidate.role == "lines"]
+            result["metric_blockers"] = {m: [] for m in METRICS}
 
-            def family(candidate):
-                return re.sub(
-                    r"\d+$", "", norm(Path(candidate.unit["source_file"]).stem)
-                )
-
-            families = {family(c) for c in selected}
-            return_sources = [
-                t
-                for t in business.schema["tables"]
-                if any(
-                    term in norm(t["source_file"] + t["source_name"])
-                    for term in ["trahang", "return", "refund", "cancel", "huydon"]
-                )
-            ]
-            if return_sources:
-                raise DomainAbstain("unbound_return_source")
-            conversion_names = {
-                "tensanpham",
-                "tenhang",
-                "mahang",
-                "masanpham",
-                "masp",
-                "donvilon",
-                "donvinho",
-                "donvicoban",
-                "donvitinhcoban",
-                "donviban",
-                "donvitinh",
-                "heso",
-                "hesoquydoi",
-                "quydoi",
-                "soluongquydoi",
-            }
-            coverage = []
-            unbound = []
-            selected_names = {c.unit["sql_name"] for c in selected}
-            for c in candidates:
-                labels = {norm(header(column)) for column in c.unit["columns"]}
-                if c.unit["sql_name"] in selected_names:
-                    disposition = "selected_order_source"
-                elif (
-                    not c.columns.get("id")
-                    and c.unit.get("header_status") in VERIFIED_HEADERS
-                    and labels
-                    and labels <= conversion_names
-                    and labels & {"heso", "hesoquydoi", "quydoi"}
-                    and labels
-                    & {"tensanpham", "tenhang", "mahang", "masanpham", "masp"}
-                ):
-                    disposition = "excluded_closed_conversion_signature"
-                else:
-                    disposition = "unresolved_source_role"
-                    unbound.append(c)
-                coverage.append(
-                    dict(
-                        unit=c.unit["sql_name"],
-                        source_file=c.unit["source_file"],
-                        source_name=c.unit["source_name"],
-                        disposition=disposition,
+            def add(reason, *, metrics=METRICS, category="c", unit=None):
+                for metric in metrics:
+                    result["metric_blockers"][metric].append(
+                        blocker(reason, category=category, unit=unit)
                     )
+
+            result["unit_coverage"] = [
+                dict(
+                    unit=p.candidate.unit["sql_name"],
+                    source_file=p.candidate.unit["source_file"],
+                    source_name=p.candidate.unit["source_name"],
+                    disposition="excluded_conversion_semantics"
+                    if p.kind == "conversion"
+                    else "unresolved_source_role"
+                    if p.kind == "unresolved"
+                    else "selected_order_source",
                 )
-            result["unit_coverage"] = coverage
-            if unbound:
-                raise DomainAbstain(
-                    "unbound_order_partition"
-                    if any(family(c) in families for c in unbound)
-                    else "unbound_relevant_source"
-                )
+                for p in plans
+            ]
+            for c in unbound:
+                add("unresolved_source_role", unit=c.unit["sql_name"])
+                for reason in c.reasons:
+                    add(reason, unit=c.unit["sql_name"])
+            if not any(p.kind in {"headers", "combined_lines"} for p in selected):
+                raise DomainAbstain("no_order_candidate")
+            if any(p.kind == "details" for p in selected) and not headers:
+                raise DomainAbstain("missing_verified_header")
             budget = [0]
             source_sha = {
                 r["path"]: r["sha256"] for r in business.profile["provenance"]["files"]
             }
             bound = []
-            for candidate in selected:
-                counts = Counter()
-                samples = []
-                checks = inspect_rows(
-                    data_rows(business, candidate, counts, samples, budget, max_rows),
-                    candidate,
-                )
+            header_ids, detail_ids, event_ids, combined_ids = set(), set(), set(), set()
+            identity_bytes = 0
+            for plan in selected:
+                candidate = plan.candidate
+                counts, samples = Counter(), []
+                joined = plan.kind == "details"
+
+                def rows_with_ids():
+                    nonlocal identity_bytes
+                    last_id = None
+                    for row in data_rows(
+                        business,
+                        candidate,
+                        counts,
+                        samples,
+                        budget,
+                        max_rows,
+                        require_metadata=not joined and plan.kind != "return_quantity",
+                    ):
+                        qid = (
+                            row.cells.get(candidate.columns["id"]) or ""
+                        ).strip() or last_id
+                        if not qid or len(qid) > 512:
+                            raise DomainAbstain("missing_or_invalid_order_id")
+                        last_id = qid
+                        identity_bytes += 64 + len(qid.encode("utf-8"))
+                        if identity_bytes > max_bytes:
+                            raise DomainAbstain("identity_byte_limit")
+                        if plan.kind == "headers":
+                            if qid in header_ids:
+                                add(
+                                    "duplicate_order_header",
+                                    category="a",
+                                    unit=candidate.unit["sql_name"],
+                                )
+                            header_ids.add(qid)
+                        elif joined:
+                            detail_ids.add(qid)
+                        elif plan.kind == "return_quantity":
+                            event_ids.add(qid)
+                        elif plan.kind == "combined_lines":
+                            combined_ids.add(qid)
+                        yield row
+
+                if plan.kind == "return_quantity":
+                    event_count = total = 0
+                    for row in rows_with_ids():
+                        total += 1
+                        event_count += return_quantity(row, candidate) > 0
+                    checks = dict(
+                        count_format_ok=True,
+                        revenue_format_ok=True,
+                        status_values={"returned": "returned"},
+                        date_format="%Y-%m-%d",
+                        number_format="plain",
+                        reasons=[],
+                        rows=total,
+                        returned_rows=event_count,
+                    )
+                else:
+                    checks = inspect_rows(
+                        rows_with_ids(), candidate, header_join=joined
+                    )
                 result["candidates"].append(
                     dict(
                         unit=candidate.unit["sql_name"],
@@ -224,58 +265,126 @@ def audit_business(
                         source_name=candidate.unit["source_name"],
                         role=candidate.role,
                         columns=candidate.columns,
-                        semantic_evidence=candidate.evidence,
+                        semantic_evidence=plan.evidence,
                         checks=checks,
                         row_kinds=dict(counts),
                         samples=samples,
                         printed_total_comparison="not_comparable_scope_unproven",
                     )
                 )
+                if not checks["count_format_ok"]:
+                    for reason in checks["reasons"]:
+                        if (
+                            reason
+                            in {
+                                "unknown_status",
+                                "missing_status_inventory",
+                                "date_format_unverified",
+                            }
+                            or reason in candidate.reasons
+                        ):
+                            add(reason, unit=candidate.unit["sql_name"])
+                if candidate.role == "lines" and not checks["revenue_format_ok"]:
+                    for reason in checks["reasons"]:
+                        add(
+                            reason,
+                            metrics=("revenue_total",),
+                            unit=candidate.unit["sql_name"],
+                        )
                 if checks["count_format_ok"]:
-                    b = Binding(
+                    binding = Binding(
                         candidate.role,
                         candidate.columns["id"],
-                        candidate.columns["day"],
-                        candidate.columns["status"],
+                        candidate.columns.get("day"),
+                        "derived_return_status"
+                        if plan.kind == "return_quantity"
+                        else candidate.columns.get("status"),
                         candidate.columns.get("amount")
                         if checks["revenue_format_ok"]
                         else None,
                         checks["status_values"],
-                        carry_order_fields=True,
-                        date_format=checks["date_format"],
+                        carry_order_fields=candidate.role == "lines",
+                        date_format=checks["date_format"] or "%Y-%m-%d",
                         number_format=checks["number_format"] or "plain",
                     )
-                    bound.append((candidate, b))
+                    bound.append((plan, binding))
+            if unbound:
+
+                def family(c):
+                    return re.sub(r"\d+$", "", norm(Path(c.unit["source_file"]).stem))
+
+                families = {family(p.candidate) for p in selected}
+                raise DomainAbstain(
+                    "unbound_order_partition"
+                    if any(family(c) in families for c in unbound)
+                    else "unbound_relevant_source"
+                )
+            if any(
+                b["reason"] == "duplicate_order_header"
+                for b in result["metric_blockers"]["order_count"]
+            ):
+                raise DomainAbstain("duplicate_order_header")
             if len(bound) != len(selected):
                 raise DomainAbstain("binding_data_checks_failed")
+            if headers and detail_ids - header_ids:
+                raise DomainAbstain("orphan_order_detail")
+            # Check all event references, including zero-return rows, not only
+            # the derived positive events consumed by the ledger.
+            if event_ids - (header_ids | combined_ids):
+                raise DomainAbstain("orphan_order_event")
+            if not lines:
+                add("missing_order_details", metrics=("revenue_total",))
             budget = [0]
+
+            def bound_rows(plan):
+                candidate = plan.candidate
+                rows = data_rows(
+                    business,
+                    candidate,
+                    Counter(),
+                    [],
+                    budget,
+                    max_rows,
+                    require_metadata=plan.kind not in {"details", "return_quantity"},
+                )
+                return (
+                    event_rows(rows, candidate)
+                    if plan.kind == "return_quantity"
+                    else rows
+                )
+
             sources = [
                 BoundSource(
-                    c.unit["sql_name"],
-                    source_sha[c.unit["source_file"]],
+                    p.candidate.unit["sql_name"],
+                    source_sha[p.candidate.unit["source_file"]],
                     b,
-                    data_rows(business, c, Counter(), [], budget, max_rows),
+                    bound_rows(p),
                 )
-                for c, b in bound
+                for p, b in bound
             ]
             ledger_started = time.perf_counter()
             ledger = adapt_sources(sources, max_rows=max_rows, max_bytes=max_bytes)
             result["ledger_seconds"] = time.perf_counter() - ledger_started
             if any(
-                business.consumed.get(c.unit["sql_name"]) != c.unit["row_count"]
-                for c in selected
+                business.consumed.get(p.candidate.unit["sql_name"])
+                != p.candidate.unit["row_count"]
+                for p in selected
             ):
                 raise DomainAbstain("incomplete_source_coverage")
+            if lines and any(not o.lines for o in ledger.orders):
+                add("header_without_order_details", metrics=("revenue_total",))
             result.update(
                 count_checked=True,
                 revenue_checked=bool(lines)
-                and all(c["checks"]["revenue_format_ok"] for c in result["candidates"]),
+                and not result["metric_blockers"]["revenue_total"],
                 review_status="machine_checked_pending_independent_review",
                 ledger_orders=len(ledger.orders),
                 ledger_lines=sum(len(o.lines) for o in ledger.orders),
                 ledger_extent=asdict(ledger.extent),
                 provenance=business.proof,
                 selected_source_hashes=ledger.provenance,
+                order_status_counts=dict(Counter(o.status for o in ledger.orders)),
+                joined_header_orders=len(header_ids),
             )
             match = re.search(
                 r"đến hết\s+(\d{1,2}/\d{1,2}/\d{4})", business.readme, re.IGNORECASE
@@ -294,6 +403,9 @@ def audit_business(
                 else "mismatch_not_automatically_repaired"
             )
     except DomainAbstain as exc:
+        metric_blockers = result.setdefault("metric_blockers", {m: [] for m in METRICS})
+        for metric in METRICS:
+            metric_blockers[metric].append(blocker(exc.code))
         result.update(
             count_checked=False,
             revenue_checked=False,

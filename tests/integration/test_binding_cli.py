@@ -12,7 +12,8 @@ def entry():
     return mod
 
 
-def test_worker_denies_nondev_before_reader_or_output(tmp_path):
+@pytest.mark.parametrize("mode", ["worker", "diagnose-worker", "diagnose"])
+def test_worker_denies_nondev_before_reader_or_output(tmp_path, mode):
     mod = entry()
     called = []
     scope = dict(
@@ -24,7 +25,7 @@ def test_worker_denies_nondev_before_reader_or_output(tmp_path):
     with pytest.raises(PermissionError):
         mod.main(
             [
-                "worker",
+                mode,
                 "--profile-index",
                 str(tmp_path / "no-profile.json"),
                 "--business",

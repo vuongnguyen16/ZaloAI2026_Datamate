@@ -418,7 +418,11 @@
       "docs/research/p2c_binding_design.md",
       "docs/research/p2c_binding_plan.md",
       "reports/p2c_binding_results.md",
-      "runs/p2c-binding-audit-20261107-v2/ (local):18dev businesses; count/revenue checked1/18,one cluster; author check only; no newgold/model/PA/G2"
+      "runs/p2c-binding-audit-20261107-v2/ (local):18dev businesses; count/revenue checked1/18,one cluster; author check only; no newgold/model/PA/G2",
+      "docs/research/p2c_structural_plan.md",
+      "reports/p2c_structural_results.md",
+      "runs/p2c-structural-audit-20261108-v3/ (local):18dev; count/revenue machine-checked1/18,one cluster; observed unknown_status13/unresolved_source_role12/resource guard2; no newgold/PA/G2",
+      "runs/p2c-proposal-model-20261108-v2/ (local):13real Modal BF16 proposals,8valid unknown/5rejected/0accepted mappings; peak29.8389GiB/offline/read-only/cleanup pass; first app failed before model due stdlib dependency and preserved; no automatic apply"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -427,7 +431,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "P2c CPU core PR5 merged98c1c1e; verified reader/rule binding audit implemented; one business/one cluster checked, G2 pending",
+    "decision_status": "P2c structural binder/metric diagnosis and semantic proposal transport implemented; bounded rule round still1/18/one cluster; real proposal probe produced8unknown/5rejected,0accepted mappings; G2 pending",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -439,7 +443,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "P2c CPU: explain unbound sources/header-detail layouts and unknown statuses from source semantics, obtain reviewed bindings across at least2dev clusters; then short-intent adapter/throughput probe before full1895dev. No newgold/model/PA/G2 in binding increment; independent business approval and largest-business ledger budget pending."
+    "next_action": "Keep rule stop condition. Validate projection/citation completeness and role-only protocol for non-ledger sources using synthetic/dev evidence; review unknown statuses/source semantics and obtain independently reviewed bindings across>=2dev clusters. Then short-intent adapter/throughput before full1895dev. No calibration, gold inference or auto-apply of rejected/unknown proposals; fresh account/budget before another model job."
   },
   {
     "id": "P3",

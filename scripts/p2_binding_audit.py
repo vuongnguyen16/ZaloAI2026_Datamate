@@ -19,6 +19,7 @@ from datamate.domain_lib.binding_diagnostics import (
     summarize_blockers,
 )
 from datamate.domain_lib.semantic_review import load_approved_lexicon
+from datamate.domain_lib.source_exclusions import load_source_exclusions
 from datamate.evaluation import external_metadata, output_path
 from datamate.splits import authorize_access, open_split
 
@@ -77,6 +78,8 @@ def main(argv=None, *, scope_reader=None, auditor=None):
     parser.add_argument("--business")
     parser.add_argument("--status-lexicon", type=Path)
     parser.add_argument("--lexicon-sha256")
+    parser.add_argument("--source-exclusions", type=Path)
+    parser.add_argument("--exclusions-sha256")
     args = parser.parse_args(argv)
     scope = (scope_reader or dev_scope)()
     if args.business is not None and args.business not in scope["businesses"]:
@@ -84,6 +87,23 @@ def main(argv=None, *, scope_reader=None, auditor=None):
     if args.mode in {"worker", "diagnose-worker"} and args.business is None:
         parser.error("worker requires business")
     status_values = None
+    source_exclusions = None
+    if args.source_exclusions or args.exclusions_sha256:
+        if (
+            not args.source_exclusions
+            or not args.exclusions_sha256
+            or args.mode in {"diagnose", "diagnose-worker"}
+        ):
+            raise ValueError(
+                "audit requires both exclusions path/hash; diagnose cannot apply semantics"
+            )
+        external_metadata(args.source_exclusions, scope["source"], scope["split"])
+        source_exclusions = load_source_exclusions(
+            args.source_exclusions,
+            args.exclusions_sha256,
+            hashlib.sha256((scope["source"] / "rulebook.md").read_bytes()).hexdigest(),
+            scope["businesses"],
+        )
     if args.status_lexicon or args.lexicon_sha256:
         if (
             not args.status_lexicon
@@ -117,9 +137,16 @@ def main(argv=None, *, scope_reader=None, auditor=None):
             scope["source"],
             args.business,
             **({"status_values": status_values} if status_values is not None else {}),
+            **(
+                {"source_exclusions": source_exclusions}
+                if source_exclusions is not None
+                else {}
+            ),
         )
         if args.status_lexicon:
             result["approved_lexicon_sha256"] = args.lexicon_sha256
+        if args.source_exclusions:
+            result["approved_source_exclusions_sha256"] = args.exclusions_sha256
         write(output / "binding.json", result)
         return 0
     selected = sorted([args.business] if args.business else scope["businesses"])
@@ -148,6 +175,13 @@ def main(argv=None, *, scope_reader=None, auditor=None):
                 str(args.status_lexicon.resolve()),
                 "--lexicon-sha256",
                 args.lexicon_sha256,
+            ]
+        if args.source_exclusions:
+            command += [
+                "--source-exclusions",
+                str(args.source_exclusions.resolve()),
+                "--exclusions-sha256",
+                args.exclusions_sha256,
             ]
         try:
             run = subprocess.run(
@@ -212,6 +246,11 @@ def main(argv=None, *, scope_reader=None, auditor=None):
         review_status="machine checks only; author review and independent/human approval separate",
     )
     summary["mode"] = args.mode
+    if args.source_exclusions:
+        summary["approved_source_exclusions_sha256"] = args.exclusions_sha256
+        summary["reviewed_exclusion_scope"] = (
+            "default_unfiltered only, not filter or full-binding approval"
+        )
     summary["patterns"] = aggregate_patterns(
         [r | {"sources": r.get("sources", [])} for r in results]
     )

@@ -20,6 +20,7 @@ from .binding_structure import plan_source
 from .model import DomainAbstain
 from .orders import Binding, BoundSource, RawRow, _money, adapt_sources
 from .raw_reader import open_business
+from .source_exclusions import match_source_exclusions
 
 
 def peak_rss_bytes():
@@ -139,6 +140,7 @@ def audit_business(
     max_rows=200000,
     max_bytes=128 * 1024**2,
     status_values=None,
+    source_exclusions=None,
 ):
     started = time.perf_counter()
     result = dict(
@@ -151,19 +153,59 @@ def audit_business(
         gold_read=False,
         metric_scope="unfiltered only; no question/inference or PA acceptance",
         inspection=dict(
-            row_scan_complete=False, ledger_validated=False, uninspected_units=[]
+            row_scan_complete=False,
+            required_row_scan_complete=False,
+            ledger_validated=False,
+            uninspected_units=[],
+            approved_excluded_units=[],
         ),
     )
+    if source_exclusions is not None:
+        result["approved_source_exclusions_sha256"] = source_exclusions.sha256
     try:
         with open_business(index, source, business_id) as business:
             units = business.schema["tables"]
             result["inspection"]["uninspected_units"] = [u["sql_name"] for u in units]
+            try:
+                excluded = (
+                    match_source_exclusions(source_exclusions, business, business_id)
+                    if source_exclusions is not None
+                    else {}
+                )
+            except ValueError as exc:
+                raise DomainAbstain(
+                    "source_exclusion_identity_or_plan_mismatch"
+                ) from exc
+            result["inspection"]["approved_excluded_units"] = sorted(excluded)
             diagnosis = diagnose_sources(units, business.readme)
             result["sources"] = diagnosis["sources"]
-            result["diagnosis_blockers"] = diagnosis["metric_blockers"]
+            result["machine_diagnosis_blockers"] = diagnosis["metric_blockers"]
+            result["diagnosis_blockers"] = {
+                m: [
+                    b
+                    for b in diagnosis["metric_blockers"][m]
+                    if b.get("unit") not in excluded
+                ]
+                for m in METRICS
+            }
+            for item in result["sources"]:
+                if item["unit"] in excluded:
+                    item.update(
+                        machine_kind=item["kind"],
+                        kind="reviewed_exclusion",
+                        pattern="unresolved",
+                        reviewed_role=excluded[item["unit"]].role,
+                        review_sha256=source_exclusions.sha256,
+                        review_scope="default_unfiltered",
+                    )
             plans = [plan_source(t, business.readme) for t in units]
             selected = [p for p in plans if p.kind not in {"conversion", "unresolved"}]
-            unbound = [p.candidate for p in plans if p.kind == "unresolved"]
+            unbound = [
+                p.candidate
+                for p in plans
+                if p.kind == "unresolved"
+                and p.candidate.unit["sql_name"] not in excluded
+            ]
             headers = [p for p in selected if p.kind == "headers"]
             lines = [p for p in selected if p.candidate.role == "lines"]
             result["metric_blockers"] = {m: [] for m in METRICS}
@@ -179,11 +221,23 @@ def audit_business(
                     unit=p.candidate.unit["sql_name"],
                     source_file=p.candidate.unit["source_file"],
                     source_name=p.candidate.unit["source_name"],
-                    disposition="excluded_conversion_semantics"
+                    disposition="excluded_by_review"
+                    if p.candidate.unit["sql_name"] in excluded
+                    else "excluded_conversion_semantics"
                     if p.kind == "conversion"
                     else "unresolved_source_role"
                     if p.kind == "unresolved"
                     else "selected_order_source",
+                    **(
+                        dict(
+                            review_sha256=source_exclusions.sha256,
+                            reviewed_role=excluded[p.candidate.unit["sql_name"]].role,
+                            scope="default_unfiltered",
+                            metrics=list(METRICS),
+                        )
+                        if p.candidate.unit["sql_name"] in excluded
+                        else {}
+                    ),
                 )
                 for p in plans
             ]
@@ -392,6 +446,7 @@ def audit_business(
                 raise DomainAbstain("incomplete_source_coverage")
             if lines and any(not o.lines for o in ledger.orders):
                 add("header_without_order_details", metrics=("revenue_total",))
+            result["inspection"]["required_row_scan_complete"] = True
             result.update(
                 count_checked=True,
                 revenue_checked=bool(lines)
@@ -423,6 +478,7 @@ def audit_business(
             )
     except DomainAbstain as exc:
         result["inspection"]["ledger_validated"] = False
+        result["inspection"]["required_row_scan_complete"] = False
         metric_blockers = result.setdefault("metric_blockers", {m: [] for m in METRICS})
         for metric in METRICS:
             metric_blockers[metric].append(blocker(exc.code))

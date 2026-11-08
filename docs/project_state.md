@@ -5,6 +5,56 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
+Increment source approvals08/11: người dùng duyệt6catalog/payment exclusions
+đúng scope default-unfiltered của hai metric. Đã có loader/matcher SHA+proof+
+unit/raw/README, CLI paired flags và traceable coverage; không theo basename,
+không bỏ known order/return hoặc data/resource gates.
+[Kết quả](../reports/p2c_source_exclusions_results.md),
+[design](research/p2c_source_exclusions_design.md),
+[plan/ledger](research/p2c_source_exclusions_plan.md).
+Audit18dev có review-assisted machine checks: **count3/18 ở2cụm C3/C4**,
+revenue1/18/1cụm. Count mở thêm2business C3, không regression; revenue ở2business
+này còn amount_format_unverified.18worker cùng receipt SHA; chỉ6unit đổi
+disposition, mọi nguồn chưa duyệt giữ nguyên, lexicon/SHA/6unknown không đổi.
+Artifact nguồn/receipt local `runs/p2c-source-exclusions-approved-20261108/`;
+audit/delta/resource `runs/p2c-reviewed-source-audit-20261108/`.
+Required ledger scan ở2business mới complete; full physical scan vẫn false
+vì approved-excluded sources không quét, báo riêng. Chưa full-binding
+independent approval/PA/G2; pure-rule baseline không receipt vẫn1business.
+Scope/filter khác không được thừa hưởng loại trừ. Inventory12count candidates
+C3/8C4 chưa15answered/cụm; giữ acceptance. Bước tiếp là short-intent/capability
+verifier/throughput/predict với thêm coverage có chứng minh, không tự chạy
+model hoặc nới guard. PR8 cập nhật code, chưa merge. CPU cuối xem báo cáo trên.
+CPU cuối source exclusions:603passed/2skipped109,67s, Ruff/format pass,
+source không đổi; đã đọc gate.json/ba log ở
+`runs/cpu-check-20261108T060549767365Z-q29ky47_/gate.json`.
+Context passed/current, timeline current. Review source/synthetic không có
+Critical/Important; minor hoãn là positive CLI-forwarding synthetic coverage,
+đã ghi report. Có kiểm thực18worker SHA và đúng6disposition thay đổi.
+
+Follow-up feasibility08/11: PR#7 d5c9ea2 đã merge thành aee0785 sau CI Linux
+576passed35,18s, Ruff/format pass, không unresolved review; theo quyền merge
+khi xanh của người dùng. Nhánh follow-up `work/p2c-count-feasibility` từ main
+sau merge; chỉ khảo sát CPU text/no-gold và làm rõ tài liệu.
+[Kết quả](../reports/p2c_count_feasibility_results.md),
+[assessment](research/p2c_count_feasibility_review.md).
+1895dev questions:217count signals,105default-unfiltered text candidates;
+không dùng gold type/answer, không là supported/answered. Source-only có3ứng
+viên ởC2,12ởC3; business đã qua binding ởC4 có8. Chỉ duyệt nguồn chưa cho
+thấy đủ>=15answered ở2cụm. Status-only có21ứng viên C1 và11C4, còn phụ thuộc
+review nghĩa nhãn. Acceptance per-function15 vẫn giữ; khác prerequisite
+binding>=2cụm và G2 toàn dev không cổng coverage.
+Local `runs/p2c-count-feasibility-20261108/` có bảng theo business/câu hỏi,
+author proposals23nguồn theo metric+unfiltered và bảng nhị phân6nhãn, tất cả
+pending. Lexicon approved/SHA không đổi; không thêm status thứ5, không tự
+exclude nhãn lạ, không chạy model/PA hoặc nới guard. Nguồn có dấu hiệu trả
+hàng vẫn required-review/reconcile. Bước sau: duyệt source/semantics cụ thể,
+chọn mở thêm binding/scope có bằng chứng, giữ acceptance và thứ tự P2→P3.
+CPU cuối feasibility:574passed/2skipped131,95s, Ruff/format pass; đã đọc
+gate.json/ba log tại `runs/cpu-check-20261108T054029635743Z-betocitb/gate.json`,
+context passed/current, timeline current. Packet source C3 tập trung6catalog/
+payment exclusions đã có quote/hash, vẫn cần receipt riêng; chưa kích hoạt.
+
 Follow-up08/11 sau duyệt lexicon: chủ project duyệt đúng Proposed group,
 giữ unknown; đã tạo artifact SHA-pinned local,23entry approved/6unknown.
 [Kết quả áp dụng](../reports/p2c_approved_lexicon_results.md).
@@ -88,7 +138,8 @@ Bước kế tiếp: kiểm completeness của projection/citation và role-only
 nguồn ngoài ledger bằng synthetic/dev; duyệt nghĩa nhãn/nguồn để có binding
 ở>=2cụm. Sau đó short-intent/throughput rồi full1895dev. Chưa có lý do chạy
 full dev từ8unknown/5reject. P2 active duy nhất; giữ G2/split/scorer, không
-thêm cổng6business/15câu mỗi cụm; calibration hoãn, gold không inference.
+thêm cổng6business cho binding; acceptance PA từng hàm>=15answered/cụm vẫn
+theo domain_scope. Calibration hoãn, gold không inference.
 Quyền dev Modal đã có; mỗi job mới vẫn kiểm account/budget. Docker P3 sau G2.
 PR#6 đã merge; các ghi chú branch/chưa merge/CPU509pass bên dưới là lịch sử.
 

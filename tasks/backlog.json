@@ -430,7 +430,17 @@
       "runs/p2c-semantic-review-20261108-v3/ (local): authorized18dev,212source units,29literal labels from verified order-status columns; all pending; corrected raw README SHA/file-table association/shared source-rulebook evidence; resource scope streaming inventory only, not full-ledger; no gold/model/PA",
       "reports/p2c_approved_lexicon_results.md",
       "runs/p2c-status-approved-20261108/ (local): explicit user approval of reviewed29label Proposed group;23approved/6unknown, SHA-pinned receipt; source roles not approved",
-      "runs/p2c-approved-lexicon-audit-20261108/ (local):18dev after lexicon; count/revenue still1/18/one cluster,no regressions; unknown_status13to10; observed count source-only3business/2clusters; priority packet23unresolved sources with27context units; no gold/model/PA/G2"
+      "runs/p2c-approved-lexicon-audit-20261108/ (local):18dev after lexicon; count/revenue still1/18/one cluster,no regressions; unknown_status13to10; observed count source-only3business/2clusters; priority packet23unresolved sources with27context units; no gold/model/PA/G2",
+      "docs/research/p2c_count_feasibility_review.md",
+      "reports/p2c_count_feasibility_results.md",
+      "PR7 merged aee0785efc33699879d770dc1789200a5a0790d4 after explicit user instruction and CI run42449917024 success:576Linux tests/35.18s, lint/format pass, review threads clear; expected-head lock used",
+      "runs/p2c-count-feasibility-20261108/ (local):1895dev text-only questions,no gold type/answer;203primary count/217signals,105default-unfiltered candidates; author inspected217plus56supplemental texts; source-only C2=3,C3=12,already-bound C4=8; candidate counts are not support/answered",
+      "runs/p2c-count-feasibility-20261108/source-author-proposals-local and binary-status-proposals-local (local):23source proposals per metric+unfiltered,16scope-limited exclusions pending;6status review proposals pending,approved lexicon unchanged,no fifth state or activation",
+      "docs/research/p2c_source_exclusions_design.md",
+      "docs/research/p2c_source_exclusions_plan.md",
+      "reports/p2c_source_exclusions_results.md",
+      "runs/p2c-source-exclusions-approved-20261108/ (local): exact six-source user approval compiled via verified reader; SHA3fd4c1ccfc6f9a143f645424e155d06a15034c0aa2fd3011d3e68b673a1fd032; both default-unfiltered metrics only;6unknown/other17sources unchanged",
+      "runs/p2c-reviewed-source-audit-20261108/ (local):18dev,source/status SHA pinned on18workers; count1to3businesses/1to2clusters(C3,C4),revenue1/18/one cluster,no regressions;exactly6unit dispositions changed;new2ledger scans validated,revenue format veto retained;no gold/model/PA/G2"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -439,7 +449,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "Human-approved status lexicon applied by SHA on18dev:23approved/6unknown; unknown_status13to10 but binding remains1/18/one cluster. Source roles/oracle/model/PA/G2 pending.",
+    "decision_status": "Approved source-exclusion loader/matcher and scope gates implemented. Review-assisted dev count checks3/18 across2clusters(C3,C4),revenue1/18; default pure-rule baseline unchanged. No answered/PA/G2 claim;15sample per-function requirement retained.",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -451,7 +461,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "Review source role/column/join/per-metric relevance in the local priority packet for3dev businesses across2clusters (23unresolved sources). Lexicon already approved and audited; retain6unknown labels and do not ask approval again or auto-remap them. Only explicitly approved source bindings may feed a CPU-validated oracle control, separate from G2. Then proposal accuracy, fresh account/budget model probe, intent/throughput before full1895dev. P3 after G2; resource guards unchanged."
+    "next_action": "Move count slice toward short-intent/capability verifier, throughput and predict with CPU-verified unfiltered bindings; source exclusions cannot authorize entity/payment filters. Current text candidates C3=12/C4=8 remain below15answered/cluster,so add evidenced scope/bindings without relaxing per-function precision/sample acceptance or pooling revenue. Revenue retains amount-format vetoes. Six approved exclusions applied; do not ask them again; other17source proposals and6unknown unchanged. Fresh account/budget before model; P3 after G2. Positive CLI-forwarding synthetic regression is a deferred minor; real18worker SHA verified."
   },
   {
     "id": "P3",

@@ -5,6 +5,24 @@ hash `499fe26b696d5d8eb5d71117c927e57438cbfa96064934da5e2fccc918451d28`;
 [bản đọc](../Research/Timeline_DataMate_A-G.md). A–G là chuyên môn, P0–P9 tuần tự;
 tracker duy nhất state và tasks/backlog.json.
 
+Follow-up08/11 sau duyệt lexicon: chủ project duyệt đúng Proposed group,
+giữ unknown; đã tạo artifact SHA-pinned local,23entry approved/6unknown.
+[Kết quả áp dụng](../reports/p2c_approved_lexicon_results.md).
+Audit mới18dev vẫn count/revenue1/18/1cụm, không regression;
+unknown_status giảm13→10business, source-role vẫn12, resource guard2.
+Count có3business/2cụm chỉ còn observed blocker nguồn, chưa có pass mới.
+Receipt local `runs/p2c-status-approved-20261108/`; audit/comparison/packet
+ưu tiên23source của3business tại `runs/p2c-approved-lexicon-audit-20261108/`.
+Lexicon chỉ audit opt-in bằng SHA, không đổi STATUS mặc định.6nhãn unknown
+tiếp tục abstain; chưa duyệt source-role/oracle, chưa gọi model/PA/G2.
+Bước tiếp là duyệt role/column/join/relevance của packet nguồn ưu tiên,
+không hỏi lại duyệt lexicon hoặc tự ghi đè unknown. Gate mới xem báo cáo trên;
+các trạng thái pending lexicon/gate bên dưới là lịch sử trước follow-up này.
+CPU cuối follow-up:574passed/2skipped123,80s, Ruff/format pass, source không
+đổi; gate.json/ba log đã đọc ở
+`runs/cpu-check-20261108T050931075922Z-3mp7smxr/gate.json`.
+Context P2 passed/current, timeline current; không code runtime mới.
+
 Increment semantic review08/11 trên cùng `work/p2c-structural-binding`:
 [kết quả](../reports/p2c_reviewed_semantics_results.md),
 [design](research/p2c_reviewed_semantics_design.md),

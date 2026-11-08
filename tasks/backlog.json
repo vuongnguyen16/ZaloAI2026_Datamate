@@ -427,7 +427,10 @@
       "docs/research/p2c_reviewed_semantics_plan.md",
       "reports/p2c_reviewed_semantics_results.md",
       "runs/p2c-semantic-review-20261108-v2/ (local): authorized18dev,212source units,29literal labels from verified order-status columns; all pending; largest physical source289369rows but status stream78850rows/1.94s/127.54MiB; not full-ledger RSS; no gold/model/PA",
-      "runs/p2c-semantic-review-20261108-v3/ (local): authorized18dev,212source units,29literal labels from verified order-status columns; all pending; corrected raw README SHA/file-table association/shared source-rulebook evidence; resource scope streaming inventory only, not full-ledger; no gold/model/PA"
+      "runs/p2c-semantic-review-20261108-v3/ (local): authorized18dev,212source units,29literal labels from verified order-status columns; all pending; corrected raw README SHA/file-table association/shared source-rulebook evidence; resource scope streaming inventory only, not full-ledger; no gold/model/PA",
+      "reports/p2c_approved_lexicon_results.md",
+      "runs/p2c-status-approved-20261108/ (local): explicit user approval of reviewed29label Proposed group;23approved/6unknown, SHA-pinned receipt; source roles not approved",
+      "runs/p2c-approved-lexicon-audit-20261108/ (local):18dev after lexicon; count/revenue still1/18/one cluster,no regressions; unknown_status13to10; observed count source-only3business/2clusters; priority packet23unresolved sources with27context units; no gold/model/PA/G2"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -436,7 +439,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "P2c observed blocker sets/dev review packets and source-span/case-specific proposal decoder implemented; new semantics pending human review; no new accepted binding/model/PA or G2 claim",
+    "decision_status": "Human-approved status lexicon applied by SHA on18dev:23approved/6unknown; unknown_status13to10 but binding remains1/18/one cluster. Source roles/oracle/model/PA/G2 pending.",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -448,7 +451,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "Human review local lexicon and source role/column/join/per-metric packet. Only after actual approval apply SHA-pinned lexicon and audit again; approved oracle binding is a separate control, not G2 or an answer oracle. Measure proposal correctness/unknowns against reviewed control before another model job with fresh account/budget. Keep P3 after G2 and row guard until full-ledger measurement; then short-intent/throughput before full1895dev."
+    "next_action": "Review source role/column/join/per-metric relevance in the local priority packet for3dev businesses across2clusters (23unresolved sources). Lexicon already approved and audited; retain6unknown labels and do not ask approval again or auto-remap them. Only explicitly approved source bindings may feed a CPU-validated oracle control, separate from G2. Then proposal accuracy, fresh account/budget model probe, intent/throughput before full1895dev. P3 after G2; resource guards unchanged."
   },
   {
     "id": "P3",

@@ -100,7 +100,9 @@ LLM phân tích business theo thiết kế hai tầng tại `p2c_cpu_design.md`,
 theo content/code/model/rulebook hash; đổi evidence phải vô hiệu cache.
 Điểm dừng rule không tự cấp quyền chạy job: vẫn kiểm account/budget trước
 Modal và giữ scope dev đã được cấp. Mỗi hàm vẫn cần bằng chứng đúng trên
-ít nhất2cụm trước nghiệm thu P2; không thêm cổng6business hoặc15câu/cụm.
+ít nhất2cụm trước nghiệm thu P2. Audit binding không thêm cổng6business hay
+15câu/cụm trước model. Acceptance PA nội bộ từng hàm theo domain_scope vẫn
+cần>=15answered/cụm và precision>=90% ở>=2cụm; không bỏ hoặc gộp hai cổng.
 Calibration tiếp tục hoãn. Chưa chạy chẩn đoán mới, model, throughput hay PA
 trong lần cập nhật note này.
 

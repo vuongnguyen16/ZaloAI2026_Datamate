@@ -430,7 +430,12 @@
       "runs/p2c-semantic-review-20261108-v3/ (local): authorized18dev,212source units,29literal labels from verified order-status columns; all pending; corrected raw README SHA/file-table association/shared source-rulebook evidence; resource scope streaming inventory only, not full-ledger; no gold/model/PA",
       "reports/p2c_approved_lexicon_results.md",
       "runs/p2c-status-approved-20261108/ (local): explicit user approval of reviewed29label Proposed group;23approved/6unknown, SHA-pinned receipt; source roles not approved",
-      "runs/p2c-approved-lexicon-audit-20261108/ (local):18dev after lexicon; count/revenue still1/18/one cluster,no regressions; unknown_status13to10; observed count source-only3business/2clusters; priority packet23unresolved sources with27context units; no gold/model/PA/G2"
+      "runs/p2c-approved-lexicon-audit-20261108/ (local):18dev after lexicon; count/revenue still1/18/one cluster,no regressions; unknown_status13to10; observed count source-only3business/2clusters; priority packet23unresolved sources with27context units; no gold/model/PA/G2",
+      "docs/research/p2c_count_feasibility_review.md",
+      "reports/p2c_count_feasibility_results.md",
+      "PR7 merged aee0785efc33699879d770dc1789200a5a0790d4 after explicit user instruction and CI run42449917024 success:576Linux tests/35.18s, lint/format pass, review threads clear; expected-head lock used",
+      "runs/p2c-count-feasibility-20261108/ (local):1895dev text-only questions,no gold type/answer;203primary count/217signals,105default-unfiltered candidates; author inspected217plus56supplemental texts; source-only C2=3,C3=12,already-bound C4=8; candidate counts are not support/answered",
+      "runs/p2c-count-feasibility-20261108/source-author-proposals-local and binary-status-proposals-local (local):23source proposals per metric+unfiltered,16scope-limited exclusions pending;6status review proposals pending,approved lexicon unchanged,no fifth state or activation"
     ],
     "gate": "G2",
     "migrated_from": [
@@ -439,7 +444,7 @@
       "C-T2",
       "G-T2"
     ],
-    "decision_status": "Human-approved status lexicon applied by SHA on18dev:23approved/6unknown; unknown_status13to10 but binding remains1/18/one cluster. Source roles/oracle/model/PA/G2 pending.",
+    "decision_status": "PR7 merged after green exact-head CI. Text feasibility:105default-unfiltered count candidates; source-only C2=3/C3=12 and bound C4=8 do not establish15answered in two clusters. Binding remains1/18; source and binary proposals pending, per-function acceptance unchanged.",
     "deferred_to": {
       "P4": [
         "minimal SQL fallback read-only/timeout",
@@ -451,7 +456,7 @@
         "SQL and model technique optimization"
       ]
     },
-    "next_action": "Review source role/column/join/per-metric relevance in the local priority packet for3dev businesses across2clusters (23unresolved sources). Lexicon already approved and audited; retain6unknown labels and do not ask approval again or auto-remap them. Only explicitly approved source bindings may feed a CPU-validated oracle control, separate from G2. Then proposal accuracy, fresh account/budget model probe, intent/throughput before full1895dev. P3 after G2; resource guards unchanged."
+    "next_action": "Review the annotated23source proposals per metric AND filter scope; retain possible-return sources for reconciliation and CPU gates. Source-only business count does not guarantee enough count questions: seek additional evidenced bindings/supported scope while retaining>=15answered/cluster and>=90%precision for each function in>=2clusters. Do not pool revenue to certify order_count, auto-exclude unknown labels or add a fifth lifecycle state. Existing approved6unknown stay unchanged until explicit new approval; new local binary proposal is not active. Then CPU audit, short-intent/throughput/predict with verified capabilities; no model without fresh account/budget, P3 after G2."
   },
   {
     "id": "P3",
